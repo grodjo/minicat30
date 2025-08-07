@@ -14,7 +14,7 @@ Une application PWA (Progressive Web App) mobile-first pour un quiz de course d'
 ## 🛠 Stack Technique
 
 - **Framework** : Next.js 14+ (App Router)
-- **Base de données** : SQLite avec Prisma ORM
+- **Base de données** : MongoDB Atlas avec Mongoose ODM
 - **Styling** : Tailwind CSS (mobile-first)
 - **PWA** : next-pwa
 - **TypeScript** : Full TypeScript support
@@ -25,11 +25,8 @@ Une application PWA (Progressive Web App) mobile-first pour un quiz de course d'
 # Installation des dépendances
 npm install
 
-# Configuration de la base de données
-npx prisma migrate dev --name init
-
-# Génération du client Prisma
-npx prisma generate
+# Configuration de la base de données MongoDB Atlas
+# Aucune migration nécessaire - MongoDB crée automatiquement les collections
 
 # Lancement en développement
 npm run dev

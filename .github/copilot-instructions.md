@@ -8,7 +8,7 @@ This is a Next.js 14+ PWA application for an orienteering quiz game with the fol
 - Next.js App Router with TypeScript
 - Progressive Web App (PWA) with next-pwa
 - Tailwind CSS for mobile-first responsive design
-- Prisma ORM for database management
+- - MongoDB with Mongoose ODM for database management
 - Server Actions for backend logic
 
 ## Game Flow

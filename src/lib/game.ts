@@ -1,32 +1,30 @@
-import { prisma } from './prisma';
+import { connectToDatabase } from './mongodb';
+import { User, GameSession, Attempt } from './models';
 import { getQuestionByOrder, getTotalQuestions } from './questions';
 
 export async function createUser(pseudo: string) {
-  return await prisma.user.create({
-    data: { pseudo }
-  });
+  await connectToDatabase();
+  const user = new User({ pseudo });
+  return await user.save();
 }
 
 export async function createGameSession(userId: string) {
-  return await prisma.gameSession.create({
-    data: {
-      userId,
-      startedAt: new Date()
-    }
+  await connectToDatabase();
+  const session = new GameSession({
+    userId,
+    startedAt: new Date()
   });
+  return await session.save();
 }
 
 export async function getCurrentQuestion(sessionId: string) {
+  await connectToDatabase();
+  
   // Récupérer toutes les tentatives réussies de cette session
-  const successfulAttempts = await prisma.attempt.findMany({
-    where: {
-      sessionId,
-      isCorrect: true
-    },
-    orderBy: {
-      answeredAt: 'asc'
-    }
-  });
+  const successfulAttempts = await Attempt.find({
+    sessionId,
+    isCorrect: true
+  }).sort({ answeredAt: 1 });
 
   // La prochaine question est celle qui suit le nombre de bonnes réponses
   const nextQuestionOrder = successfulAttempts.length + 1;
@@ -39,6 +37,8 @@ export async function getCurrentQuestion(sessionId: string) {
 }
 
 export async function validateAnswer(sessionId: string, questionId: string, answer: string) {
+  await connectToDatabase();
+  
   const question = await import('./questions').then(mod => mod.getQuestionById(questionId));
   
   if (!question) {
@@ -48,44 +48,40 @@ export async function validateAnswer(sessionId: string, questionId: string, answ
   const isCorrect = answer.toLowerCase().trim() === question.answer.toLowerCase().trim();
 
   // Créer une tentative
-  const attempt = await prisma.attempt.create({
-    data: {
-      sessionId,
-      questionId,
-      startedAt: new Date(),
-      answeredAt: new Date(),
-      usedHints: '[]', // Sera mis à jour si des indices ont été utilisés
-      isCorrect
-    }
+  const attempt = new Attempt({
+    sessionId,
+    questionId,
+    startedAt: new Date(),
+    answeredAt: new Date(),
+    usedHints: '[]', // Sera mis à jour si des indices ont été utilisés
+    isCorrect
   });
+
+  await attempt.save();
 
   return { isCorrect, attempt };
 }
 
 export async function addHintUsage(sessionId: string, questionId: string, hintIndex: number) {
+  await connectToDatabase();
+  
   // Trouver la tentative en cours pour cette question
-  const currentAttempt = await prisma.attempt.findFirst({
-    where: {
-      sessionId,
-      questionId,
-      answeredAt: null
-    },
-    orderBy: {
-      startedAt: 'desc'
-    }
-  });
+  const currentAttempt = await Attempt.findOne({
+    sessionId,
+    questionId,
+    answeredAt: null
+  }).sort({ startedAt: -1 });
 
   if (!currentAttempt) {
     // Créer une nouvelle tentative si aucune n'existe
-    return await prisma.attempt.create({
-      data: {
-        sessionId,
-        questionId,
-        startedAt: new Date(),
-        usedHints: JSON.stringify([hintIndex]),
-        isCorrect: false
-      }
+    const newAttempt = new Attempt({
+      sessionId,
+      questionId,
+      startedAt: new Date(),
+      usedHints: JSON.stringify([hintIndex]),
+      isCorrect: false
     });
+    return await newAttempt.save();
   }
 
   // Ajouter l'indice aux indices utilisés
@@ -94,36 +90,31 @@ export async function addHintUsage(sessionId: string, questionId: string, hintIn
     usedHints.push(hintIndex);
   }
 
-  return await prisma.attempt.update({
-    where: { id: currentAttempt.id },
-    data: {
-      usedHints: JSON.stringify(usedHints)
-    }
-  });
+  currentAttempt.usedHints = JSON.stringify(usedHints);
+  return await currentAttempt.save();
 }
 
 export async function completeSession(sessionId: string) {
-  return await prisma.gameSession.update({
-    where: { id: sessionId },
-    data: {
-      completedAt: new Date()
-    }
-  });
+  await connectToDatabase();
+  
+  return await GameSession.findByIdAndUpdate(
+    sessionId,
+    { completedAt: new Date() },
+    { new: true }
+  );
 }
 
 export async function getSessionStats(sessionId: string) {
-  const session = await prisma.gameSession.findUnique({
-    where: { id: sessionId },
-    include: {
-      user: true,
-      attempts: {
-        where: { isCorrect: true },
-        orderBy: { answeredAt: 'asc' }
-      }
-    }
-  });
+  await connectToDatabase();
+  
+  const session = await GameSession.findById(sessionId);
+  const user = session ? await User.findById(session.userId) : null;
+  const attempts = await Attempt.find({
+    sessionId,
+    isCorrect: true
+  }).sort({ answeredAt: 1 });
 
-  if (!session) {
+  if (!session || !user) {
     throw new Error('Session not found');
   }
 
@@ -132,47 +123,49 @@ export async function getSessionStats(sessionId: string) {
     : Date.now() - session.startedAt.getTime();
 
   return {
-    user: session.user,
+    user,
     totalTime,
-    attempts: session.attempts,
+    attempts,
     completedAt: session.completedAt
   };
 }
 
 export async function getScoreboard() {
-  const completedSessions = await prisma.gameSession.findMany({
-    where: {
-      completedAt: { not: null }
-    },
-    include: {
-      user: true,
-      attempts: {
-        where: { isCorrect: true },
-        orderBy: { answeredAt: 'asc' }
-      }
-    },
-    orderBy: {
-      completedAt: 'asc' // Plus rapide en premier
-    }
-  });
+  await connectToDatabase();
+  
+  const completedSessions = await GameSession.find({
+    completedAt: { $ne: null }
+  }).sort({ completedAt: 1 }); // Plus rapide en premier
 
-  return completedSessions.map(session => {
-    const totalTime = session.completedAt!.getTime() - session.startedAt.getTime();
-    const totalHints = session.attempts.reduce((sum, attempt) => {
+  const scoreboardData = [];
+
+  for (const session of completedSessions) {
+    const user = await User.findById(session.userId);
+    const attempts = await Attempt.find({
+      sessionId: session._id.toString(),
+      isCorrect: true
+    }).sort({ answeredAt: 1 });
+
+    if (!user || !session.completedAt) continue;
+
+    const totalTime = session.completedAt.getTime() - session.startedAt.getTime();
+    const totalHints = attempts.reduce((sum, attempt) => {
       const hints = JSON.parse(attempt.usedHints) as number[];
       return sum + hints.length;
     }, 0);
 
-    return {
-      pseudo: session.user.pseudo,
+    scoreboardData.push({
+      pseudo: user.pseudo,
       totalTime,
       totalHints,
       completedAt: session.completedAt,
-      attempts: session.attempts.map(attempt => ({
+      attempts: attempts.map(attempt => ({
         questionId: attempt.questionId,
         timeSpent: attempt.answeredAt!.getTime() - attempt.startedAt.getTime(),
         hintsUsed: JSON.parse(attempt.usedHints).length
       }))
-    };
-  });
+    });
+  }
+
+  return scoreboardData;
 }

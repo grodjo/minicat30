@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     const session = await createGameSession(user.id);
 
     return NextResponse.json({
-      sessionId: session.id,
-      userId: user.id,
+      sessionId: session._id.toString(),
+      userId: user._id.toString(),
       pseudo: user.pseudo
     });
 

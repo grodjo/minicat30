@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 export default function Home() {
   const [pseudo, setPseudo] = useState('');
@@ -37,13 +38,22 @@ export default function Home() {
           router.push(`/quiz/${sessionId}`);
         }, 1600); // 1.6s pour que toutes les animations se terminent
       } else {
-        alert('Erreur lors de la création de la session');
+        const errorData = await response.json();
         setIsLoading(false);
+        
+        // Afficher l'erreur avec un toast
+        if (response.status === 409) {
+          // Pseudonyme déjà pris
+          toast.error(errorData.error || 'Déjà pris ! Creusez vous le ciboulot !');
+        } else {
+          // Autre erreur
+          toast.error(errorData.error || 'Erreur lors de la création de la session');
+        }
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Erreur lors de la création de la session');
       setIsLoading(false);
+      toast.error('Erreur lors de la création de la session');
     }
   };
 

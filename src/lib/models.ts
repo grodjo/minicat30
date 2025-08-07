@@ -5,6 +5,8 @@ const UserSchema = new mongoose.Schema({
   pseudo: {
     type: String,
     required: true,
+    unique: true,
+    trim: true,
   },
   createdAt: {
     type: Date,

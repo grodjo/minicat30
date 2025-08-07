@@ -16,6 +16,13 @@ export const metadata: Metadata = {
   title: "Quiz Course d'Orientation",
   description: "Application quiz mobile-first pour course d'orientation avec questions chronométrées et système d'indices",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", sizes: "192x192", type: "image/svg+xml" }
+    ],
+    apple: { url: "/icon.svg", sizes: "192x192" }
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

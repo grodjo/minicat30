@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  pseudo    String
+  createdAt DateTime @default(now())
+  sessions  GameSession[]
+}
+
+model GameSession {
+  id         String      @id @default(cuid())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  startedAt  DateTime
+  completedAt DateTime?
+  attempts   Attempt[]
+}
+
+model Attempt {
+  id          String       @id @default(cuid())
+  session     GameSession  @relation(fields: [sessionId], references: [id])
+  sessionId   String
+  questionId  String       // vient du fichier questions.ts
+  startedAt   DateTime
+  answeredAt  DateTime?
+  usedHints   String       // JSON array of hint indices
+  isCorrect   Boolean
+}

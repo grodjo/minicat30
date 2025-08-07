@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quiz Course d'Orientation
 
-## Getting Started
+Une application PWA (Progressive Web App) mobile-first pour un quiz de course d'orientation gamifié.
 
-First, run the development server:
+## 🎯 Fonctionnalités
+
+- **Quiz progressif** : Questions séquentielles avec validation côté serveur
+- **Système d'indices** : Indices déblocables avec suivi d'utilisation
+- **Chronométrage** : Temps global et par question
+- **Tableau des scores** : Classement avec détails par joueur
+- **PWA** : Installation sur mobile et fonctionnement hors-ligne
+- **Sécurisé** : Réponses et validation exclusivement côté serveur
+
+## 🛠 Stack Technique
+
+- **Framework** : Next.js 14+ (App Router)
+- **Base de données** : SQLite avec Prisma ORM
+- **Styling** : Tailwind CSS (mobile-first)
+- **PWA** : next-pwa
+- **TypeScript** : Full TypeScript support
+
+## 🚀 Installation et Lancement
 
 ```bash
+# Installation des dépendances
+npm install
+
+# Configuration de la base de données
+npx prisma migrate dev --name init
+
+# Génération du client Prisma
+npx prisma generate
+
+# Lancement en développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L'application sera disponible sur [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📊 Base de Données
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Le schéma inclut :
+- **User** : Gestion des pseudonymes
+- **GameSession** : Sessions de jeu avec temps de début/fin
+- **Attempt** : Tentatives de réponse avec temps et indices utilisés
 
-## Learn More
+## 🎮 Utilisation
 
-To learn more about Next.js, take a look at the following resources:
+1. **Accueil** : Saisir un pseudonyme pour commencer
+2. **Quiz** : Répondre aux questions une par une
+3. **Indices** : Demander des indices si nécessaire
+4. **Fin** : Voir son temps total et accéder au classement
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔧 API Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `POST /api/start` - Créer utilisateur et session
+- `GET /api/session/:id/current-question` - Question actuelle
+- `POST /api/session/:id/answer` - Valider une réponse
+- `POST /api/session/:id/hint` - Obtenir un indice
+- `GET /api/scoreboard` - Tableau des scores
 
-## Deploy on Vercel
+## 📱 PWA
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+L'application peut être installée sur mobile via le navigateur pour une expérience native.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 Sécurité
+
+- Questions/réponses jamais exposées côté client
+- Validation serveur uniquement
+- Protection contre la triche via DevTools
+
+## 🎨 Personnalisation
+
+Modifiez `/src/lib/questions.ts` pour personnaliser les questions du quiz.

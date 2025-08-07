@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Créer icône PWA</title>
+</head>
+<body>
+    <canvas id="canvas" width="192" height="192" style="border: 1px solid #000;"></canvas>
+    <br><br>
+    <button onclick="download192()">Télécharger icon-192x192.png</button>
+    <button onclick="download512()">Télécharger icon-512x512.png</button>
+
+    <script>
+        function createIcon(size) {
+            const canvas = document.getElementById('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Fond bleu
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Cercle blanc au centre
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/3, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            
+            // Lettre Q au centre
+            ctx.font = `bold ${size/3}px Arial`;
+            ctx.fillStyle = '#2563eb';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Q', size/2, size/2);
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        function download192() {
+            const dataUrl = createIcon(192);
+            const link = document.createElement('a');
+            link.download = 'icon-192x192.png';
+            link.href = dataUrl;
+            link.click();
+        }
+        
+        function download512() {
+            const dataUrl = createIcon(512);
+            const link = document.createElement('a');
+            link.download = 'icon-512x512.png';
+            link.href = dataUrl;
+            link.click();
+        }
+        
+        // Afficher l'icône 192x192 par défaut
+        createIcon(192);
+    </script>
+</body>
+</html>

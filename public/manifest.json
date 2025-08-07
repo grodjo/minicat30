@@ -1,0 +1,14 @@
+{
+  "name": "Quiz Course d'Orientation",
+  "short_name": "Quiz Orientation",
+  "description": "Application quiz pour course d'orientation avec questions chronométrées",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#dbeafe",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [],
+  "categories": ["games", "education"],
+  "lang": "fr",
+  "dir": "ltr"
+}

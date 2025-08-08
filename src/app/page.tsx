@@ -57,10 +57,28 @@ export default function Home() {
     }
   };
 
+  const goToScoreboard = () => {
+    router.push('/scoreboard');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Grille futuriste en arrière-plan - plus visible */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(147,51,234,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(147,51,234,0.08)_1px,transparent_1px)] bg-[size:60px_60px] opacity-60"></div>
+
+      {/* Bouton classement en haut à droite */}
+      <div className="absolute top-8 right-4 z-20 pt-4">
+        <button
+          onClick={goToScoreboard}
+          className="text-violet-200 hover:text-white text-sm font-medium flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl border border-violet-300/20 hover:bg-white/10 transition-all duration-200"
+          suppressHydrationWarning
+        >
+          🏆 Classement
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9,18 15,12 9,6"></polyline>
+          </svg>
+        </button>
+      </div>
 
       <div className="relative z-10 text-center space-y-16 max-w-lg w-full">
         {/* Titre principal avec effet de brillance */}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { useTimer } from '@/hooks/use-timer';
 
 interface Question {
   stepName: string;
@@ -14,6 +15,7 @@ interface Question {
   title: string;
   hints: string[];
   pseudo?: string | null;
+  startedAt: string;
 }
 
 interface Hint {
@@ -36,6 +38,9 @@ export default function QuizPage() {
   const [hintModalOpen, setHintModalOpen] = useState(false);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState<number | null>(null);
+
+  // Hook pour le timer
+  const elapsedTime = useTimer(question?.startedAt || null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
@@ -222,14 +227,14 @@ export default function QuizPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative">
-      {/* Header avec pseudo */}
+      {/* Header avec pseudo et timer */}
       <div className="absolute top-0 left-0 right-0 p-4 z-10">
         <div className="flex justify-between items-center">
-          <div className="text-violet-200 text-sm font-medium bg-white/10 backdrop-blur-md px-3 py-1 rounded-full">
-            {question.pseudo ? question.pseudo : `Session ${sessionId.slice(-8)}`}
+          <div className="text-violet-200 text-sm font-semibold bg-white/10 backdrop-blur-md px-3 py-2 rounded-full">
+            👤 {question.pseudo ? question.pseudo : `Session ${sessionId.slice(-8)}`}
           </div>
-          <div className="text-violet-200 text-sm font-medium bg-white/10 backdrop-blur-md px-3 py-1 rounded-full">
-            Étape {question.order}
+          <div className="text-yellow-300 text-sm font-semibold bg-yellow-400/10 backdrop-blur-md px-3 py-2 rounded-full border border-yellow-400/30">
+            ⏱️ {elapsedTime}
           </div>
         </div>
       </div>
@@ -238,6 +243,14 @@ export default function QuizPage() {
       <div className="min-h-screen flex flex-col pt-20 pb-32 px-4">
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-2xl">
+            {/* Question avec style Minicat30 mais plus petit */}
+            <div className="text-center mb-8">
+              <h2 className="text-lg font-bold text-violet-200/90 tracking-wider mb-3">
+                QUESTION {question.order}
+              </h2>
+              <div className="w-16 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto"></div>
+            </div>
+
             <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 leading-relaxed">
               {question.title}
             </h1>
@@ -274,7 +287,7 @@ export default function QuizPage() {
                                   ? 'bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-400/30 hover:text-yellow-100'
                                   : 'bg-gray-500/20 border-gray-400/50 text-gray-400 cursor-not-allowed'
                               } 
-                              disabled:opacity-50 min-w-[120px]
+                              disabled:opacity-50 min-w-[120px] font-semibold
                             `}
                           >
                             {isLoading ? (
@@ -319,9 +332,13 @@ export default function QuizPage() {
               <Button
                 type="submit"
                 disabled={!answer.trim() || submitting}
-                className="h-14 px-8 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+                className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
               >
-                {submitting ? 'Validation...' : 'Valider'}
+                {submitting ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  <span className="text-xl">➤</span>
+                )}
               </Button>
             </div>
           </form>

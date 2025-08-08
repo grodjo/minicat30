@@ -40,7 +40,8 @@ export async function GET(
       order: step.order,
       title: step.title,
       hints: step.hints,
-      pseudo: session.user.pseudo
+      pseudo: session.user.pseudo,
+      startedAt: session.startedAt.toISOString()
     });
 
   } catch (error) {

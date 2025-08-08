@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addHintUsage } from '@/lib/game';
-import { getQuestionById } from '@/lib/questions';
+import { getQuestionByStepName } from '@/lib/questions';
 
 export async function POST(
   request: NextRequest,
@@ -9,31 +9,31 @@ export async function POST(
   try {
     const params = await context.params;
     const sessionId = params.sessionId;
-    const { questionId, hintIndex } = await request.json();
+    const { stepName, hintIndex } = await request.json();
 
-    if (!sessionId || !questionId || typeof hintIndex !== 'number') {
+    if (!sessionId || !stepName || typeof hintIndex !== 'number') {
       return NextResponse.json(
         { error: 'Paramètres manquants' },
         { status: 400 }
       );
     }
 
-    const question = getQuestionById(questionId);
+    const question = getQuestionByStepName(stepName);
     if (!question) {
       return NextResponse.json(
-        { error: 'Question non trouvée' },
+        { error: 'Étape non trouvée' },
         { status: 404 }
       );
     }
 
     if (hintIndex < 0 || hintIndex >= question.hints.length) {
       return NextResponse.json(
-        { error: 'Index d\'indice invalide' },
+        { error: "Index d'indice invalide" },
         { status: 400 }
       );
     }
 
-    await addHintUsage(sessionId, questionId, hintIndex);
+    await addHintUsage(sessionId, stepName, hintIndex);
 
     return NextResponse.json({
       hint: question.hints[hintIndex],
@@ -44,7 +44,7 @@ export async function POST(
   } catch (error) {
     console.error('Error getting hint:', error);
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération de l\'indice' },
+      { error: "Erreur lors de la récupération de l'indice" },
       { status: 500 }
     );
   }

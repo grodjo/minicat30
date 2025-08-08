@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db_container
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: minicat30_user
+      POSTGRES_PASSWORD: minicat30_password
+      POSTGRES_DB: minicat30_db
+    ports:
+      - '5433:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+volumes:
+  pg_data:

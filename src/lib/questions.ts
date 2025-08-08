@@ -1,36 +1,36 @@
 export interface Question {
-  id: string;
+  stepName: string; // previously id
   order: number;
   title: string;
-  answer: string;
+  answer: string; // server-side only usage
   hints: string[];
 }
 
 export const questions: Question[] = [
   {
-    id: 'q1',
+    stepName: '01 | Bibliothèque',
     order: 1,
     title: 'Quel est le nom de la première grande bibliothèque publique de France ?',
     answer: 'Bibliothèque Mazarine',
     hints: [
       'Elle a été fondée au 17ème siècle',
-      'Son nom vient d\'un cardinal célèbre',
+      "Son nom vient d'un cardinal célèbre",
       'Elle se trouve dans le 6ème arrondissement de Paris'
     ]
   },
   {
-    id: 'q2',
+    stepName: '02 | Phare antique',
     order: 2,
     title: 'Dans quelle ville se trouve le plus ancien phare encore en activité en France ?',
     answer: 'La Coruña',
     hints: [
-      'Ce phare date de l\'époque romaine',
+      "Ce phare date de l'époque romaine",
       'Il se trouve en Espagne, pas en France',
-      'Son nom commence par "Tour d\'..."'
+      "Son nom commence par \"Tour d'...\""
     ]
   },
   {
-    id: 'q3',
+    stepName: '03 | Plus petit département',
     order: 3,
     title: 'Quel est le plus petit département français en superficie ?',
     answer: 'Territoire de Belfort',
@@ -41,18 +41,18 @@ export const questions: Question[] = [
     ]
   },
   {
-    id: 'q4',
+    stepName: '04 | Capitale Australie',
     order: 4,
-    title: 'Quelle est la capitale de l\'Australie ?',
+    title: "Quelle est la capitale de l'Australie ?",
     answer: 'Canberra',
     hints: [
-      'Ce n\'est ni Sydney ni Melbourne',
+      "Ce n'est ni Sydney ni Melbourne",
       'Elle a été créée spécialement pour être la capitale',
       'Son nom commence par un C'
     ]
   },
   {
-    id: 'q5',
+    stepName: '05 | Symbole Au',
     order: 5,
     title: 'Quel élément chimique a pour symbole Au ?',
     answer: 'Or',
@@ -64,18 +64,18 @@ export const questions: Question[] = [
   }
 ];
 
-export function getQuestionById(id: string): Question | undefined {
-  return questions.find(q => q.id === id);
+export function getQuestionByStepName(stepName: string): Question | undefined {
+  return questions.find(q => q.stepName === stepName);
 }
 
 export function getQuestionByOrder(order: number): Question | undefined {
   return questions.find(q => q.order === order);
 }
 
-export function getNextQuestion(currentOrder: number): Question | undefined {
-  return questions.find(q => q.order === currentOrder + 1);
+export function getTotalSteps(): number {
+  return questions.length;
 }
 
-export function getTotalQuestions(): number {
-  return questions.length;
+export function getNextStep(currentOrder: number): Question | undefined {
+  return questions.find(q => q.order === currentOrder + 1);
 }

@@ -1,178 +1,166 @@
-import { connectToDatabase } from './mongodb';
-import { User, GameSession, Attempt } from './models';
-import { getQuestionByOrder, getTotalQuestions } from './questions';
+import { prisma } from './prisma'
+import { getQuestionByOrder, getQuestionByStepName, getTotalSteps } from './questions'
 
+// Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
-  await connectToDatabase();
-  const user = new User({ pseudo });
-  return await user.save();
+  return prisma.user.create({ data: { pseudo } })
 }
 
+// Création d'une nouvelle session de jeu
 export async function createGameSession(userId: string) {
-  await connectToDatabase();
-  const session = new GameSession({
-    userId,
-    startedAt: new Date()
-  });
-  return await session.save();
+  return prisma.gameSession.create({ data: { userId } })
 }
 
-export async function getCurrentQuestion(sessionId: string) {
-  await connectToDatabase();
-  
-  // Récupérer toutes les tentatives réussies de cette session
-  const successfulAttempts = await Attempt.find({
-    sessionId,
-    isCorrect: true
-  }).sort({ answeredAt: 1 });
+export async function getCurrentStep(sessionId: string) {
+  // Compter le nombre de tentatives correctes pour déterminer l'ordre suivant
+  const correctAttempts = await prisma.attempt.findMany({
+    where: { sessionId, isCorrect: true },
+    select: { stepName: true },
+    orderBy: { answeredAt: 'asc' }
+  })
+  const nextOrder = correctAttempts.length + 1
+  if (nextOrder > getTotalSteps()) return null
+  return getQuestionByOrder(nextOrder)
+}
 
-  // La prochaine question est celle qui suit le nombre de bonnes réponses
-  const nextQuestionOrder = successfulAttempts.length + 1;
-  
-  if (nextQuestionOrder > getTotalQuestions()) {
-    return null; // Jeu terminé
+export async function validateAnswer(sessionId: string, stepName: string, answer: string) {
+  const question = getQuestionByStepName(stepName)
+  if (!question) throw new Error('Étape introuvable')
+
+  const normalizedAnswer = answer.trim().toLowerCase()
+  const normalizedExpected = question.answer.trim().toLowerCase()
+  const isCorrect = normalizedAnswer === normalizedExpected
+
+  // Upsert de la tentative (clé composite unique sessionId + stepName)
+  const existing = await prisma.attempt.findUnique({
+    where: { sessionId_stepName: { sessionId, stepName } }
+  })
+
+  if (!existing) {
+    await prisma.attempt.create({
+      data: {
+        sessionId,
+        stepName,
+        startedAt: new Date(),
+        answeredAt: new Date(),
+        isCorrect,
+        usedHints: []
+      }
+    })
+  } else if (existing.answeredAt === null || !existing.isCorrect) {
+    // On ne réécrit la tentative que si elle n'était pas encore finalisée ou incorrecte
+    await prisma.attempt.update({
+      where: { id: existing.id },
+      data: { answeredAt: new Date(), isCorrect }
+    })
   }
 
-  return getQuestionByOrder(nextQuestionOrder);
+  return { isCorrect }
 }
 
-export async function getSessionWithUser(sessionId: string) {
-  await connectToDatabase();
-  
-  const session = await GameSession.findById(sessionId).populate('userId');
-  return session;
-}
+export async function addHintUsage(sessionId: string, stepName: string, hintIndex: number) {
+  const question = getQuestionByStepName(stepName)
+  if (!question) throw new Error('Étape introuvable')
 
-export async function validateAnswer(sessionId: string, questionId: string, answer: string) {
-  await connectToDatabase();
-  
-  const question = await import('./questions').then(mod => mod.getQuestionById(questionId));
-  
-  if (!question) {
-    throw new Error('Question not found');
-  }
-
-  const isCorrect = answer.toLowerCase().trim() === question.answer.toLowerCase().trim();
-
-  // Créer une tentative
-  const attempt = new Attempt({
-    sessionId,
-    questionId,
-    startedAt: new Date(),
-    answeredAt: new Date(),
-    usedHints: '[]', // Sera mis à jour si des indices ont été utilisés
-    isCorrect
-  });
-
-  await attempt.save();
-
-  return { isCorrect, attempt };
-}
-
-export async function addHintUsage(sessionId: string, questionId: string, hintIndex: number) {
-  await connectToDatabase();
-  
-  // Trouver la tentative en cours pour cette question
-  const currentAttempt = await Attempt.findOne({
-    sessionId,
-    questionId,
-    answeredAt: null
-  }).sort({ startedAt: -1 });
-
-  if (!currentAttempt) {
-    // Créer une nouvelle tentative si aucune n'existe
-    const newAttempt = new Attempt({
+  const attempt = await prisma.attempt.upsert({
+    where: { sessionId_stepName: { sessionId, stepName } },
+    create: {
       sessionId,
-      questionId,
+      stepName,
       startedAt: new Date(),
-      usedHints: JSON.stringify([hintIndex]),
+      usedHints: [hintIndex],
       isCorrect: false
-    });
-    return await newAttempt.save();
+    },
+    update: {}
+  })
+
+  // Garantir l'unicité des indices stockés
+  const used = Array.isArray(attempt.usedHints) ? (attempt.usedHints as number[]) : []
+  if (!used.includes(hintIndex)) {
+    used.push(hintIndex)
+    await prisma.attempt.update({
+      where: { id: attempt.id },
+      data: { usedHints: used }
+    })
   }
 
-  // Ajouter l'indice aux indices utilisés
-  const usedHints = JSON.parse(currentAttempt.usedHints) as number[];
-  if (!usedHints.includes(hintIndex)) {
-    usedHints.push(hintIndex);
-  }
-
-  currentAttempt.usedHints = JSON.stringify(usedHints);
-  return await currentAttempt.save();
+  return { usedHints: used }
 }
 
 export async function completeSession(sessionId: string) {
-  await connectToDatabase();
-  
-  return await GameSession.findByIdAndUpdate(
-    sessionId,
-    { completedAt: new Date() },
-    { new: true }
-  );
+  return prisma.gameSession.update({
+    where: { id: sessionId },
+    data: { completedAt: new Date() }
+  })
 }
 
 export async function getSessionStats(sessionId: string) {
-  await connectToDatabase();
-  
-  const session = await GameSession.findById(sessionId);
-  const user = session ? await User.findById(session.userId) : null;
-  const attempts = await Attempt.find({
-    sessionId,
-    isCorrect: true
-  }).sort({ answeredAt: 1 });
+  const session = await prisma.gameSession.findUnique({
+    where: { id: sessionId }
+  })
+  if (!session) throw new Error('Session introuvable')
+  const user = await prisma.user.findUnique({ where: { id: session.userId } })
+  if (!user) throw new Error('Utilisateur introuvable')
 
-  if (!session || !user) {
-    throw new Error('Session not found');
-  }
+  const attempts = await prisma.attempt.findMany({
+    where: { sessionId, isCorrect: true },
+    orderBy: { answeredAt: 'asc' }
+  })
 
-  const totalTime = session.completedAt 
-    ? session.completedAt.getTime() - session.startedAt.getTime()
-    : Date.now() - session.startedAt.getTime();
+  const totalTime = (session.completedAt?.getTime() || Date.now()) - session.startedAt.getTime()
 
-  return {
-    user,
-    totalTime,
-    attempts,
-    completedAt: session.completedAt
-  };
+  return { user, totalTime, attempts, completedAt: session.completedAt }
 }
 
-export async function getScoreboard() {
-  await connectToDatabase();
-  
-  const completedSessions = await GameSession.find({
-    completedAt: { $ne: null }
-  }).sort({ completedAt: 1 }); // Plus rapide en premier
+interface ScoreboardAttemptRow {
+  stepName: string
+  timeSpent: number
+  hintsUsed: number
+}
+interface ScoreboardRow {
+  pseudo: string
+  totalTime: number
+  totalHints: number
+  completedAt: Date
+  attempts: ScoreboardAttemptRow[]
+}
 
-  const scoreboardData = [];
+export async function getScoreboard(): Promise<ScoreboardRow[]> {
+  const sessions = await prisma.gameSession.findMany({
+    where: { completedAt: { not: null } },
+    orderBy: { completedAt: 'asc' },
+    include: {
+      user: true,
+      attempts: { where: { isCorrect: true }, orderBy: { answeredAt: 'asc' } }
+    }
+  })
 
-  for (const session of completedSessions) {
-    const user = await User.findById(session.userId);
-    const attempts = await Attempt.find({
-      sessionId: session._id.toString(),
-      isCorrect: true
-    }).sort({ answeredAt: 1 });
-
-    if (!user || !session.completedAt) continue;
-
-    const totalTime = session.completedAt.getTime() - session.startedAt.getTime();
-    const totalHints = attempts.reduce((sum, attempt) => {
-      const hints = JSON.parse(attempt.usedHints) as number[];
-      return sum + hints.length;
-    }, 0);
-
-    scoreboardData.push({
-      pseudo: user.pseudo,
+  return sessions.map((s: typeof sessions[number]): ScoreboardRow => {
+    const totalTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
+    const totalHints = s.attempts.reduce((sum: number, a: typeof s.attempts[number]): number => {
+      const arr = Array.isArray(a.usedHints) ? (a.usedHints as unknown as number[]) : []
+      return sum + arr.length
+    }, 0)
+    return {
+      pseudo: s.user.pseudo,
       totalTime,
       totalHints,
-      completedAt: session.completedAt,
-      attempts: attempts.map(attempt => ({
-        questionId: attempt.questionId,
-        timeSpent: attempt.answeredAt!.getTime() - attempt.startedAt.getTime(),
-        hintsUsed: JSON.parse(attempt.usedHints).length
+      completedAt: s.completedAt!,
+      attempts: s.attempts.map((a: typeof s.attempts[number]): ScoreboardAttemptRow => ({
+        stepName: a.stepName,
+        timeSpent: a.answeredAt && a.startedAt ? a.answeredAt.getTime() - a.startedAt.getTime() : 0,
+        hintsUsed: Array.isArray(a.usedHints) ? (a.usedHints as number[]).length : 0
       }))
-    });
-  }
+    }
+  })
+}
 
-  return scoreboardData;
+export async function getSessionWithUser(sessionId: string) {
+  const session = await prisma.gameSession.findUnique({
+    where: { id: sessionId },
+    include: { user: { select: { pseudo: true } } }
+  })
+  if (!session) throw new Error('SESSION_NOT_FOUND')
+  if (!session.user) throw new Error('SESSION_USER_MISSING')
+  return session
 }

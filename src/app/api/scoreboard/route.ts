@@ -5,7 +5,6 @@ export async function GET() {
   try {
     const scoreboard = await getScoreboard();
 
-    // Formater les temps pour l'affichage
     const formattedScoreboard = scoreboard.map((score, index) => ({
       rank: index + 1,
       pseudo: score.pseudo,
@@ -14,7 +13,7 @@ export async function GET() {
       totalHints: score.totalHints,
       completedAt: score.completedAt,
       attempts: score.attempts.map(attempt => ({
-        questionId: attempt.questionId,
+        stepName: attempt.stepName,
         timeSpent: formatTime(attempt.timeSpent),
         timeSpentMs: attempt.timeSpent,
         hintsUsed: attempt.hintsUsed

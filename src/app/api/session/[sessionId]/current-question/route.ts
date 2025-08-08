@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentQuestion, getSessionWithUser } from '@/lib/game';
+import { getCurrentStep, getSessionWithUser } from '@/lib/game';
 
 export async function GET(
   request: NextRequest,
@@ -16,29 +16,37 @@ export async function GET(
       );
     }
 
-    const question = await getCurrentQuestion(sessionId);
-    const session = await getSessionWithUser(sessionId);
+    const [step, session] = await Promise.all([
+      getCurrentStep(sessionId),
+      getSessionWithUser(sessionId)
+    ]);
 
-    if (!question) {
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'Session inconnue' },
+        { status: 404 }
+      );
+    }
+
+    if (!step) {
       return NextResponse.json(
         { completed: true, message: 'Quiz terminé!' },
         { status: 200 }
       );
     }
 
-    // Renvoyer la question avec le pseudo de l'utilisateur
     return NextResponse.json({
-      id: question.id,
-      order: question.order,
-      title: question.title,
-      hints: question.hints,
-      userPseudo: session?.userId?.pseudo || 'Anonyme'
+      stepName: step.stepName,
+      order: step.order,
+      title: step.title,
+      hints: step.hints,
+      pseudo: session.user.pseudo
     });
 
   } catch (error) {
-    console.error('Error getting current question:', error);
+    console.error('Error getting current step:', error);
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération de la question' },
+      { error: "Erreur lors de la récupération de l'étape" },
       { status: 500 }
     );
   }

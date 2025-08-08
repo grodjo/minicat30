@@ -1,0 +1,44 @@
+// Prisma schema for Quiz App migrated from MongoDB to PostgreSQL
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String        @id @default(cuid())
+  pseudo    String        @unique
+  createdAt DateTime      @default(now())
+  sessions  GameSession[]
+}
+
+model GameSession {
+  id          String     @id @default(cuid())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  startedAt   DateTime   @default(now())
+  completedAt DateTime?
+  attempts    Attempt[]
+
+  @@index([userId])
+  @@index([completedAt])
+}
+
+model Attempt {
+  id         String      @id @default(cuid())
+  session    GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId  String
+  stepName   String
+  startedAt  DateTime    @default(now())
+  answeredAt DateTime?
+  usedHints  Json        @default("[]") // array of numbers (indexes) or strings
+  isCorrect  Boolean     @default(false)
+
+  @@unique([sessionId, stepName])
+  @@index([sessionId, isCorrect])
+}

@@ -9,11 +9,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { toast } from 'sonner';
 
 interface Question {
-  id: string;
+  stepName: string;
   order: number;
   title: string;
   hints: string[];
-  userPseudo?: string;
+  pseudo?: string | null;
 }
 
 interface Hint {
@@ -55,9 +55,6 @@ export default function QuizPage() {
 
       if (data.completed) {
         setCompleted(true);
-        toast.success(data.message, {
-          className: quizToastClass
-        });
       } else {
         setQuestion(data);
         setHints([]);
@@ -91,7 +88,7 @@ export default function QuizPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          questionId: question.id,
+          stepName: question.stepName,
           answer: answer.trim(),
         }),
       });
@@ -145,8 +142,8 @@ export default function QuizPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          questionId: question.id,
-          hintIndex: hintIndex,
+          stepName: question.stepName,
+          hintIndex: hints.length,
         }),
       });
 
@@ -229,10 +226,10 @@ export default function QuizPage() {
       <div className="absolute top-0 left-0 right-0 p-4 z-10">
         <div className="flex justify-between items-center">
           <div className="text-violet-200 text-sm font-medium bg-white/10 backdrop-blur-md px-3 py-1 rounded-full">
-            👤 {question.userPseudo}
+            {question.pseudo ? question.pseudo : `Session ${sessionId.slice(-8)}`}
           </div>
           <div className="text-violet-200 text-sm font-medium bg-white/10 backdrop-blur-md px-3 py-1 rounded-full">
-            Question {question.order}
+            Étape {question.order}
           </div>
         </div>
       </div>

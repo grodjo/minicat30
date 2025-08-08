@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateAnswer, completeSession, getCurrentQuestion } from '@/lib/game';
+import { validateAnswer, completeSession, getCurrentStep } from '@/lib/game';
 
 export async function POST(
   request: NextRequest,
@@ -8,22 +8,22 @@ export async function POST(
   try {
     const params = await context.params;
     const sessionId = params.sessionId;
-    const { questionId, answer } = await request.json();
+    const { stepName, answer } = await request.json();
 
-    if (!sessionId || !questionId || !answer) {
+    if (!sessionId || !stepName || !answer) {
       return NextResponse.json(
         { error: 'Paramètres manquants' },
         { status: 400 }
       );
     }
 
-    const result = await validateAnswer(sessionId, questionId, answer);
+    const result = await validateAnswer(sessionId, stepName, answer);
 
     // Si la réponse est correcte, vérifier si c'est la dernière question
     if (result.isCorrect) {
-      const nextQuestion = await getCurrentQuestion(sessionId);
+      const nextStep = await getCurrentStep(sessionId);
       
-      if (!nextQuestion) {
+      if (!nextStep) {
         // Toutes les questions ont été répondues, terminer la session
         await completeSession(sessionId);
         return NextResponse.json({

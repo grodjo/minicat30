@@ -8,58 +8,36 @@ export interface Question {
 
 export const questions: Question[] = [
   {
-    stepName: '01 | Bibliothèque',
+    stepName: '01 | Animal domestique',
     order: 1,
-    title: 'Quel est le nom de la première grande bibliothèque publique de France ?',
-    answer: 'Bibliothèque Mazarine',
+    title: 'Quel animal domestique aboie ?',
+    answer: 'Chien',
     hints: [
-      'Elle a été fondée au 17ème siècle',
-      "Son nom vient d'un cardinal célèbre",
-      'Elle se trouve dans le 6ème arrondissement de Paris'
+      'Il remue la queue quand il est content',
+      'Il est le meilleur ami de l\'homme',
+      'Il garde la maison'
     ]
   },
   {
-    stepName: '02 | Phare antique',
+    stepName: '02 | Couleur primaire',
     order: 2,
-    title: 'Dans quelle ville se trouve le plus ancien phare encore en activité en France ?',
-    answer: 'La Coruña',
+    title: 'Quelle couleur obtient-on en mélangeant le jaune et le bleu ?',
+    answer: 'Vert',
     hints: [
-      "Ce phare date de l'époque romaine",
-      'Il se trouve en Espagne, pas en France',
-      "Son nom commence par \"Tour d'...\""
+      'C\'est la couleur de l\'herbe',
+      'C\'est la couleur des feuilles au printemps',
+      'C\'est une couleur secondaire'
     ]
   },
   {
-    stepName: '03 | Plus petit département',
+    stepName: '03 | Planète rouge',
     order: 3,
-    title: 'Quel est le plus petit département français en superficie ?',
-    answer: 'Territoire de Belfort',
+    title: 'Quelle planète est surnommée la planète rouge ?',
+    answer: 'Mars',
     hints: [
-      'Il se trouve dans l\'Est de la France',
-      'Il a été créé en 1922',
-      'Son chef-lieu a le même nom que le département'
-    ]
-  },
-  {
-    stepName: '04 | Capitale Australie',
-    order: 4,
-    title: "Quelle est la capitale de l'Australie ?",
-    answer: 'Canberra',
-    hints: [
-      "Ce n'est ni Sydney ni Melbourne",
-      'Elle a été créée spécialement pour être la capitale',
-      'Son nom commence par un C'
-    ]
-  },
-  {
-    stepName: '05 | Symbole Au',
-    order: 5,
-    title: 'Quel élément chimique a pour symbole Au ?',
-    answer: 'Or',
-    hints: [
-      'C\'est un métal précieux',
-      'Son symbole vient du latin "Aurum"',
-      'Il est de couleur jaune'
+      'Elle est la quatrième planète du système solaire',
+      'Elle porte le nom du dieu romain de la guerre',
+      'Elle a deux petites lunes'
     ]
   }
 ];

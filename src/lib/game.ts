@@ -128,14 +128,13 @@ interface ScoreboardRow {
 export async function getScoreboard(): Promise<ScoreboardRow[]> {
   const sessions = await prisma.gameSession.findMany({
     where: { completedAt: { not: null } },
-    orderBy: { completedAt: 'asc' },
     include: {
       user: true,
       attempts: { where: { isCorrect: true }, orderBy: { answeredAt: 'asc' } }
     }
   })
 
-  return sessions.map((s: typeof sessions[number]): ScoreboardRow => {
+  const scoreboard = sessions.map((s: typeof sessions[number]): ScoreboardRow => {
     const totalTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
     const totalHints = s.attempts.reduce((sum: number, a: typeof s.attempts[number]): number => {
       const arr = Array.isArray(a.usedHints) ? (a.usedHints as unknown as number[]) : []
@@ -153,6 +152,9 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
       }))
     }
   })
+
+  // Trier par temps total croissant (le plus rapide en premier)
+  return scoreboard.sort((a, b) => a.totalTime - b.totalTime)
 }
 
 export async function getSessionWithUser(sessionId: string) {

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
+import confetti from 'canvas-confetti';
 
 interface Question {
   stepName: string;
@@ -38,6 +39,7 @@ export default function QuizPage() {
   const [hintModalOpen, setHintModalOpen] = useState(false);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState<number | null>(null);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
 
   // Hook pour le timer
   const elapsedTime = useTimer(question?.startedAt || null);
@@ -101,17 +103,35 @@ export default function QuizPage() {
       const data = await response.json();
       
       if (data.isCorrect) {
-        toast.success(data.message, {
-          className: quizToastClass
-        });
-        if (data.completed) {
-          setCompleted(true);
-        } else {
-          // Passer à la question suivante après un délai
-          setTimeout(() => {
+        // Disparition brutale de la question
+        setIsCorrectAnswer(true);
+        
+        // Explosion centrale réaliste avec plus de confettis
+        const fireExplosion = () => {
+          // Explosion principale avec effet de burst
+          confetti({
+            particleCount: 200,
+            spread: 360,
+            origin: { x: 0.5, y: 0.5 },
+            colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'],
+            ticks: 100,
+            gravity: 1.2,
+            scalar: 1.4,
+            startVelocity: 45
+          });
+        };
+
+        fireExplosion();
+        
+        // Après l'explosion, transition simple vers la nouvelle question
+        setTimeout(() => {
+          setIsCorrectAnswer(false);
+          if (data.completed) {
+            setCompleted(true);
+          } else {
             loadCurrentQuestion();
-          }, 1500);
-        }
+          }
+        }, 2000); // Réduit à 2 secondes pour plus de fluidité
       } else {
         toast.error(data.message, {
           className: quizToastClass
@@ -190,22 +210,23 @@ export default function QuizPage() {
 
   if (completed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 flex items-center justify-center p-4">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
-          <div className="text-6xl mb-4">🎉</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Félicitations !
-          </h1>
-          <p className="text-gray-600 mb-8">
-            Vous avez terminé le quiz !
-          </p>
-          <Button
-            onClick={goToScoreboard}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            Voir le classement
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex flex-col items-center justify-center p-4 text-center">
+        <div className="text-8xl mb-8 animate-bounce">🎉</div>
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-wide">
+          Félicitations !
+        </h1>
+        <div className="w-24 h-1 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto mb-8 rounded-full"></div>
+        <p className="text-violet-200 mb-12 text-xl md:text-2xl font-light max-w-2xl leading-relaxed">
+          Vous avez terminé le quiz avec brio !
+        </p>
+        <Button
+          onClick={goToScoreboard}
+          className="h-14 px-8 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-110 hover:shadow-violet-500/50"
+        >
+          <span className="mr-1 text-2xl">🏆</span>
+          Voir le classement
+          
+        </Button>
       </div>
     );
   }
@@ -226,7 +247,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative overflow-hidden">
       {/* Header avec pseudo et timer */}
       <div className="absolute top-0 left-0 right-0 p-4 z-10">
         <div className="flex justify-between items-center">
@@ -242,7 +263,9 @@ export default function QuizPage() {
       {/* Contenu principal */}
       <div className="min-h-screen flex flex-col pt-20 pb-32 px-4">
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-2xl">
+          <div className={`w-full max-w-2xl transition-all duration-300 ${
+            isCorrectAnswer ? 'animate-question-vanish' : 'opacity-100 transform translate-y-0'
+          }`}>
             {/* Question avec style Minicat30 mais plus petit */}
             <div className="text-center mb-8">
               <h2 className="text-lg font-bold text-violet-200/90 tracking-wider mb-3">
@@ -278,7 +301,7 @@ export default function QuizPage() {
                         <DialogTrigger asChild>
                           <Button
                             onClick={() => getHint(index)}
-                            disabled={!isAccessible || isLoading}
+                            disabled={!isAccessible || isLoading || isCorrectAnswer}
                             variant="outline"
                             className={`
                               ${isConsulted 
@@ -317,7 +340,9 @@ export default function QuizPage() {
         </div>
 
         {/* Zone de saisie fixée en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-violet-200/50 shadow-2xl p-4">
+        <div className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-violet-200/50 shadow-2xl p-4 transition-all duration-500 ${
+          isCorrectAnswer ? 'transform translate-y-full opacity-0' : ''
+        }`}>
           <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
             <div className="flex gap-3">
               <Input
@@ -327,11 +352,11 @@ export default function QuizPage() {
                 className="flex-1 h-14 bg-white border-violet-300/50 text-slate-900 placeholder:text-violet-600/60 text-lg font-medium focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl"
                 placeholder="Votre réponse..."
                 required
-                disabled={submitting}
+                disabled={submitting || isCorrectAnswer}
               />
               <Button
                 type="submit"
-                disabled={!answer.trim() || submitting}
+                disabled={!answer.trim() || submitting || isCorrectAnswer}
                 className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
               >
                 {submitting ? (

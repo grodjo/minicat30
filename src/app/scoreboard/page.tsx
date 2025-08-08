@@ -153,7 +153,7 @@ export default function ScoreboardPage() {
                       <div className="grid gap-4">
                         {entry.attempts.map((attempt, index) => (
                           <div
-                            key={attempt.questionId}
+                            key={`${entry.pseudo}-attempt-${index}`}
                             className="bg-white/5 rounded-xl p-4 border border-violet-300/10"
                           >
                             <div className="flex justify-between items-center">

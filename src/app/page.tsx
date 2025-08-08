@@ -36,7 +36,7 @@ export default function Home() {
         // Attendre la fin de l'animation avant de naviguer
         setTimeout(() => {
           router.push(`/quiz/${sessionId}`);
-        }, 1600); // 1.6s pour que toutes les animations se terminent
+        }, 800); // Réduit à 0.8s (durée des animations d'éléments)
       } else {
         const errorData = await response.json();
         setIsLoading(false);
@@ -58,7 +58,7 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center p-4 relative overflow-hidden ${isExiting ? 'animate-exit-background-fade' : ''}`}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Grille futuriste en arrière-plan - plus visible */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(147,51,234,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(147,51,234,0.08)_1px,transparent_1px)] bg-[size:60px_60px] opacity-60"></div>
 

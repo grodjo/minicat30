@@ -3,12 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface Question {
   id: string;
   order: number;
   title: string;
   hints: string[];
+  userPseudo?: string;
 }
 
 interface Hint {
@@ -27,8 +32,11 @@ export default function QuizPage() {
   const [hints, setHints] = useState<Hint[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
   const [completed, setCompleted] = useState(false);
+  const [hintModalOpen, setHintModalOpen] = useState(false);
+
+  // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
+  const quizToastClass = "transform -translate-y-22";
 
   const loadCurrentQuestion = async () => {
     try {
@@ -37,16 +45,19 @@ export default function QuizPage() {
 
       if (data.completed) {
         setCompleted(true);
-        setMessage(data.message);
+        toast.success(data.message, {
+          className: quizToastClass
+        });
       } else {
         setQuestion(data);
         setHints([]);
         setAnswer('');
-        setMessage('');
       }
     } catch (error) {
       console.error('Error loading question:', error);
-      setMessage('Erreur lors du chargement de la question');
+      toast.error('Erreur lors du chargement de la question', {
+        className: quizToastClass
+      });
     } finally {
       setLoading(false);
     }
@@ -76,9 +87,11 @@ export default function QuizPage() {
       });
 
       const data = await response.json();
-      setMessage(data.message);
-
+      
       if (data.isCorrect) {
+        toast.success(data.message, {
+          className: quizToastClass
+        });
         if (data.completed) {
           setCompleted(true);
         } else {
@@ -87,10 +100,16 @@ export default function QuizPage() {
             loadCurrentQuestion();
           }, 1500);
         }
+      } else {
+        toast.error(data.message, {
+          className: quizToastClass
+        });
       }
     } catch (error) {
       console.error('Error submitting answer:', error);
-      setMessage('Erreur lors de la soumission de la réponse');
+      toast.error('Erreur lors de la soumission de la réponse', {
+        className: quizToastClass
+      });
     } finally {
       setSubmitting(false);
     }
@@ -114,12 +133,17 @@ export default function QuizPage() {
       const data = await response.json();
       if (response.ok) {
         setHints([...hints, data]);
+        setHintModalOpen(true);
       } else {
-        setMessage(data.error);
+        toast.error(data.error, {
+          className: quizToastClass
+        });
       }
     } catch (error) {
       console.error('Error getting hint:', error);
-      setMessage('Erreur lors de la récupération de l\'indice');
+      toast.error('Erreur lors de la récupération de l\'indice', {
+        className: quizToastClass
+      });
     }
   };
 
@@ -129,10 +153,10 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-400 mx-auto mb-4"></div>
+          <p className="text-violet-100">Chargement...</p>
         </div>
       </div>
     );
@@ -140,22 +164,21 @@ export default function QuizPage() {
 
   if (completed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 flex items-center justify-center p-4">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Félicitations !
           </h1>
           <p className="text-gray-600 mb-8">
-            {message}
+            Vous avez terminé le quiz !
           </p>
-          <button
+          <Button
             onClick={goToScoreboard}
-            className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
-            suppressHydrationWarning
+            className="w-full bg-green-600 hover:bg-green-700"
           >
             Voir le classement
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -163,8 +186,8 @@ export default function QuizPage() {
 
   if (!question) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-500 via-pink-600 to-rose-700 flex items-center justify-center p-4">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">
             Erreur
           </h1>
@@ -177,87 +200,76 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Question {question.order}
-            </h1>
-            <div className="text-sm text-gray-500">
-              Session: {sessionId.slice(-8)}
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative">
+      {/* Header avec pseudo */}
+      <div className="absolute top-0 left-0 right-0 p-4 z-10">
+        <div className="flex justify-between items-center">
+          <div className="text-violet-200 text-sm font-medium bg-white/10 backdrop-blur-md px-3 py-1 rounded-full">
+            👤 {question.userPseudo}
           </div>
+          <div className="text-violet-200 text-sm font-medium bg-white/10 backdrop-blur-md px-3 py-1 rounded-full">
+            Question {question.order}
+          </div>
+        </div>
+      </div>
 
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      {/* Contenu principal */}
+      <div className="min-h-screen flex flex-col pt-20 pb-32 px-4">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 leading-relaxed">
               {question.title}
-            </h2>
+            </h1>
 
-            {hints.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-yellow-800 mb-2">Indices :</h3>
-                <ul className="space-y-1">
-                  {hints.map((hint, index) => (
-                    <li key={index} className="text-yellow-700">
-                      {index + 1}. {hint.hint}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6" suppressHydrationWarning>
-              <div>
-                <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-2">
-                  Votre réponse
-                </label>
-                <input
-                  type="text"
-                  id="answer"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Tapez votre réponse..."
-                  required
-                  disabled={submitting}
-                  suppressHydrationWarning
-                />
-              </div>
-
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  disabled={!answer.trim() || submitting}
-                  className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                  suppressHydrationWarning
-                >
-                  {submitting ? 'Validation...' : 'Valider'}
-                </button>
-
-                {hints.length < question.hints.length && (
-                  <button
-                    type="button"
-                    onClick={getHint}
-                    className="px-6 py-3 border border-yellow-400 text-yellow-700 rounded-lg font-medium hover:bg-yellow-50 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors"
-                    suppressHydrationWarning
-                  >
-                    Indice ({hints.length + 1}/{question.hints.length})
-                  </button>
-                )}
-              </div>
-            </form>
-
-            {message && (
-              <div className={`mt-4 p-4 rounded-lg ${
-                message.includes('Bonne') 
-                  ? 'bg-green-50 text-green-800 border border-green-200' 
-                  : 'bg-red-50 text-red-800 border border-red-200'
-              }`}>
-                {message}
+            {/* Bouton d'indice centré */}
+            {hints.length < question.hints.length && (
+              <div className="text-center mb-8">
+                <Dialog open={hintModalOpen} onOpenChange={setHintModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={getHint}
+                      variant="outline"
+                      className="bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-400/30 hover:text-yellow-100"
+                    >
+                      💡 Indice ({hints.length + 1}/{question.hints.length})
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-yellow-50 border-yellow-200">
+                    <DialogHeader>
+                      <DialogTitle className="text-yellow-800">💡 Indice #{hints.length}</DialogTitle>
+                      <DialogDescription className="text-yellow-700 text-base font-medium">
+                        {hints[hints.length - 1]?.hint}
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               </div>
             )}
           </div>
+        </div>
+
+        {/* Zone de saisie fixée en bas */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-violet-200/50 shadow-2xl p-4">
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+            <div className="flex gap-3">
+              <Input
+                type="text"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                className="flex-1 h-14 bg-white border-violet-300/50 text-slate-900 placeholder:text-violet-600/60 text-lg font-medium focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl"
+                placeholder="Votre réponse..."
+                required
+                disabled={submitting}
+              />
+              <Button
+                type="submit"
+                disabled={!answer.trim() || submitting}
+                className="h-14 px-8 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+              >
+                {submitting ? 'Validation...' : 'Valider'}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

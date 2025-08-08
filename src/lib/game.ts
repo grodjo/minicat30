@@ -36,6 +36,13 @@ export async function getCurrentQuestion(sessionId: string) {
   return getQuestionByOrder(nextQuestionOrder);
 }
 
+export async function getSessionWithUser(sessionId: string) {
+  await connectToDatabase();
+  
+  const session = await GameSession.findById(sessionId).populate('userId');
+  return session;
+}
+
 export async function validateAnswer(sessionId: string, questionId: string, answer: string) {
   await connectToDatabase();
   

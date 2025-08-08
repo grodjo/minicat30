@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentQuestion } from '@/lib/game';
+import { getCurrentQuestion, getSessionWithUser } from '@/lib/game';
 
 export async function GET(
   request: NextRequest,
@@ -17,6 +17,7 @@ export async function GET(
     }
 
     const question = await getCurrentQuestion(sessionId);
+    const session = await getSessionWithUser(sessionId);
 
     if (!question) {
       return NextResponse.json(
@@ -25,12 +26,13 @@ export async function GET(
       );
     }
 
-    // Renvoyer seulement la question sans la réponse
+    // Renvoyer la question avec le pseudo de l'utilisateur
     return NextResponse.json({
       id: question.id,
       order: question.order,
       title: question.title,
-      hints: question.hints
+      hints: question.hints,
+      userPseudo: session?.userId?.pseudo || 'Anonyme'
     });
 
   } catch (error) {

@@ -34,9 +34,19 @@ export default function QuizPage() {
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [hintModalOpen, setHintModalOpen] = useState(false);
+  const [isLoadingHint, setIsLoadingHint] = useState(false);
+  const [currentHintIndex, setCurrentHintIndex] = useState<number | null>(null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
+
+  // Ouvrir la modale quand un nouvel indice est chargé
+  useEffect(() => {
+    if (isLoadingHint && hints.length > 0 && currentHintIndex !== null) {
+      setHintModalOpen(true);
+      setIsLoadingHint(false);
+    }
+  }, [hints, isLoadingHint, currentHintIndex]);
 
   const loadCurrentQuestion = async () => {
     try {
@@ -115,9 +125,19 @@ export default function QuizPage() {
     }
   };
 
-  const getHint = async () => {
+  const getHint = async (hintIndex: number) => {
     if (!question) return;
 
+    // Si l'indice est déjà chargé, juste ouvrir la modale
+    if (hints[hintIndex]) {
+      setCurrentHintIndex(hintIndex);
+      setHintModalOpen(true);
+      return;
+    }
+
+    // Sinon, charger l'indice
+    setIsLoadingHint(true);
+    setCurrentHintIndex(hintIndex);
     try {
       const response = await fetch(`/api/session/${sessionId}/hint`, {
         method: 'POST',
@@ -126,21 +146,25 @@ export default function QuizPage() {
         },
         body: JSON.stringify({
           questionId: question.id,
-          hintIndex: hints.length,
+          hintIndex: hintIndex,
         }),
       });
 
       const data = await response.json();
       if (response.ok) {
         setHints([...hints, data]);
-        setHintModalOpen(true);
+        // La modale s'ouvrira automatiquement via useEffect
       } else {
+        setIsLoadingHint(false);
+        setCurrentHintIndex(null);
         toast.error(data.error, {
           className: quizToastClass
         });
       }
     } catch (error) {
       console.error('Error getting hint:', error);
+      setIsLoadingHint(false);
+      setCurrentHintIndex(null);
       toast.error('Erreur lors de la récupération de l\'indice', {
         className: quizToastClass
       });
@@ -221,28 +245,62 @@ export default function QuizPage() {
               {question.title}
             </h1>
 
-            {/* Bouton d'indice centré */}
-            {hints.length < question.hints.length && (
+            {/* Boutons d'indices - un par indice possible */}
+            {question.hints.length > 0 && (
               <div className="text-center mb-8">
-                <Dialog open={hintModalOpen} onOpenChange={setHintModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      onClick={getHint}
-                      variant="outline"
-                      className="bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-400/30 hover:text-yellow-100"
-                    >
-                      💡 Indice ({hints.length + 1}/{question.hints.length})
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-yellow-50 border-yellow-200">
-                    <DialogHeader>
-                      <DialogTitle className="text-yellow-800">💡 Indice #{hints.length}</DialogTitle>
-                      <DialogDescription className="text-yellow-700 text-base font-medium">
-                        {hints[hints.length - 1]?.hint}
-                      </DialogDescription>
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
+                <div className="flex justify-center gap-3 flex-wrap">
+                  {Array.from({ length: question.hints.length }, (_, index) => {
+                    const isConsulted = hints.some(h => h.hintIndex === index);
+                    const isAccessible = index === 0 || hints.some(h => h.hintIndex === index - 1);
+                    const isLoading = isLoadingHint && currentHintIndex === index;
+                    
+                    return (
+                      <Dialog 
+                        key={index} 
+                        open={hintModalOpen && currentHintIndex === index} 
+                        onOpenChange={(open) => {
+                          if (!open) {
+                            setHintModalOpen(false);
+                            setCurrentHintIndex(null);
+                          }
+                        }}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            onClick={() => getHint(index)}
+                            disabled={!isAccessible || isLoading}
+                            variant="outline"
+                            className={`
+                              ${isConsulted 
+                                ? 'bg-green-500/20 border-green-400/50 text-green-200 hover:bg-green-400/30 hover:text-green-100' 
+                                : isAccessible 
+                                  ? 'bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-400/30 hover:text-yellow-100'
+                                  : 'bg-gray-500/20 border-gray-400/50 text-gray-400 cursor-not-allowed'
+                              } 
+                              disabled:opacity-50 min-w-[120px]
+                            `}
+                          >
+                            {isLoading ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                            ) : (
+                              <>
+                                {isConsulted ? '✅' : isAccessible ? '💡' : '🔒'} Indice {index + 1}
+                              </>
+                            )}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-yellow-50 border-yellow-200">
+                          <DialogHeader>
+                            <DialogTitle className="text-yellow-800">💡 Indice #{index + 1}</DialogTitle>
+                            <DialogDescription className="text-yellow-700 text-base font-medium">
+                              {hints.find(h => h.hintIndex === index)?.hint || ''}
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

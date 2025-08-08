@@ -12,15 +12,34 @@ export async function createGameSession(userId: string) {
 }
 
 export async function getCurrentStep(sessionId: string) {
-  // Compter le nombre de tentatives correctes pour déterminer l'ordre suivant
-  const correctAttempts = await prisma.attempt.findMany({
-    where: { sessionId, isCorrect: true },
-    select: { stepName: true },
+  // Compter le nombre de questions complétées via QuestionSession
+  const completedQuestions = await prisma.questionSession.findMany({
+    where: { gameSessionId: sessionId, answeredAt: { not: null } },
+    select: { order: true },
     orderBy: { answeredAt: 'asc' }
   })
-  const nextOrder = correctAttempts.length + 1
+  
+  const nextOrder = completedQuestions.length + 1
   if (nextOrder > getTotalSteps()) return null
-  return getQuestionByOrder(nextOrder)
+  
+  const question = getQuestionByOrder(nextOrder)
+  if (!question) return null
+
+  // Créer ou récupérer la QuestionSession pour cette question
+  await prisma.questionSession.upsert({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName: question.stepName } },
+    create: {
+      gameSessionId: sessionId,
+      stepName: question.stepName,
+      order: question.order,
+      startedAt: new Date()
+    },
+    update: {
+      // Si elle existe déjà, on ne met pas à jour startedAt pour préserver le temps original
+    }
+  })
+
+  return question
 }
 
 export async function validateAnswer(sessionId: string, stepName: string, answer: string) {
@@ -31,27 +50,30 @@ export async function validateAnswer(sessionId: string, stepName: string, answer
   const normalizedExpected = question.answer.trim().toLowerCase()
   const isCorrect = normalizedAnswer === normalizedExpected
 
-  // Upsert de la tentative (clé composite unique sessionId + stepName)
-  const existing = await prisma.attempt.findUnique({
-    where: { sessionId_stepName: { sessionId, stepName } }
+  // Récupérer la QuestionSession
+  const questionSession = await prisma.questionSession.findUnique({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
   })
 
-  if (!existing) {
-    await prisma.attempt.create({
-      data: {
-        sessionId,
-        stepName,
-        startedAt: new Date(),
-        answeredAt: new Date(),
-        isCorrect,
-        usedHints: []
-      }
-    })
-  } else if (existing.answeredAt === null || !existing.isCorrect) {
-    // On ne réécrit la tentative que si elle n'était pas encore finalisée ou incorrecte
-    await prisma.attempt.update({
-      where: { id: existing.id },
-      data: { answeredAt: new Date(), isCorrect }
+  if (!questionSession) {
+    throw new Error('Session de question introuvable')
+  }
+
+  // Créer un nouvel Attempt lié à la QuestionSession
+  await prisma.attempt.create({
+    data: {
+      questionSessionId: questionSession.id,
+      submittedAt: new Date(),
+      answer: answer.trim(),
+      isCorrect
+    }
+  })
+
+  // Si la réponse est correcte, marquer la QuestionSession comme terminée
+  if (isCorrect) {
+    await prisma.questionSession.update({
+      where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } },
+      data: { answeredAt: new Date() }
     })
   }
 
@@ -62,29 +84,29 @@ export async function addHintUsage(sessionId: string, stepName: string, hintInde
   const question = getQuestionByStepName(stepName)
   if (!question) throw new Error('Étape introuvable')
 
-  const attempt = await prisma.attempt.upsert({
-    where: { sessionId_stepName: { sessionId, stepName } },
-    create: {
-      sessionId,
-      stepName,
-      startedAt: new Date(),
-      usedHints: [hintIndex],
-      isCorrect: false
-    },
-    update: {}
+  // Récupérer la QuestionSession pour cette question
+  const questionSession = await prisma.questionSession.findUnique({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
   })
 
-  // Garantir l'unicité des indices stockés
-  const used = Array.isArray(attempt.usedHints) ? (attempt.usedHints as number[]) : []
-  if (!used.includes(hintIndex)) {
-    used.push(hintIndex)
-    await prisma.attempt.update({
-      where: { id: attempt.id },
-      data: { usedHints: used }
-    })
+  if (!questionSession) {
+    throw new Error('Session de question introuvable')
   }
 
-  return { usedHints: used }
+  // Mettre à jour les indices utilisés
+  const currentHints = Array.isArray(questionSession.usedHints) ? 
+    (questionSession.usedHints as number[]) : []
+  
+  if (!currentHints.includes(hintIndex)) {
+    const updatedHints = [...currentHints, hintIndex]
+    await prisma.questionSession.update({
+      where: { id: questionSession.id },
+      data: { usedHints: updatedHints }
+    })
+    return { usedHints: updatedHints }
+  }
+
+  return { usedHints: currentHints }
 }
 
 export async function completeSession(sessionId: string) {
@@ -130,25 +152,29 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
     where: { completedAt: { not: null } },
     include: {
       user: true,
-      attempts: { where: { isCorrect: true }, orderBy: { answeredAt: 'asc' } }
+      questionSessions: { 
+        where: { answeredAt: { not: null } }, 
+        orderBy: { answeredAt: 'asc' } 
+      }
     }
   })
 
   const scoreboard = sessions.map((s: typeof sessions[number]): ScoreboardRow => {
     const totalTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
-    const totalHints = s.attempts.reduce((sum: number, a: typeof s.attempts[number]): number => {
-      const arr = Array.isArray(a.usedHints) ? (a.usedHints as unknown as number[]) : []
+    const totalHints = s.questionSessions.reduce((sum: number, qs: typeof s.questionSessions[number]): number => {
+      const arr = Array.isArray(qs.usedHints) ? (qs.usedHints as unknown as number[]) : []
       return sum + arr.length
     }, 0)
+    
     return {
       pseudo: s.user.pseudo,
       totalTime,
       totalHints,
       completedAt: s.completedAt!,
-      attempts: s.attempts.map((a: typeof s.attempts[number]): ScoreboardAttemptRow => ({
-        stepName: a.stepName,
-        timeSpent: a.answeredAt && a.startedAt ? a.answeredAt.getTime() - a.startedAt.getTime() : 0,
-        hintsUsed: Array.isArray(a.usedHints) ? (a.usedHints as number[]).length : 0
+      attempts: s.questionSessions.map((qs: typeof s.questionSessions[number]): ScoreboardAttemptRow => ({
+        stepName: qs.stepName,
+        timeSpent: qs.answeredAt && qs.startedAt ? qs.answeredAt.getTime() - qs.startedAt.getTime() : 0,
+        hintsUsed: Array.isArray(qs.usedHints) ? (qs.usedHints as number[]).length : 0
       }))
     }
   })

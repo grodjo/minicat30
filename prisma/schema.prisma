@@ -18,27 +18,51 @@ model User {
 }
 
 model GameSession {
-  id          String     @id @default(cuid())
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  startedAt   DateTime   @default(now())
-  completedAt DateTime?
-  attempts    Attempt[]
+  id              String            @id @default(cuid())
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  startedAt       DateTime          @default(now())
+  completedAt     DateTime?
+  questionSessions QuestionSession[]
+  
+  // Relations temporaires pour compatibilité pendant la migration
+  attempts        Attempt[]
 
   @@index([userId])
   @@index([completedAt])
 }
 
-model Attempt {
-  id         String      @id @default(cuid())
-  session    GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sessionId  String
-  stepName   String
-  startedAt  DateTime    @default(now())
-  answeredAt DateTime?
-  usedHints  Json        @default("[]") // array of numbers (indexes) or strings
-  isCorrect  Boolean     @default(false)
+model QuestionSession {
+  id        String      @id @default(cuid())
+  gameSession   GameSession @relation(fields: [gameSessionId], references: [id], onDelete: Cascade)
+  gameSessionId String
+  stepName  String
+  order     Int
+  startedAt DateTime    @default(now()) // Quand la question est présentée à l'utilisateur
+  answeredAt DateTime?  // Quand l'utilisateur répond correctement
+  usedHints Json        @default("[]") // array of numbers (indexes)
+  attempts  Attempt[]   // Toutes les tentatives pour cette question
+  
+  @@unique([gameSessionId, stepName])
+  @@index([gameSessionId, order])
+}
 
-  @@unique([sessionId, stepName])
-  @@index([sessionId, isCorrect])
+model Attempt {
+  id                String           @id @default(cuid())
+  questionSession   QuestionSession? @relation(fields: [questionSessionId], references: [id], onDelete: Cascade)
+  questionSessionId String?
+  submittedAt       DateTime         @default(now()) // Quand la réponse est soumise
+  answer            String?          // La réponse soumise (nullable temporairement)
+  isCorrect         Boolean          @default(false)
+  
+  // Anciens champs à supprimer dans une prochaine migration
+  session    GameSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId  String?
+  stepName   String?
+  usedHints  Json?        @default("[]") // array of numbers (indexes)
+  startedAt  DateTime?    // À supprimer
+  answeredAt DateTime?    // À supprimer
+
+  @@index([questionSessionId])
+  @@index([sessionId, stepName]) // Index temporaire pour compatibilité
 }

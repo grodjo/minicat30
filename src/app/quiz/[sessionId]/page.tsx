@@ -40,6 +40,7 @@ export default function QuizPage() {
   const [isLoadingHint, setIsLoadingHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState<number | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Hook pour le timer
   const elapsedTime = useTimer(question?.startedAt || null);
@@ -103,8 +104,9 @@ export default function QuizPage() {
       const data = await response.json();
       
       if (data.isCorrect) {
-        // Disparition brutale de la question
+        // Début de la transition - masquer immédiatement l'ancienne question
         setIsCorrectAnswer(true);
+        setIsTransitioning(true);
         
         // Explosion centrale réaliste avec plus de confettis
         const fireExplosion = () => {
@@ -123,15 +125,18 @@ export default function QuizPage() {
 
         fireExplosion();
         
-        // Après l'explosion, transition simple vers la nouvelle question
-        setTimeout(() => {
-          setIsCorrectAnswer(false);
+        // Charger la nouvelle question en arrière-plan pendant les confettis
+        setTimeout(async () => {
           if (data.completed) {
             setCompleted(true);
           } else {
-            loadCurrentQuestion();
+            // Charger la nouvelle question avant de la montrer
+            await loadCurrentQuestion();
           }
-        }, 2000); // Réduit à 2 secondes pour plus de fluidité
+          // Finir la transition
+          setIsCorrectAnswer(false);
+          setIsTransitioning(false);
+        }, 2000); // 2 secondes pour les confettis
       } else {
         toast.error(data.message, {
           className: quizToastClass
@@ -264,7 +269,7 @@ export default function QuizPage() {
       <div className="min-h-screen flex flex-col pt-20 pb-32 px-4">
         <div className="flex-1 flex items-center justify-center">
           <div className={`w-full max-w-2xl transition-all duration-300 ${
-            isCorrectAnswer ? 'animate-question-vanish' : 'opacity-100 transform translate-y-0'
+            isCorrectAnswer || isTransitioning ? 'animate-question-vanish' : 'opacity-100 transform translate-y-0'
           }`}>
             {/* Question avec style Minicat30 mais plus petit */}
             <div className="text-center mb-8">

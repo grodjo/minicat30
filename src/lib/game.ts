@@ -118,20 +118,25 @@ export async function completeSession(sessionId: string) {
 
 export async function getSessionStats(sessionId: string) {
   const session = await prisma.gameSession.findUnique({
-    where: { id: sessionId }
+    where: { id: sessionId },
+    include: {
+      user: true,
+      questionSessions: {
+        include: {
+          attempts: {
+            where: { isCorrect: true }
+          }
+        },
+        orderBy: { order: 'asc' }
+      }
+    }
   })
   if (!session) throw new Error('Session introuvable')
-  const user = await prisma.user.findUnique({ where: { id: session.userId } })
-  if (!user) throw new Error('Utilisateur introuvable')
 
-  const attempts = await prisma.attempt.findMany({
-    where: { sessionId, isCorrect: true },
-    orderBy: { answeredAt: 'asc' }
-  })
-
+  const attempts = session.questionSessions.map(qs => qs.attempts[0]).filter(Boolean)
   const totalTime = (session.completedAt?.getTime() || Date.now()) - session.startedAt.getTime()
 
-  return { user, totalTime, attempts, completedAt: session.completedAt }
+  return { user: session.user, totalTime, attempts, completedAt: session.completedAt }
 }
 
 interface ScoreboardAttemptRow {

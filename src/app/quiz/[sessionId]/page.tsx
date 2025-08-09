@@ -41,6 +41,7 @@ export default function QuizPage() {
   const [currentHintIndex, setCurrentHintIndex] = useState<number | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isQuestionEntering, setIsQuestionEntering] = useState(false);
 
   // Hook pour le timer
   const elapsedTime = useTimer(question?.startedAt || null);
@@ -67,6 +68,10 @@ export default function QuizPage() {
         setQuestion(data);
         setHints([]);
         setAnswer('');
+        
+        // Déclencher l'animation d'entrée
+        setIsQuestionEntering(true);
+        setTimeout(() => setIsQuestionEntering(false), 600); // Animation de 600ms
       }
     } catch (error) {
       console.error('Error loading question:', error);
@@ -269,7 +274,9 @@ export default function QuizPage() {
       <div className="min-h-screen flex flex-col pt-20 pb-32 px-4">
         <div className="flex-1 flex items-center justify-center">
           <div className={`w-full max-w-2xl transition-all duration-300 ${
-            isCorrectAnswer || isTransitioning ? 'animate-question-vanish' : 'opacity-100 transform translate-y-0'
+            isCorrectAnswer || isTransitioning ? 'animate-question-vanish' : 
+            isQuestionEntering ? 'animate-question-bounce-in' : 
+            'opacity-100 transform translate-y-0'
           }`}>
             {/* Question avec style Minicat30 mais plus petit */}
             <div className="text-center mb-8">
@@ -346,7 +353,8 @@ export default function QuizPage() {
 
         {/* Zone de saisie fixée en bas */}
         <div className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-violet-200/50 shadow-2xl p-4 transition-all duration-500 ${
-          isCorrectAnswer ? 'transform translate-y-full opacity-0' : ''
+          isCorrectAnswer ? 'transform translate-y-full opacity-0' : 
+          isQuestionEntering ? 'animate-input-slide-up' : ''
         }`}>
           <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
             <div className="flex gap-3">

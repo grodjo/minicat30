@@ -24,9 +24,6 @@ model GameSession {
   startedAt       DateTime          @default(now())
   completedAt     DateTime?
   questionSessions QuestionSession[]
-  
-  // Relations temporaires pour compatibilité pendant la migration
-  attempts        Attempt[]
 
   @@index([userId])
   @@index([completedAt])
@@ -48,21 +45,12 @@ model QuestionSession {
 }
 
 model Attempt {
-  id                String           @id @default(cuid())
-  questionSession   QuestionSession? @relation(fields: [questionSessionId], references: [id], onDelete: Cascade)
-  questionSessionId String?
-  submittedAt       DateTime         @default(now()) // Quand la réponse est soumise
-  answer            String?          // La réponse soumise (nullable temporairement)
-  isCorrect         Boolean          @default(false)
-  
-  // Anciens champs à supprimer dans une prochaine migration
-  session    GameSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sessionId  String?
-  stepName   String?
-  usedHints  Json?        @default("[]") // array of numbers (indexes)
-  startedAt  DateTime?    // À supprimer
-  answeredAt DateTime?    // À supprimer
+  id                String          @id @default(cuid())
+  questionSession   QuestionSession @relation(fields: [questionSessionId], references: [id], onDelete: Cascade)
+  questionSessionId String
+  submittedAt       DateTime        @default(now()) // Quand la réponse est soumise
+  answer            String          // La réponse soumise
+  isCorrect         Boolean         @default(false)
 
   @@index([questionSessionId])
-  @@index([sessionId, stepName]) // Index temporaire pour compatibilité
 }

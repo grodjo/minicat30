@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateAnswer, completeSession, getCurrentStep } from '@/lib/game';
+import { completeSubStep, completeSession, getCurrentStepWithSubStep } from '@/lib/game';
+import { validateStepAnswer } from '@/lib/steps';
 
 export async function POST(
   request: NextRequest,
@@ -8,36 +9,43 @@ export async function POST(
   try {
     const params = await context.params;
     const sessionId = params.sessionId;
-    const { stepName, answer } = await request.json();
+    const { stepName, answer, subStepType } = await request.json();
 
-    if (!sessionId || !stepName || !answer) {
+    if (!sessionId || !stepName || !answer || !subStepType) {
       return NextResponse.json(
         { error: 'Paramètres manquants' },
         { status: 400 }
       );
     }
 
-    const result = await validateAnswer(sessionId, stepName, answer);
+    // Valider la réponse selon le type de sous-étape
+    const isCorrect = validateStepAnswer(stepName, subStepType, answer);
 
-    // Si la réponse est correcte, vérifier si c'est la dernière question
-    if (result.isCorrect) {
-      const nextStep = await getCurrentStep(sessionId);
+    if (isCorrect) {
+      // Marquer la sous-étape comme complétée
+      await completeSubStep(sessionId, stepName, subStepType, { isCorrect: true });
+
+      // Vérifier si toutes les étapes sont terminées
+      const nextStepData = await getCurrentStepWithSubStep(sessionId);
       
-      if (!nextStep) {
-        // Toutes les questions ont été répondues, terminer la session
+      if (!nextStepData) {
+        // Toutes les étapes ont été complétées, terminer la session
         await completeSession(sessionId);
         return NextResponse.json({
           isCorrect: true,
           completed: true,
-          message: 'Félicitations ! Vous avez terminé le quiz !'
+          message: 'Félicitations ! Vous avez terminé toutes les étapes !'
         });
       }
+    } else if (subStepType === 'bonus') {
+      // Pour les bonus, même si incorrect, marquer comme tenté
+      await completeSubStep(sessionId, stepName, subStepType, { isCorrect: false });
     }
 
     return NextResponse.json({
-      isCorrect: result.isCorrect,
+      isCorrect,
       completed: false,
-      message: result.isCorrect 
+      message: isCorrect 
         ? 'Bonne réponse !' 
         : 'Réponse incorrecte. Essayez encore.'
     });

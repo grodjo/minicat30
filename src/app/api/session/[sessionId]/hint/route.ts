@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addHintUsage } from '@/lib/game';
-import { getQuestionByStepName } from '@/lib/questions';
+import { getStepByName } from '@/lib/steps';
 
 export async function POST(
   request: NextRequest,
@@ -18,27 +18,28 @@ export async function POST(
       );
     }
 
-    const question = getQuestionByStepName(stepName);
-    if (!question) {
+    const step = getStepByName(stepName);
+    if (!step) {
       return NextResponse.json(
         { error: 'Étape non trouvée' },
         { status: 404 }
       );
     }
 
-    if (hintIndex < 0 || hintIndex >= question.hints.length) {
+    // Dans la nouvelle structure, il n'y a qu'un seul hint
+    if (hintIndex !== 0) {
       return NextResponse.json(
         { error: "Index d'indice invalide" },
         { status: 400 }
       );
     }
 
-    await addHintUsage(sessionId, stepName, hintIndex);
+    await addHintUsage(sessionId, stepName);
 
     return NextResponse.json({
-      hint: question.hints[hintIndex],
-      hintIndex,
-      totalHints: question.hints.length
+      hint: step.enigma.hint,
+      hintIndex: 0,
+      totalHints: 1
     });
 
   } catch (error) {

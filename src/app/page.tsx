@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -11,7 +11,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [showStartModal, setShowStartModal] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+
+  // Éviter les erreurs d'hydratation en attendant le montage côté client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleShowModal = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +81,6 @@ export default function Home() {
         <button
           onClick={goToScoreboard}
           className="text-violet-200 hover:text-white text-sm font-medium flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl border border-violet-300/20 hover:bg-white/10 transition-all duration-200"
-          suppressHydrationWarning
         >
           🏆 Classement
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -110,45 +115,59 @@ export default function Home() {
         </div>
 
         {/* Interface de connexion - design moderne */}
-        <form onSubmit={handleShowModal} className={`space-y-8 ${isExiting ? 'animate-exit-content-down' : ''}`} suppressHydrationWarning>
-          <div className="space-y-6">
-            <div className="relative">
-              {/* Input moderne avec ligne */}
-              <div className="relative group">
-                <input
-                  type="text"
-                  value={pseudo}
-                  onChange={(e) => setPseudo(e.target.value)}
-                  required
-                  maxLength={50}
-                  disabled={isLoading || isExiting}
-                  className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-medium text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50"
-                  placeholder="Choisissez un nom d'équipe"
-                />
-                
-                {/* Ligne animée au focus */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 transition-all duration-300 w-0 group-focus-within:w-3/4"></div>
+        {!isMounted ? (
+          // Placeholder pendant l'hydratation pour éviter le flash
+          <div className="space-y-8 opacity-50">
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="relative group">
+                  <div className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-medium text-center py-4 px-2 h-14"></div>
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 w-0"></div>
+                </div>
               </div>
             </div>
+            <div className="w-full h-14 bg-gradient-to-r from-slate-600 to-slate-600 text-slate-300 rounded-2xl"></div>
           </div>
+        ) : (
+          <form onSubmit={handleShowModal} className={`space-y-8 ${isExiting ? 'animate-exit-content-down' : ''}`}>
+            <div className="space-y-6">
+              <div className="relative">
+                {/* Input moderne avec ligne */}
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={pseudo}
+                    onChange={(e) => setPseudo(e.target.value)}
+                    required
+                    maxLength={50}
+                    disabled={isLoading || isExiting}
+                    className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-medium text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50"
+                    placeholder="Choisissez un nom d'équipe"
+                  />
+                  
+                  {/* Ligne animée au focus */}
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 transition-all duration-300 w-0 group-focus-within:w-3/4"></div>
+                </div>
+              </div>
+            </div>
 
-          {/* Bouton classique "Je veux jouer !" */}
-          <Button
-            type="submit"
-            disabled={!pseudo.trim() || isLoading || isExiting}
-            className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg tracking-wide transition-all duration-300 shadow-xl hover:shadow-2xl disabled:from-slate-600 disabled:to-slate-600 disabled:text-slate-300 rounded-2xl"
-            suppressHydrationWarning
-          >
-            {isLoading ? 'Chargement...' : isExiting ? 'Connexion...' : 'On est chaud patate 🔥🥔'}
-          </Button>
-        </form>
+            {/* Bouton classique "Je veux jouer !" */}
+            <Button
+              type="submit"
+              disabled={!pseudo.trim() || isLoading || isExiting}
+              className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg tracking-wide transition-all duration-300 shadow-xl hover:shadow-2xl disabled:from-slate-600 disabled:to-slate-600 disabled:text-slate-300 rounded-2xl"
+            >
+              {isLoading ? 'Chargement...' : isExiting ? 'Connexion...' : 'On est chaud patate 🔥🥔'}
+            </Button>
+          </form>
+        )}
 
         {/* Modale de confirmation */}
         <Dialog open={showStartModal} onOpenChange={setShowStartModal}>
           <DialogContent className="bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 border-violet-300/30 text-white max-w-lg w-full min-h-[50vh] flex flex-col justify-between">
             <DialogHeader className="space-y-6 pt-8">
               <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-violet-200">
-                Bienvenue équipe {pseudo} !
+                Bienvenue équipe {pseudo}&nbsp;!
               </DialogTitle>
               <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full"></div>
               <DialogDescription className="text-violet-200/80 text-center text-lg md:text-xl leading-relaxed px-6">

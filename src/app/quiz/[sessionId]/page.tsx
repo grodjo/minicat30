@@ -10,11 +10,25 @@ import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
 
-interface Question {
+interface Step {
   stepName: string;
-  order: number;
-  title: string;
-  hints: string[];
+  currentSubStep: string;
+  subStepData: {
+    type: string;
+    question?: string;
+    content?: string;
+    hint?: string;
+    buttonText?: string;
+    requiresAnswer?: boolean;
+    singleAttempt?: boolean;
+  };
+  stepSession: {
+    directionCompleted: boolean;
+    enigmaCompleted: boolean;
+    bonusCompleted: boolean;
+    bonusCorrect: boolean;
+    keyCompleted: boolean;
+  };
   pseudo?: string | null;
   startedAt: string;
 }
@@ -30,7 +44,7 @@ export default function QuizPage() {
   const router = useRouter();
   const sessionId = params?.sessionId as string;
 
-  const [question, setQuestion] = useState<Question | null>(null);
+  const [step, setStep] = useState<Step | null>(null);
   const [answer, setAnswer] = useState('');
   const [hints, setHints] = useState<Hint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,10 +55,10 @@ export default function QuizPage() {
   const [currentHintIndex, setCurrentHintIndex] = useState<number | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isQuestionEntering, setIsQuestionEntering] = useState(false);
+  const [isStepEntering, setIsStepEntering] = useState(false);
 
   // Hook pour le timer
-  const elapsedTime = useTimer(question?.startedAt || null);
+  const elapsedTime = useTimer(step?.startedAt || null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
@@ -57,25 +71,25 @@ export default function QuizPage() {
     }
   }, [hints, isLoadingHint, currentHintIndex]);
 
-  const loadCurrentQuestion = async () => {
+  const loadCurrentStep = async () => {
     try {
-      const response = await fetch(`/api/session/${sessionId}/current-question`);
+      const response = await fetch(`/api/session/${sessionId}/current-step`);
       const data = await response.json();
 
       if (data.completed) {
         setCompleted(true);
       } else {
-        setQuestion(data);
+        setStep(data);
         setHints([]);
         setAnswer('');
         
         // Déclencher l'animation d'entrée
-        setIsQuestionEntering(true);
-        setTimeout(() => setIsQuestionEntering(false), 600); // Animation de 600ms
+        setIsStepEntering(true);
+        setTimeout(() => setIsStepEntering(false), 600); // Animation de 600ms
       }
     } catch (error) {
-      console.error('Error loading question:', error);
-      toast.error('Erreur lors du chargement de la question', {
+      console.error('Error loading step:', error);
+      toast.error('Erreur lors du chargement de l\'étape', {
         className: quizToastClass
       });
     } finally {
@@ -85,13 +99,48 @@ export default function QuizPage() {
 
   useEffect(() => {
     if (!sessionId) return;
-    loadCurrentQuestion();
+    loadCurrentStep();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!answer.trim() || !question) return;
+    if (!step) return;
+
+    // Pour les sous-étapes qui ne nécessitent pas de réponse (direction, key)
+    if (!step.subStepData.requiresAnswer) {
+      setSubmitting(true);
+      try {
+        const response = await fetch(`/api/session/${sessionId}/complete-substep`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            stepName: step.stepName,
+            subStepType: step.currentSubStep,
+            data: step.subStepData.type === 'key' ? { key: 'found' } : {}
+          }),
+        });
+
+        if (response.ok) {
+          // Charger la prochaine sous-étape
+          await loadCurrentStep();
+        } else {
+          const data = await response.json();
+          toast.error(data.error, { className: quizToastClass });
+        }
+      } catch (error) {
+        console.error('Error completing substep:', error);
+        toast.error('Erreur lors de la validation', { className: quizToastClass });
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    // Pour les énigmes et bonus qui nécessitent une réponse
+    if (!answer.trim()) return;
 
     setSubmitting(true);
     try {
@@ -101,8 +150,9 @@ export default function QuizPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          stepName: question.stepName,
+          stepName: step.stepName,
           answer: answer.trim(),
+          subStepType: step.currentSubStep,
         }),
       });
 
@@ -135,8 +185,8 @@ export default function QuizPage() {
           if (data.completed) {
             setCompleted(true);
           } else {
-            // Charger la nouvelle question avant de la montrer
-            await loadCurrentQuestion();
+            // Charger la nouvelle étape avant de la montrer
+            await loadCurrentStep();
           }
           // Finir la transition
           setIsCorrectAnswer(false);
@@ -158,7 +208,7 @@ export default function QuizPage() {
   };
 
   const getHint = async (hintIndex: number) => {
-    if (!question) return;
+    if (!step) return;
 
     // Si l'indice est déjà chargé, juste ouvrir la modale
     if (hints[hintIndex]) {
@@ -177,7 +227,7 @@ export default function QuizPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          stepName: question.stepName,
+          stepName: step.stepName,
           hintIndex: hints.length,
         }),
       });
@@ -241,7 +291,7 @@ export default function QuizPage() {
     );
   }
 
-  if (!question) {
+  if (!step) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-500 via-pink-600 to-rose-700 flex items-center justify-center p-4">
         <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
@@ -249,7 +299,7 @@ export default function QuizPage() {
             Erreur
           </h1>
           <p className="text-gray-600">
-            Impossible de charger la question
+            Impossible de charger l&apos;étape
           </p>
         </div>
       </div>
@@ -262,7 +312,7 @@ export default function QuizPage() {
       <div className="absolute top-0 left-0 right-0 p-4 z-10">
         <div className="flex justify-between items-center">
           <div className="text-violet-200 text-sm font-semibold bg-white/10 backdrop-blur-md px-3 py-2 rounded-full">
-            👤 {question.pseudo ? question.pseudo : `Session ${sessionId.slice(-8)}`}
+            👤 {step.pseudo ? step.pseudo : `Session ${sessionId.slice(-8)}`}
           </div>
           <div className="text-yellow-300 text-sm font-semibold bg-yellow-400/10 backdrop-blur-md px-3 py-2 rounded-full border border-yellow-400/30">
             ⏱️ {elapsedTime}
@@ -275,111 +325,130 @@ export default function QuizPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className={`w-full max-w-2xl transition-all duration-300 ${
             isCorrectAnswer || isTransitioning ? 'animate-question-vanish' : 
-            isQuestionEntering ? 'animate-question-bounce-in' : 
+            isStepEntering ? 'animate-question-bounce-in' : 
             'opacity-100 transform translate-y-0'
           }`}>
-            {/* Question avec style Minicat30 mais plus petit */}
+            {/* Étape avec style Minicat30 mais plus petit */}
             <div className="text-center mb-8">
               <h2 className="text-lg font-bold text-violet-200/90 tracking-wider mb-3">
-                QUESTION {question.order}
+                {step.stepName}
               </h2>
               <div className="w-16 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto"></div>
             </div>
 
+            {/* Direction pour se rendre au lieu */}
+            {step.subStepData.type === 'direction' && (
+              <div className="text-center mb-6">
+                <p className="text-violet-300 text-lg italic">
+                  📍 {step.subStepData.content}
+                </p>
+              </div>
+            )}
+
+            {/* Affichage adaptatif selon le type de sous-étape */}
             <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 leading-relaxed">
-              {question.title}
+              {step.subStepData.type === 'direction' ? step.subStepData.content :
+               step.subStepData.type === 'key' ? step.subStepData.content :
+               step.subStepData.question}
             </h1>
 
-            {/* Boutons d'indices - un par indice possible */}
-            {question.hints.length > 0 && (
+            {/* Bouton d'indice unique - seulement pour les énigmes */}
+            {step.subStepData.type === 'enigma' && (
               <div className="text-center mb-8">
-                <div className="flex justify-center gap-3 flex-wrap">
-                  {Array.from({ length: question.hints.length }, (_, index) => {
-                    const isConsulted = hints.some(h => h.hintIndex === index);
-                    const isAccessible = index === 0 || hints.some(h => h.hintIndex === index - 1);
-                    const isLoading = isLoadingHint && currentHintIndex === index;
-                    
-                    return (
-                      <Dialog 
-                        key={index} 
-                        open={hintModalOpen && currentHintIndex === index} 
-                        onOpenChange={(open) => {
-                          if (!open) {
-                            setHintModalOpen(false);
-                            setCurrentHintIndex(null);
-                          }
-                        }}
+                <div className="flex justify-center">
+                  <Dialog 
+                    open={hintModalOpen} 
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setHintModalOpen(false);
+                        setCurrentHintIndex(null);
+                      }
+                    }}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => getHint(0)}
+                        disabled={isLoadingHint || isCorrectAnswer}
+                        variant="outline"
+                        className={`
+                          ${hints.length > 0
+                            ? 'bg-green-500/20 border-green-400/50 text-green-200 hover:bg-green-400/30 hover:text-green-100' 
+                            : 'bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-400/30 hover:text-yellow-100'
+                          } 
+                          disabled:opacity-50 min-w-[120px] font-semibold
+                        `}
                       >
-                        <DialogTrigger asChild>
-                          <Button
-                            onClick={() => getHint(index)}
-                            disabled={!isAccessible || isLoading || isCorrectAnswer}
-                            variant="outline"
-                            className={`
-                              ${isConsulted 
-                                ? 'bg-green-500/20 border-green-400/50 text-green-200 hover:bg-green-400/30 hover:text-green-100' 
-                                : isAccessible 
-                                  ? 'bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-400/30 hover:text-yellow-100'
-                                  : 'bg-gray-500/20 border-gray-400/50 text-gray-400 cursor-not-allowed'
-                              } 
-                              disabled:opacity-50 min-w-[120px] font-semibold
-                            `}
-                          >
-                            {isLoading ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                            ) : (
-                              <>
-                                {isConsulted ? '✅' : isAccessible ? '💡' : '🔒'} Indice {index + 1}
-                              </>
-                            )}
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-yellow-50 border-yellow-200">
-                          <DialogHeader>
-                            <DialogTitle className="text-yellow-800">💡 Indice #{index + 1}</DialogTitle>
-                            <DialogDescription className="text-yellow-700 text-base font-medium">
-                              {hints.find(h => h.hintIndex === index)?.hint || ''}
-                            </DialogDescription>
-                          </DialogHeader>
-                        </DialogContent>
-                      </Dialog>
-                    );
-                  })}
+                        {isLoadingHint ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                        ) : (
+                          <>
+                            {hints.length > 0 ? '✅' : '💡'} Indice
+                          </>
+                        )}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-yellow-50 border-yellow-200">
+                      <DialogHeader>
+                        <DialogTitle className="text-yellow-800">💡 Indice</DialogTitle>
+                        <DialogDescription className="text-yellow-700 text-base font-medium">
+                          {hints.find(h => h.hintIndex === 0)?.hint || step.subStepData.hint}
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Zone de saisie fixée en bas */}
+        {/* Zone de saisie fixée en bas - adaptée selon le type de sous-étape */}
         <div className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-violet-200/50 shadow-2xl p-4 transition-all duration-500 ${
           isCorrectAnswer ? 'transform translate-y-full opacity-0' : 
-          isQuestionEntering ? 'animate-input-slide-up' : ''
+          isStepEntering ? 'animate-input-slide-up' : ''
         }`}>
-          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-            <div className="flex gap-3">
-              <Input
-                type="text"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                className="flex-1 h-14 bg-white border-violet-300/50 text-slate-900 placeholder:text-violet-600/60 text-lg font-medium focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl"
-                placeholder="Votre réponse..."
-                required
-                disabled={submitting || isCorrectAnswer}
-              />
+          {step.subStepData.requiresAnswer ? (
+            // Formulaire pour les énigmes et bonus
+            <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+              <div className="flex gap-3">
+                <Input
+                  type="text"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  className="flex-1 h-14 bg-white border-violet-300/50 text-slate-900 placeholder:text-violet-600/60 text-lg font-medium focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl"
+                  placeholder="Votre réponse..."
+                  required
+                  disabled={submitting || isCorrectAnswer}
+                />
+                <Button
+                  type="submit"
+                  disabled={!answer.trim() || submitting || isCorrectAnswer}
+                  className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+                >
+                  {submitting ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    <span className="text-xl">➤</span>
+                  )}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            // Bouton simple pour direction et key
+            <div className="max-w-2xl mx-auto">
               <Button
-                type="submit"
-                disabled={!answer.trim() || submitting || isCorrectAnswer}
-                className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+                onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+                disabled={submitting || isCorrectAnswer}
+                className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
               >
                 {submitting ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 ) : (
-                  <span className="text-xl">➤</span>
+                  step.subStepData.buttonText || 'Continuer'
                 )}
               </Button>
             </div>
-          </form>
+          )}
         </div>
       </div>
     </div>

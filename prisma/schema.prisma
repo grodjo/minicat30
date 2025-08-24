@@ -23,34 +23,31 @@ model GameSession {
   userId          String
   startedAt       DateTime          @default(now())
   completedAt     DateTime?
-  questionSessions QuestionSession[]
+  stepSessions    StepSession[]
 
   @@index([userId])
   @@index([completedAt])
 }
 
-model QuestionSession {
+model StepSession {
   id        String      @id @default(cuid())
   gameSession   GameSession @relation(fields: [gameSessionId], references: [id], onDelete: Cascade)
   gameSessionId String
   stepName  String
-  order     Int
-  startedAt DateTime    @default(now()) // Quand la question est présentée à l'utilisateur
-  answeredAt DateTime?  // Quand l'utilisateur répond correctement
-  usedHints Json        @default("[]") // array of numbers (indexes)
-  attempts  Attempt[]   // Toutes les tentatives pour cette question
+  stepRank     Int
+  startedAt DateTime    @default(now()) // Quand l'étape est présentée à l'utilisateur
+  answeredAt DateTime?  // Quand l'utilisateur répond correctement à l'énigme
+  hasUsedHint  Boolean   @default(false) // Si l'utilisateur a utilisé l'indice
+  
+  // Nouvelles colonnes pour les sous-étapes
+  currentSubStep String @default("direction") // direction, enigma, bonus, key
+  directionCompletedAt DateTime?
+  enigmaCompletedAt DateTime?
+  bonusAttemptedAt DateTime?
+  isBonusCorrect Boolean?
+  keyCompletedAt DateTime?
+  collectedKey String? // La clé trouvée dans cette étape
   
   @@unique([gameSessionId, stepName])
-  @@index([gameSessionId, order])
-}
-
-model Attempt {
-  id                String          @id @default(cuid())
-  questionSession   QuestionSession @relation(fields: [questionSessionId], references: [id], onDelete: Cascade)
-  questionSessionId String
-  submittedAt       DateTime        @default(now()) // Quand la réponse est soumise
-  answer            String          // La réponse soumise
-  isCorrect         Boolean         @default(false)
-
-  @@index([questionSessionId])
+  @@index([gameSessionId, stepRank])
 }

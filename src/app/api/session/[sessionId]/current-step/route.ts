@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentStep, getSessionWithUser } from '@/lib/game';
+import { getCurrentStepWithSubStep, getSessionWithUser } from '@/lib/game';
+import { getSubStepData } from '@/lib/steps';
 
 export async function GET(
   request: NextRequest,
@@ -16,8 +17,8 @@ export async function GET(
       );
     }
 
-    const [step, session] = await Promise.all([
-      getCurrentStep(sessionId),
+    const [stepData, session] = await Promise.all([
+      getCurrentStepWithSubStep(sessionId),
       getSessionWithUser(sessionId)
     ]);
 
@@ -28,18 +29,27 @@ export async function GET(
       );
     }
 
-    if (!step) {
+    if (!stepData) {
       return NextResponse.json(
-        { completed: true, message: 'Quiz terminé!' },
+        { completed: true, message: 'Toutes les étapes terminées!' },
         { status: 200 }
       );
     }
 
+    const { step, stepSession, currentSubStep } = stepData;
+    const subStepData = getSubStepData(step, currentSubStep);
+
     return NextResponse.json({
-      stepName: step.stepName,
-      order: step.order,
-      title: step.title,
-      hints: step.hints,
+      stepName: step.name,
+      currentSubStep,
+      subStepData,
+      stepSession: {
+        directionCompleted: !!stepSession.directionCompletedAt,
+        enigmaCompleted: !!stepSession.enigmaCompletedAt,
+        bonusCompleted: !!stepSession.bonusAttemptedAt,
+        bonusCorrect: stepSession.isBonusCorrect,
+        keyCompleted: !!stepSession.keyCompletedAt
+      },
       pseudo: session.user.pseudo,
       startedAt: session.startedAt.toISOString()
     });

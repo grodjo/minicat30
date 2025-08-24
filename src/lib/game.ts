@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { getQuestionByOrder, getQuestionByStepName, getTotalSteps } from './questions'
+import { getStepByOrder, getStepByName, getTotalSteps } from './steps'
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
@@ -12,26 +12,26 @@ export async function createGameSession(userId: string) {
 }
 
 export async function getCurrentStep(sessionId: string) {
-  // Compter le nombre de questions complétées via QuestionSession
-  const completedQuestions = await prisma.questionSession.findMany({
+  // Compter le nombre d'étapes complétées via StepSession
+  const completedSteps = await prisma.stepSession.findMany({
     where: { gameSessionId: sessionId, answeredAt: { not: null } },
-    select: { order: true },
+    select: { stepRank: true },
     orderBy: { answeredAt: 'asc' }
   })
   
-  const nextOrder = completedQuestions.length + 1
-  if (nextOrder > getTotalSteps()) return null
+  const nextRank = completedSteps.length + 1
+  if (nextRank > getTotalSteps()) return null
   
-  const question = getQuestionByOrder(nextOrder)
-  if (!question) return null
+  const step = getStepByOrder(nextRank)
+  if (!step) return null
 
-  // Créer ou récupérer la QuestionSession pour cette question
-  await prisma.questionSession.upsert({
-    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName: question.stepName } },
+  // Créer ou récupérer la StepSession pour cette étape
+  await prisma.stepSession.upsert({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName: step.name } },
     create: {
       gameSessionId: sessionId,
-      stepName: question.stepName,
-      order: question.order,
+      stepName: step.name,
+      stepRank: nextRank,
       startedAt: new Date()
     },
     update: {
@@ -39,39 +39,29 @@ export async function getCurrentStep(sessionId: string) {
     }
   })
 
-  return question
+  return step
 }
 
 export async function validateAnswer(sessionId: string, stepName: string, answer: string) {
-  const question = getQuestionByStepName(stepName)
-  if (!question) throw new Error('Étape introuvable')
+  const step = getStepByName(stepName)
+  if (!step) throw new Error('Étape introuvable')
 
   const normalizedAnswer = answer.trim().toLowerCase()
-  const normalizedExpected = question.answer.trim().toLowerCase()
+  const normalizedExpected = step.enigma.answer.trim().toLowerCase()
   const isCorrect = normalizedAnswer === normalizedExpected
 
-  // Récupérer la QuestionSession
-  const questionSession = await prisma.questionSession.findUnique({
+  // Récupérer la StepSession
+  const stepSession = await prisma.stepSession.findUnique({
     where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
   })
 
-  if (!questionSession) {
-    throw new Error('Session de question introuvable')
+  if (!stepSession) {
+    throw new Error('Session d\'étape introuvable')
   }
 
-  // Créer un nouvel Attempt lié à la QuestionSession
-  await prisma.attempt.create({
-    data: {
-      questionSessionId: questionSession.id,
-      submittedAt: new Date(),
-      answer: answer.trim(),
-      isCorrect
-    }
-  })
-
-  // Si la réponse est correcte, marquer la QuestionSession comme terminée
+  // Si la réponse est correcte, marquer la StepSession comme terminée
   if (isCorrect) {
-    await prisma.questionSession.update({
+    await prisma.stepSession.update({
       where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } },
       data: { answeredAt: new Date() }
     })
@@ -80,33 +70,26 @@ export async function validateAnswer(sessionId: string, stepName: string, answer
   return { isCorrect }
 }
 
-export async function addHintUsage(sessionId: string, stepName: string, hintIndex: number) {
-  const question = getQuestionByStepName(stepName)
-  if (!question) throw new Error('Étape introuvable')
+export async function addHintUsage(sessionId: string, stepName: string) {
+  const step = getStepByName(stepName)
+  if (!step) throw new Error('Étape introuvable')
 
-  // Récupérer la QuestionSession pour cette question
-  const questionSession = await prisma.questionSession.findUnique({
+  // Récupérer la StepSession pour cette étape
+  const stepSession = await prisma.stepSession.findUnique({
     where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
   })
 
-  if (!questionSession) {
-    throw new Error('Session de question introuvable')
+  if (!stepSession) {
+    throw new Error('Session d\'étape introuvable')
   }
 
-  // Mettre à jour les indices utilisés
-  const currentHints = Array.isArray(questionSession.usedHints) ? 
-    (questionSession.usedHints as number[]) : []
-  
-  if (!currentHints.includes(hintIndex)) {
-    const updatedHints = [...currentHints, hintIndex]
-    await prisma.questionSession.update({
-      where: { id: questionSession.id },
-      data: { usedHints: updatedHints }
-    })
-    return { usedHints: updatedHints }
-  }
+  // Marquer que l'indice a été utilisé (on ne suit plus les indices individuels)
+  await prisma.stepSession.update({
+    where: { id: stepSession.id },
+    data: { hasUsedHint: true }
+  })
 
-  return { usedHints: currentHints }
+  return { hasUsedHint: true }
 }
 
 export async function completeSession(sessionId: string) {
@@ -121,19 +104,24 @@ export async function getSessionStats(sessionId: string) {
     where: { id: sessionId },
     include: {
       user: true,
-      questionSessions: {
-        include: {
-          attempts: {
-            where: { isCorrect: true }
-          }
-        },
-        orderBy: { order: 'asc' }
+      stepSessions: {
+        orderBy: { stepRank: 'asc' }
       }
     }
   })
   if (!session) throw new Error('Session introuvable')
 
-  const attempts = session.questionSessions.map(qs => qs.attempts[0]).filter(Boolean)
+  // Créer des données d'attempt à partir des stepSessions
+  const attempts = session.stepSessions.map(ss => ({
+    id: ss.id,
+    isCorrect: ss.enigmaCompletedAt !== null,
+    timeTaken: ss.enigmaCompletedAt ? 
+      (ss.enigmaCompletedAt.getTime() - ss.directionCompletedAt!.getTime()) / 1000 : 0,
+    stepName: ss.stepName,
+    hasUsedHint: ss.hasUsedHint,
+    isBonusCorrect: ss.isBonusCorrect
+  }))
+  
   const totalTime = (session.completedAt?.getTime() || Date.now()) - session.startedAt.getTime()
 
   return { user: session.user, totalTime, attempts, completedAt: session.completedAt }
@@ -157,18 +145,17 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
     where: { completedAt: { not: null } },
     include: {
       user: true,
-      questionSessions: { 
-        where: { answeredAt: { not: null } }, 
-        orderBy: { answeredAt: 'asc' } 
+      stepSessions: { 
+        where: { enigmaCompletedAt: { not: null } }, 
+        orderBy: { enigmaCompletedAt: 'asc' } 
       }
     }
   })
 
-  const scoreboard = sessions.map((s: typeof sessions[number]): ScoreboardRow => {
+  const scoreboard = sessions.map((s): ScoreboardRow => {
     const totalTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
-    const totalHints = s.questionSessions.reduce((sum: number, qs: typeof s.questionSessions[number]): number => {
-      const arr = Array.isArray(qs.usedHints) ? (qs.usedHints as unknown as number[]) : []
-      return sum + arr.length
+    const totalHints = s.stepSessions.reduce((sum: number, ss): number => {
+      return sum + (ss.hasUsedHint ? 1 : 0)
     }, 0)
     
     return {
@@ -176,10 +163,11 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
       totalTime,
       totalHints,
       completedAt: s.completedAt!,
-      attempts: s.questionSessions.map((qs: typeof s.questionSessions[number]): ScoreboardAttemptRow => ({
-        stepName: qs.stepName,
-        timeSpent: qs.answeredAt && qs.startedAt ? qs.answeredAt.getTime() - qs.startedAt.getTime() : 0,
-        hintsUsed: Array.isArray(qs.usedHints) ? (qs.usedHints as number[]).length : 0
+      attempts: s.stepSessions.map((ss): ScoreboardAttemptRow => ({
+        stepName: ss.stepName,
+        timeSpent: ss.enigmaCompletedAt && ss.directionCompletedAt ? 
+          ss.enigmaCompletedAt.getTime() - ss.directionCompletedAt.getTime() : 0,
+        hintsUsed: ss.hasUsedHint ? 1 : 0
       }))
     }
   })
@@ -196,4 +184,126 @@ export async function getSessionWithUser(sessionId: string) {
   if (!session) throw new Error('SESSION_NOT_FOUND')
   if (!session.user) throw new Error('SESSION_USER_MISSING')
   return session
+}
+
+// Nouvelles fonctions pour gérer les sous-étapes
+
+export async function getCurrentStepWithSubStep(sessionId: string) {
+  // Chercher une StepSession en cours (pas encore complètement terminée)
+  const currentStepSession = await prisma.stepSession.findFirst({
+    where: { 
+      gameSessionId: sessionId, 
+      keyCompletedAt: null // Pas encore terminée complètement
+    },
+    orderBy: { stepRank: 'asc' }
+  })
+
+  if (currentStepSession) {
+    const step = getStepByName(currentStepSession.stepName)
+    if (!step) throw new Error('Étape introuvable')
+    
+    return {
+      step,
+      stepSession: currentStepSession,
+      currentSubStep: currentStepSession.currentSubStep as 'direction' | 'enigma' | 'bonus' | 'key'
+    }
+  }
+
+  // Sinon, créer la prochaine étape
+  const completedSteps = await prisma.stepSession.findMany({
+    where: { gameSessionId: sessionId, keyCompletedAt: { not: null } },
+    select: { stepRank: true },
+    orderBy: { stepRank: 'asc' }
+  })
+  
+  const nextRank = completedSteps.length + 1
+  if (nextRank > getTotalSteps()) return null
+  
+  const step = getStepByOrder(nextRank)
+  if (!step) return null
+
+  // Créer la nouvelle StepSession
+  const stepSession = await prisma.stepSession.create({
+    data: {
+      gameSessionId: sessionId,
+      stepName: step.name,
+      stepRank: nextRank,
+      currentSubStep: 'direction',
+      hasUsedHint: false,
+      isBonusCorrect: false
+    }
+  })
+
+  return {
+    step,
+    stepSession,
+    currentSubStep: 'direction' as const
+  }
+}
+
+export async function completeSubStep(
+  sessionId: string, 
+  stepName: string, 
+  subStepType: 'direction' | 'enigma' | 'bonus' | 'key', 
+  data?: { isCorrect?: boolean; key?: string }
+) {
+  const stepSession = await prisma.stepSession.findUnique({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
+  })
+
+  if (!stepSession) {
+    throw new Error('Session d\'étape introuvable')
+  }
+
+  const now = new Date()
+  const updateData: {
+    directionCompletedAt?: Date;
+    enigmaCompletedAt?: Date;
+    bonusAttemptedAt?: Date;
+    isBonusCorrect?: boolean;
+    keyCompletedAt?: Date;
+    collectedKey?: string;
+    currentSubStep?: string;
+  } = {}
+
+  switch (subStepType) {
+    case 'direction':
+      updateData.directionCompletedAt = now
+      updateData.currentSubStep = 'enigma'
+      break
+    case 'enigma':
+      updateData.enigmaCompletedAt = now
+      updateData.currentSubStep = 'bonus'
+      break
+    case 'bonus':
+      updateData.bonusAttemptedAt = now
+      updateData.isBonusCorrect = data?.isCorrect || false
+      updateData.currentSubStep = 'key'
+      break
+    case 'key':
+      updateData.keyCompletedAt = now
+      updateData.collectedKey = data?.key || ''
+      // L'étape est maintenant complètement terminée
+      break
+  }
+
+  return prisma.stepSession.update({
+    where: { id: stepSession.id },
+    data: updateData
+  })
+}
+
+export async function getCollectedKeys(sessionId: string): Promise<string[]> {
+  const stepSessions = await prisma.stepSession.findMany({
+    where: { 
+      gameSessionId: sessionId,
+      collectedKey: { not: null }
+    },
+    select: { collectedKey: true },
+    orderBy: { stepRank: 'asc' }
+  })
+
+  return stepSessions
+    .map(ss => ss.collectedKey)
+    .filter((key): key is string => key !== null)
 }

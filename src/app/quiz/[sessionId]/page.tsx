@@ -44,7 +44,7 @@ interface Hint {
   totalHints: number;
 }
 
-export default function QuizPage() {
+const QuizPage = () => {
   const params = useParams();
   const router = useRouter();
   const sessionId = params?.sessionId as string;
@@ -340,4 +340,6 @@ export default function QuizPage() {
       </div>
     </div>
   );
-}
+};
+
+export default QuizPage;

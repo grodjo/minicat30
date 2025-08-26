@@ -71,35 +71,35 @@ export const steps: Step[] = [
   }
 ];
 
-export function getStepByName(name: string): Step | undefined {
+export const getStepByName = (name: string): Step | undefined => {
   return steps.find(s => s.name === name);
-}
+};
 
-export function getStepByOrder(order: number): Step | undefined {
+export const getStepByOrder = (order: number): Step | undefined => {
   return steps[order - 1]; // order is 1-based, array is 0-based
-}
+};
 
-export function getTotalSteps(): number {
+export const getTotalSteps = (): number => {
   return steps.length;
-}
+};
 
-export function getNextStep(currentOrder: number): Step | undefined {
+export const getNextStep = (currentOrder: number): Step | undefined => {
   return steps[currentOrder]; // currentOrder is the next index (0-based)
-}
+};
 
-export function getCurrentStepOrder(stepName: string): number {
+export const getCurrentStepOrder = (stepName: string): number => {
   const index = steps.findIndex(s => s.name === stepName);
   return index + 1; // return 1-based order
-}
+};
 
 // Fonctions pour gérer la progression des sous-étapes
-export function getNextSubStep(currentSubStep: SubStepType): SubStepType | null {
+export const getNextSubStep = (currentSubStep: SubStepType): SubStepType | null => {
   const sequence: SubStepType[] = ['direction', 'enigma', 'bonus', 'key'];
   const currentIndex = sequence.indexOf(currentSubStep);
   return currentIndex < sequence.length - 1 ? sequence[currentIndex + 1] : null;
-}
+};
 
-export function getSubStepData(step: Step, subStepType: SubStepType) {
+export const getSubStepData = (step: Step, subStepType: SubStepType) => {
   switch (subStepType) {
     case 'direction':
       return {
@@ -130,10 +130,9 @@ export function getSubStepData(step: Step, subStepType: SubStepType) {
     default:
       return null;
   }
-}
+};
 
-// Nouvelle fonction pour valider les réponses
-export function validateStepAnswer(stepName: string, subStepType: SubStepType, answer: string): boolean {
+export const validateStepAnswer = (stepName: string, subStepType: SubStepType, answer: string): boolean => {
   const step = getStepByName(stepName);
   if (!step) return false;
 
@@ -148,4 +147,4 @@ export function validateStepAnswer(stepName: string, subStepType: SubStepType, a
       // Les sous-étapes 'direction' et 'key' ne nécessitent pas de validation de réponse
       return true;
   }
-}
+};

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
-export default function Home() {
+export const Home = () => {
   const [pseudo, setPseudo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -206,4 +206,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;

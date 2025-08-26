@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export function useTimer(startedAt: string | null) {
+export const useTimer = (startedAt: string | null) => {
   const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
@@ -34,4 +34,4 @@ export function useTimer(startedAt: string | null) {
   };
 
   return formatTime(elapsedTime);
-}
+};

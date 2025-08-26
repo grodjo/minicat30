@@ -15,7 +15,7 @@ import { EnigmaSubStep } from '@/components/substeps/EnigmaSubStep';
 import { BonusSubStep } from '@/components/substeps/BonusSubStep';
 import { KeySubStep } from '@/components/substeps/KeySubStep';
 
-interface Step {
+interface StepData {
   stepName: string;
   currentSubStep: string;
   subStepData: {
@@ -34,7 +34,10 @@ interface Step {
     bonusCorrect: boolean;
     keyCompleted: boolean;
   };
-  pseudo?: string | null;
+}
+
+interface SessionInfo {
+  pseudo: string | null;
   startedAt: string;
 }
 
@@ -49,7 +52,8 @@ const QuizPage = () => {
   const router = useRouter();
   const sessionId = params?.sessionId as string;
 
-  const [step, setStep] = useState<Step | null>(null);
+  const [stepData, setStepData] = useState<StepData | null>(null);
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null);
   const [hints, setHints] = useState<Hint[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -60,7 +64,7 @@ const QuizPage = () => {
   const [isStepEntering, setIsStepEntering] = useState(false);
 
   // Hook pour le timer
-  const elapsedTime = useTimer(step?.startedAt || null);
+  const elapsedTime = useTimer(sessionInfo?.startedAt || null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
@@ -81,7 +85,10 @@ const QuizPage = () => {
       if (data.completed) {
         setCompleted(true);
       } else {
-        setStep(data);
+        // Séparer les données de session et d'étape
+        const { pseudo, startedAt, ...stepData } = data;
+        setSessionInfo({ pseudo, startedAt });
+        setStepData(stepData);
         setHints([]);
         
         // Déclencher l'animation d'entrée
@@ -106,7 +113,7 @@ const QuizPage = () => {
 
   // Gestion de la completion des sous-étapes sans réponse (direction, key)
   const handleSubStepComplete = async () => {
-    if (!step) return;
+    if (!stepData) return;
 
     setSubmitting(true);
     try {
@@ -116,9 +123,9 @@ const QuizPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          stepName: step.stepName,
-          subStepType: step.currentSubStep,
-          data: step.subStepData.type === 'key' ? { key: 'found' } : {}
+          stepName: stepData.stepName,
+          subStepType: stepData.currentSubStep,
+          data: stepData.subStepData.type === 'key' ? { key: 'found' } : {}
         }),
       });
 
@@ -139,7 +146,7 @@ const QuizPage = () => {
 
   // Gestion de la soumission de réponse pour énigmes et bonus
   const handleAnswerSubmit = async (answer: string) => {
-    if (!step) return;
+    if (!stepData) return;
 
     setSubmitting(true);
     try {
@@ -149,9 +156,9 @@ const QuizPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          stepName: step.stepName,
+          stepName: stepData.stepName,
           answer: answer.trim(),
-          subStepType: step.currentSubStep,
+          subStepType: stepData.currentSubStep,
         }),
       });
 
@@ -206,7 +213,7 @@ const QuizPage = () => {
 
   // Gestion de l'obtention d'un indice
   const getHint = async () => {
-    if (!step) return;
+    if (!stepData) return;
 
     // Si l'indice est déjà chargé, juste ouvrir la modale
     if (hints.length > 0) {
@@ -223,7 +230,7 @@ const QuizPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          stepName: step.stepName,
+          stepName: stepData.stepName,
           hintIndex: 0,
         }),
       });
@@ -260,26 +267,26 @@ const QuizPage = () => {
     return <CompletedState onGoToScoreboard={goToScoreboard} />;
   }
 
-  if (!step) {
+  if (!stepData) {
     return <ErrorState />;
   }
 
   // Rendu du composant approprié selon le type de sous-étape
   const renderSubStep = () => {
     const commonProps = {
-      stepName: step.stepName,
+      stepName: stepData.stepName,
       isSubmitting: submitting,
       isCorrectAnswer,
       isStepEntering
     };
 
-    switch (step.subStepData.type) {
+    switch (stepData.subStepData.type) {
       case 'direction':
         return (
           <DirectionSubStep
             {...commonProps}
-            content={step.subStepData.content!}
-            buttonText={step.subStepData.buttonText!}
+            content={stepData.subStepData.content!}
+            buttonText={stepData.subStepData.buttonText!}
             onComplete={handleSubStepComplete}
           />
         );
@@ -288,8 +295,8 @@ const QuizPage = () => {
         return (
           <EnigmaSubStep
             {...commonProps}
-            question={step.subStepData.question!}
-            hint={step.subStepData.hint!}
+            question={stepData.subStepData.question!}
+            hint={stepData.subStepData.hint!}
             onSubmit={handleAnswerSubmit}
             onGetHint={getHint}
             hintModalOpen={hintModalOpen}
@@ -303,7 +310,7 @@ const QuizPage = () => {
         return (
           <BonusSubStep
             {...commonProps}
-            question={step.subStepData.question!}
+            question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
           />
         );
@@ -312,8 +319,8 @@ const QuizPage = () => {
         return (
           <KeySubStep
             {...commonProps}
-            content={step.subStepData.content!}
-            buttonText={step.subStepData.buttonText!}
+            content={stepData.subStepData.content!}
+            buttonText={stepData.subStepData.buttonText!}
             onComplete={handleSubStepComplete}
           />
         );
@@ -327,7 +334,7 @@ const QuizPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative overflow-hidden">
       {/* Header avec pseudo et timer */}
       <QuizHeader 
-        pseudo={step.pseudo || null} 
+        pseudo={sessionInfo?.pseudo || null} 
         sessionId={sessionId} 
         elapsedTime={elapsedTime} 
       />

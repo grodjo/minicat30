@@ -1,5 +1,5 @@
 // Export all substep components for easy importing
-export { default as DirectionSubStep } from './DirectionSubStep';
-export { default as EnigmaSubStep } from './EnigmaSubStep';
-export { default as BonusSubStep } from './BonusSubStep';
-export { default as KeySubStep } from './KeySubStep';
+export { DirectionSubStep } from './DirectionSubStep';
+export { EnigmaSubStep } from './EnigmaSubStep';
+export { BonusSubStep } from './BonusSubStep';
+export { KeySubStep } from './KeySubStep';

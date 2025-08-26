@@ -12,7 +12,7 @@ interface KeySubStepProps {
   isStepEntering: boolean;
 }
 
-export default function KeySubStep({
+export const KeySubStep = ({
   stepName,
   content,
   buttonText,
@@ -20,7 +20,7 @@ export default function KeySubStep({
   isSubmitting,
   isCorrectAnswer,
   isStepEntering
-}: KeySubStepProps) {
+}: KeySubStepProps) => {
   return (
     <>
       {/* Contenu principal */}
@@ -72,4 +72,4 @@ export default function KeySubStep({
       </div>
     </>
   );
-}
+};

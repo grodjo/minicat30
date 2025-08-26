@@ -20,7 +20,7 @@ interface EnigmaSubStepProps {
   isStepEntering: boolean;
 }
 
-export default function EnigmaSubStep({
+export const EnigmaSubStep = ({
   stepName,
   question,
   hint,
@@ -33,7 +33,7 @@ export default function EnigmaSubStep({
   setHintModalOpen,
   hints,
   isLoadingHint
-}: EnigmaSubStepProps) {
+}: EnigmaSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -143,4 +143,4 @@ export default function EnigmaSubStep({
       </div>
     </>
   );
-}
+};

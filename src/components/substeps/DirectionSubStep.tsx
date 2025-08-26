@@ -12,7 +12,7 @@ interface DirectionSubStepProps {
   isStepEntering: boolean;
 }
 
-export default function DirectionSubStep({
+export const DirectionSubStep = ({
   stepName,
   content,
   buttonText,
@@ -20,7 +20,7 @@ export default function DirectionSubStep({
   isSubmitting,
   isCorrectAnswer,
   isStepEntering
-}: DirectionSubStepProps) {
+}: DirectionSubStepProps) => {
   return (
     <>
       {/* Contenu principal */}
@@ -70,4 +70,4 @@ export default function DirectionSubStep({
       </div>
     </>
   );
-}
+};

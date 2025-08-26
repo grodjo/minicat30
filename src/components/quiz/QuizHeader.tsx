@@ -6,7 +6,7 @@ interface QuizHeaderProps {
   elapsedTime: string;
 }
 
-export default function QuizHeader({ pseudo, sessionId, elapsedTime }: QuizHeaderProps) {
+export const QuizHeader = ({ pseudo, sessionId, elapsedTime }: QuizHeaderProps) => {
   return (
     <div className="absolute top-0 left-0 right-0 p-4 z-10">
       <div className="flex justify-between items-center">
@@ -19,4 +19,4 @@ export default function QuizHeader({ pseudo, sessionId, elapsedTime }: QuizHeade
       </div>
     </div>
   );
-}
+};

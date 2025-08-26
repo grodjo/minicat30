@@ -6,7 +6,7 @@ interface LoadingStateProps {
   message?: string;
 }
 
-export function LoadingState({ message = "Chargement..." }: LoadingStateProps) {
+export const LoadingState = ({ message = "Chargement..." }: LoadingStateProps = {}) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
       <div className="text-center">
@@ -15,13 +15,13 @@ export function LoadingState({ message = "Chargement..." }: LoadingStateProps) {
       </div>
     </div>
   );
-}
+};
 
 interface CompletedStateProps {
   onGoToScoreboard: () => void;
 }
 
-export function CompletedState({ onGoToScoreboard }: CompletedStateProps) {
+export const CompletedState = ({ onGoToScoreboard }: CompletedStateProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex flex-col items-center justify-center p-4 text-center">
       <div className="text-8xl mb-8 animate-bounce">🎉</div>
@@ -41,13 +41,13 @@ export function CompletedState({ onGoToScoreboard }: CompletedStateProps) {
       </Button>
     </div>
   );
-}
+};
 
 interface ErrorStateProps {
   message?: string;
 }
 
-export function ErrorState({ message = "Impossible de charger l'étape" }: ErrorStateProps) {
+export const ErrorState = ({ message = "Impossible de charger l'étape" }: ErrorStateProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-500 via-pink-600 to-rose-700 flex items-center justify-center p-4">
       <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
@@ -60,4 +60,4 @@ export function ErrorState({ message = "Impossible de charger l'étape" }: Error
       </div>
     </div>
   );
-}
+};

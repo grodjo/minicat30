@@ -13,14 +13,14 @@ interface BonusSubStepProps {
   isStepEntering: boolean;
 }
 
-export default function BonusSubStep({
+export const BonusSubStep = ({
   stepName,
   question,
   onSubmit,
   isSubmitting,
   isCorrectAnswer,
   isStepEntering
-}: BonusSubStepProps) {
+}: BonusSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -92,4 +92,4 @@ export default function BonusSubStep({
       </div>
     </>
   );
-}
+};

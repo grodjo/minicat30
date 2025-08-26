@@ -8,12 +8,12 @@ import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
 
 // Composants
-import QuizHeader from '@/components/quiz/QuizHeader';
+import { QuizHeader } from '@/components/quiz/QuizHeader';
 import { LoadingState, CompletedState, ErrorState } from '@/components/quiz/QuizStates';
-import DirectionSubStep from '@/components/substeps/DirectionSubStep';
-import EnigmaSubStep from '@/components/substeps/EnigmaSubStep';
-import BonusSubStep from '@/components/substeps/BonusSubStep';
-import KeySubStep from '@/components/substeps/KeySubStep';
+import { DirectionSubStep } from '@/components/substeps/DirectionSubStep';
+import { EnigmaSubStep } from '@/components/substeps/EnigmaSubStep';
+import { BonusSubStep } from '@/components/substeps/BonusSubStep';
+import { KeySubStep } from '@/components/substeps/KeySubStep';
 
 interface Step {
   stepName: string;

@@ -19,6 +19,7 @@ interface EnigmaSubStepProps {
   isSubmitting: boolean;
   isCorrectAnswer: boolean;
   isStepEntering: boolean;
+  hasUsedHint: boolean;
 }
 
 export const EnigmaSubStep = ({
@@ -33,7 +34,8 @@ export const EnigmaSubStep = ({
   hintModalOpen,
   setHintModalOpen,
   hints,
-  isLoadingHint
+  isLoadingHint,
+  hasUsedHint
 }: EnigmaSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -55,7 +57,7 @@ export const EnigmaSubStep = ({
               onClick={onGetHint}
               disabled={isLoadingHint || isCorrectAnswer}
               className={`
-                ${hints.length > 0
+                ${hasUsedHint
                   ? 'bg-green-600 hover:bg-green-500 text-white border-green-500 shadow-green-500/30' 
                   : 'bg-yellow-600 hover:bg-yellow-500 text-white border-yellow-500 shadow-yellow-500/30'
                 } 
@@ -66,7 +68,7 @@ export const EnigmaSubStep = ({
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               ) : (
                 <>
-                  {hints.length > 0 ? '✅' : '💡'} Indice
+                  {hasUsedHint ? '✅' : '💡'} Indice
                 </>
               )}
             </Button>

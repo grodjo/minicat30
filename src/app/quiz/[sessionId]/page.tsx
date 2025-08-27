@@ -34,6 +34,7 @@ interface StepData {
     bonusCompleted: boolean;
     bonusCorrect: boolean;
     keyCompleted: boolean;
+    hasUsedHint: boolean;
   };
 }
 
@@ -109,7 +110,17 @@ const QuizPage = () => {
         const { pseudo, startedAt, ...stepData } = data;
         setSessionInfo({ pseudo, startedAt });
         setStepData(stepData);
-        setHints([]);
+        
+        // Si l'indice a été utilisé pour cette étape, le charger
+        if (stepData.stepSession.hasUsedHint && stepData.subStepData.type === 'enigma') {
+          setHints([{
+            hint: stepData.subStepData.hint,
+            hintIndex: 0,
+            totalHints: 1
+          }]);
+        } else {
+          setHints([]);
+        }
         
         // Déclencher l'animation d'entrée
         setIsStepEntering(true);
@@ -236,13 +247,13 @@ const QuizPage = () => {
   const getHint = async () => {
     if (!stepData) return;
 
-    // Si l'indice est déjà chargé, juste ouvrir la modale
-    if (hints.length > 0) {
+    // Si l'indice a déjà été utilisé (selon la BDD), juste ouvrir la modale
+    if (stepData.stepSession.hasUsedHint && hints.length > 0) {
       setHintModalOpen(true);
       return;
     }
 
-    // Sinon, charger l'indice
+    // Sinon, charger l'indice depuis l'API
     setIsLoadingHint(true);
     try {
       const response = await fetch(`/api/session/${sessionId}/hint`, {
@@ -327,6 +338,7 @@ const QuizPage = () => {
             setHintModalOpen={setHintModalOpen}
             hints={hints}
             isLoadingHint={isLoadingHint}
+            hasUsedHint={stepData.stepSession.hasUsedHint}
           />
         );
 

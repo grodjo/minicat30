@@ -17,6 +17,7 @@ import { KeySubStep } from '@/components/substeps/KeySubStep';
 
 interface StepData {
   stepName: string;
+  stepRank: number;
   currentSubStep: string;
   subStepData: {
     type: string;
@@ -273,9 +274,8 @@ const QuizPage = () => {
 
   // Rendu du composant approprié selon le type de sous-étape
   const renderSubStep = () => {
-    // Extraction du numéro d'étape à partir du stepName
-    const stepNumber = stepData.stepName.match(/\d+/)?.[0] || '01';
-    const formattedStepName = `Étape ${stepNumber.padStart(2, '0')}`;
+    // Utilisation directe du stepRank pour un formatage propre
+    const formattedStepName = `Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
     
     const commonProps = {
       stepName: formattedStepName,

@@ -41,6 +41,7 @@ export async function GET(
 
     return NextResponse.json({
       stepName: step.name,
+      stepRank: step.stepRank,
       currentSubStep,
       subStepData,
       stepSession: {

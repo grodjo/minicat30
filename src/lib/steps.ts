@@ -1,4 +1,5 @@
 export interface Step {
+  stepRank: number;
   name: string;
   direction: string; // Sous-étape 1: indication pour se rendre au lieu
   key: string;       // Sous-étape 4: indication pour trouver l'objet caché
@@ -28,6 +29,7 @@ export interface StepProgress {
 
 export const steps: Step[] = [
   {
+    stepRank: 1,
     name: "01 | Animal domestique",
     direction: "Rendez-vous dans le parc le plus proche de votre position",
     key: "Cherchez sous le banc le plus proche de l'aire de jeux",
@@ -42,6 +44,7 @@ export const steps: Step[] = [
     }
   },
   {
+    stepRank: 2,
     name: "02 | Couleur primaire",
     direction: "Dirigez-vous vers la fontaine la plus proche",
     key: "Regardez derrière la plaque commémorative de la fontaine",
@@ -56,6 +59,7 @@ export const steps: Step[] = [
     }
   },
   {
+    stepRank: 3,
     name: "03 | Planète rouge",
     direction: "Trouvez le café ou restaurant le plus proche",
     key: "Vérifiez sous la table en terrasse la plus éloignée de l'entrée",

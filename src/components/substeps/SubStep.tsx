@@ -36,14 +36,17 @@ export const SubStep = ({
           <h2 className="text-lg font-bold text-violet-200/90 tracking-wider mb-3">
             {stepName}
           </h2>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto"></div>
+          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50"></div>
         </div>
 
         {/* Indicateur de type */}
         <div className="text-center mb-6">
-          <p className="text-violet-300 text-lg italic">
-            {typeIcon} {typeLabel}
-          </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-indigo-500/20 border border-violet-400/30 rounded-full backdrop-blur-sm shadow-lg">
+            <span className="text-2xl">{typeIcon}</span>
+            <p className="text-violet-200 text-lg font-semibold tracking-wide">
+              {typeLabel}
+            </p>
+          </div>
         </div>
 
         {/* Titre principal */}

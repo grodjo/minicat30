@@ -39,8 +39,8 @@ export const DirectionSubStep = ({
   return (
     <SubStep
       stepName={stepName}
-      typeIcon="📍"
-      typeLabel="Direction"
+      typeIcon="🧭"
+      typeLabel="Orientation"
       title={content}
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}

@@ -70,6 +70,25 @@ const QuizPage = () => {
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
 
+  // Style moderne spécifiquement pour le toast de mauvaise réponse
+  const wrongAnswerToastStyle = {
+    className: `${quizToastClass}`,
+    style: {
+      background: 'linear-gradient(135deg, #7f1d1d, #881337, #831843)',
+      border: '1px solid rgba(248, 113, 113, 0.4)',
+      color: 'white',
+      fontSize: '18px',
+      fontWeight: '600',
+      padding: '20px 24px',
+      borderRadius: '16px',
+      boxShadow: '0 25px 50px -12px rgba(239, 68, 68, 0.25), 0 0 0 1px rgba(248, 113, 113, 0.1)',
+      minHeight: '60px',
+      display: 'flex',
+      alignItems: 'center',
+      opacity: '1'
+    }
+  };
+
   // Ouvrir la modale quand un nouvel indice est chargé
   useEffect(() => {
     if (isLoadingHint && hints.length > 0) {
@@ -139,7 +158,9 @@ const QuizPage = () => {
       }
     } catch (error) {
       console.error('Error completing substep:', error);
-      toast.error('Erreur lors de la validation', { className: quizToastClass });
+      toast.error('Erreur lors de la validation', { 
+        className: quizToastClass
+      });
     } finally {
       setSubmitting(false);
     }
@@ -198,9 +219,8 @@ const QuizPage = () => {
           setIsCorrectAnswer(false);
         }, 2000); // 2 secondes pour les confettis
       } else {
-        toast.error(data.message, {
-          className: quizToastClass
-        });
+        // Toast moderne pour mauvaise réponse avec emoji (pas d'icône par défaut)
+        toast(`❌ C'est raté !`, wrongAnswerToastStyle);
       }
     } catch (error) {
       console.error('Error submitting answer:', error);

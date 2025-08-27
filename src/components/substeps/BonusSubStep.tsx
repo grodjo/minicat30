@@ -32,7 +32,7 @@ export const BonusSubStep = ({
 
   const bonusWarning = (
     <div className="text-center mb-6">
-      <p className="text-amber-400 text-sm font-medium">
+      <p className="text-amber-400 text-lg font-semibold">
         ⚠️ Une seule tentative !
       </p>
     </div>

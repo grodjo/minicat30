@@ -230,8 +230,33 @@ const QuizPage = () => {
           setIsCorrectAnswer(false);
         }, 2000); // 2 secondes pour les confettis
       } else {
-        // Toast moderne pour mauvaise réponse avec emoji (pas d'icône par défaut)
-        toast(`❌ C'est raté !`, wrongAnswerToastStyle);
+        // Vérifier si c'est un bonus raté qui doit passer à la suite
+        if (data.moveToNext) {
+          // Afficher un message informatif puis charger la prochaine étape
+          toast(`⏭️ ${data.message}`, {
+            className: quizToastClass,
+            style: {
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              color: 'white',
+              fontSize: '16px',
+              fontWeight: '600',
+              padding: '16px 20px',
+              borderRadius: '12px'
+            }
+          });
+          
+          // Attendre un peu puis charger la prochaine étape
+          setTimeout(async () => {
+            if (data.completed) {
+              setCompleted(true);
+            } else {
+              await loadCurrentStep();
+            }
+          }, 1500);
+        } else {
+          // Toast moderne pour mauvaise réponse avec emoji (pas d'icône par défaut)
+          toast(`❌ C'est raté !`, wrongAnswerToastStyle);
+        }
       }
     } catch (error) {
       console.error('Error submitting answer:', error);

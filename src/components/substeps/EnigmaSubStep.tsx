@@ -61,7 +61,7 @@ export const EnigmaSubStep = ({
                   ? 'bg-green-600 hover:bg-green-500 text-white border-green-500 shadow-green-500/30' 
                   : 'bg-yellow-600 hover:bg-yellow-500 text-white border-yellow-500 shadow-yellow-500/30'
                 } 
-                disabled:opacity-50 min-w-[120px] font-semibold px-4 py-2 rounded-lg shadow-lg hover:shadow-xl active:shadow-md active:translate-y-0.5 transition-all duration-200 border-2 transform hover:-translate-y-0.5
+                disabled:opacity-50 min-w-[120px] font-semibold text-base px-4 py-2 rounded-lg shadow-lg hover:shadow-xl active:shadow-md active:translate-y-0.5 transition-all duration-200 border-2 transform hover:-translate-y-0.5
               `}
             >
               {isLoadingHint ? (

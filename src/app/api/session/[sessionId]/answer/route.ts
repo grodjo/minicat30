@@ -38,8 +38,28 @@ export async function POST(
         });
       }
     } else if (subStepType === 'bonus') {
-      // Pour les bonus, même si incorrect, marquer comme tenté
+      // Pour les bonus, même si incorrect, marquer comme tenté et passer à l'étape suivante
       await completeSubStep(sessionId, stepName, subStepType, { isCorrect: false });
+      
+      // Vérifier si toutes les étapes sont terminées après ce bonus raté
+      const nextStepData = await getCurrentStepWithSubStep(sessionId);
+      
+      if (!nextStepData) {
+        // Toutes les étapes ont été complétées, terminer la session
+        await completeSession(sessionId);
+        return NextResponse.json({
+          isCorrect: false,
+          completed: true,
+          message: 'Quiz terminé ! Dommage pour cette question bonus.'
+        });
+      }
+      
+      return NextResponse.json({
+        isCorrect: false,
+        completed: false,
+        message: 'Dommage ! Passons à la suite.',
+        moveToNext: true // Indique au frontend de charger la prochaine étape
+      });
     }
 
     return NextResponse.json({

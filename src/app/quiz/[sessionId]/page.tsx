@@ -273,8 +273,12 @@ const QuizPage = () => {
 
   // Rendu du composant approprié selon le type de sous-étape
   const renderSubStep = () => {
+    // Extraction du numéro d'étape à partir du stepName
+    const stepNumber = stepData.stepName.match(/\d+/)?.[0] || '01';
+    const formattedStepName = `Étape ${stepNumber.padStart(2, '0')}`;
+    
     const commonProps = {
-      stepName: stepData.stepName,
+      stepName: formattedStepName,
       isSubmitting: submitting,
       isCorrectAnswer,
       isStepEntering

@@ -139,14 +139,22 @@ const Home = () => {
                     value={pseudo}
                     onChange={(e) => setPseudo(e.target.value)}
                     required
+                    minLength={3}
                     maxLength={50}
                     disabled={isLoading || isExiting}
-                    className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-medium text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50"
+                    className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-bold text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50 placeholder:text-lg tracking-wide font-mono"
                     placeholder="Choisissez un nom d'équipe"
+                    style={{
+                      textShadow: '0 0 10px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.2)',
+                      letterSpacing: '0.1em'
+                    }}
                   />
                   
                   {/* Ligne animée au focus */}
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 transition-all duration-300 w-0 group-focus-within:w-3/4"></div>
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 transition-all duration-300 w-0 group-focus-within:w-3/4 shadow-lg shadow-violet-400/50 pointer-events-none"></div>
+                  
+                  {/* Effet de brillance subtil */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 rounded pointer-events-none"></div>
                 </div>
               </div>
             </div>
@@ -154,7 +162,7 @@ const Home = () => {
             {/* Bouton classique "Je veux jouer !" */}
             <Button
               type="submit"
-              disabled={!pseudo.trim() || isLoading || isExiting}
+              disabled={!pseudo.trim() || pseudo.trim().length < 3 || isLoading || isExiting}
               className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg tracking-wide transition-all duration-300 shadow-xl hover:shadow-2xl disabled:from-slate-600 disabled:to-slate-600 disabled:text-slate-300 rounded-2xl"
             >
               {isLoading ? 'Chargement...' : isExiting ? 'Connexion...' : 'On est chaud patate 🔥🥔'}

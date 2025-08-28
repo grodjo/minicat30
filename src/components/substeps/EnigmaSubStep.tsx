@@ -1,6 +1,5 @@
-'use client';
-
-import { useState } from 'react';
+import React, { useState } from 'react';
+import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -116,7 +115,7 @@ export const EnigmaSubStep = ({
           type="text"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          className="flex-1 h-14 bg-white border-violet-300/50 text-slate-900 placeholder:text-violet-600/60 text-lg font-medium focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl"
+          className="flex-1 h-14 bg-slate-50/95 border-violet-300/50 text-violet-700 placeholder:text-violet-500/70 text-lg font-semibold focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl shadow-sm"
           placeholder="Votre réponse..."
           required
           disabled={isSubmitting || isCorrectAnswer}

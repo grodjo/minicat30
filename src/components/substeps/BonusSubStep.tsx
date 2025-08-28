@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SubStep } from './SubStep';
@@ -45,7 +46,7 @@ export const BonusSubStep = ({
           type="text"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          className="flex-1 h-14 bg-white border-amber-300/50 text-slate-900 placeholder:text-amber-600/60 text-lg font-medium focus:border-amber-400 focus:ring-2 focus:ring-amber-400/70 rounded-xl"
+          className="flex-1 h-14 bg-slate-50/95 border-amber-300/50 text-amber-700 placeholder:text-amber-600/70 text-lg font-semibold focus:border-amber-400 focus:ring-2 focus:ring-amber-400/70 rounded-xl shadow-sm"
           placeholder="Votre réponse (une seule chance)..."
           required
           disabled={isSubmitting || isCorrectAnswer}

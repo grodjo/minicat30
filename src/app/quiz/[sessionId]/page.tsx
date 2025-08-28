@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import { DirectionSubStep } from '@/components/substeps/DirectionSubStep';
 import { EnigmaSubStep } from '@/components/substeps/EnigmaSubStep';
 import { BonusSubStep } from '@/components/substeps/BonusSubStep';
 import { KeySubStep } from '@/components/substeps/KeySubStep';
+import { WrongAnswerToast, WrongAnswerToastRef } from '@/components/ui/wrong-answer-toast';
 
 interface StepData {
   stepName: string;
@@ -64,31 +65,15 @@ const QuizPage = () => {
   const [isLoadingHint, setIsLoadingHint] = useState(false);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isStepEntering, setIsStepEntering] = useState(false);
+  
+  // Ref pour le toast d'erreur
+  const wrongAnswerToastRef = useRef<WrongAnswerToastRef>(null);
 
   // Hook pour le timer
   const { formattedTime: elapsedTime, addTimePenalty, showPenaltyAnimation } = useTimer(sessionInfo?.startedAt || null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
-
-  // Style moderne spécifiquement pour le toast de mauvaise réponse
-  const wrongAnswerToastStyle = {
-    className: `${quizToastClass}`,
-    style: {
-      background: 'linear-gradient(135deg, #7f1d1d, #881337, #831843)',
-      border: '1px solid rgba(248, 113, 113, 0.4)',
-      color: 'white',
-      fontSize: '18px',
-      fontWeight: '600',
-      padding: '20px 24px',
-      borderRadius: '16px',
-      boxShadow: '0 25px 50px -12px rgba(239, 68, 68, 0.25), 0 0 0 1px rgba(248, 113, 113, 0.1)',
-      minHeight: '60px',
-      display: 'flex',
-      alignItems: 'center',
-      opacity: '1'
-    }
-  };
 
   // Ouvrir la modale quand un nouvel indice est chargé (avec délai pour laisser l'animation se terminer)
   useEffect(() => {
@@ -257,8 +242,8 @@ const QuizPage = () => {
             }
           }, 1500);
         } else {
-          // Toast moderne pour mauvaise réponse avec emoji (pas d'icône par défaut)
-          toast(`❌ C'est raté !`, wrongAnswerToastStyle);
+          // Afficher notre toast custom pour mauvaise réponse
+          wrongAnswerToastRef.current?.show();
         }
       }
     } catch (error) {
@@ -422,6 +407,12 @@ const QuizPage = () => {
           {renderSubStep()}
         </div>
       </div>
+
+      {/* Toast custom pour mauvaise réponse */}
+      <WrongAnswerToast 
+        ref={wrongAnswerToastRef}
+        message="❌ C'est raté !"
+      />
     </div>
   );
 };

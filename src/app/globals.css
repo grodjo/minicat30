@@ -345,3 +345,79 @@ body {
 .animate-timer-shake {
   animation: timer-shake 2s ease-in-out;
 }
+
+/* Animations pour le toast d'erreur rapide custom */
+@keyframes slide-in-left {
+  0% {
+    transform: translateX(-150vw);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-right {
+  0% {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(150vw);
+    opacity: 0;
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.15s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+/* Animations pour le toast d'erreur rapide */
+@keyframes error-toast-slide-in {
+  0% {
+    transform: translateX(-100%) translateY(-22px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) translateY(-22px);
+    opacity: 1;
+  }
+}
+
+@keyframes error-toast-slide-out {
+  0% {
+    transform: translateX(0) translateY(-22px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) translateY(-22px);
+    opacity: 0;
+  }
+}
+
+/* Classes pour le toast d'erreur avec animations personnalisées */
+.error-toast-slide[data-state="open"] {
+  animation: error-toast-slide-in 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.error-toast-slide[data-state="closed"] {
+  animation: error-toast-slide-out 0.15s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+/* Override des animations par défaut de Sonner pour les toasts d'erreur */
+.error-toast-slide[data-sonner-toast] {
+  animation: none !important;
+}
+
+.error-toast-slide[data-sonner-toast][data-state="open"] {
+  animation: error-toast-slide-in 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.error-toast-slide[data-sonner-toast][data-state="closed"] {
+  animation: error-toast-slide-out 0.15s cubic-bezier(0.7, 0, 0.84, 0) forwards !important;
+}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SubStep } from './SubStep';
 
 interface EnigmaSubStepProps {
@@ -48,31 +48,32 @@ export const EnigmaSubStep = ({
   const hintButton = (
     <div className="text-center mb-8">
       <div className="flex justify-center">
+        {/* Bouton indépendant sans DialogTrigger */}
+        <Button
+          onClick={onGetHint}
+          disabled={isLoadingHint || isCorrectAnswer}
+          className={`
+            ${hasUsedHint
+              ? 'bg-green-600 hover:bg-green-500 text-white border-green-500 shadow-green-500/30' 
+              : 'bg-yellow-600 hover:bg-yellow-500 text-white border-yellow-500 shadow-yellow-500/30'
+            } 
+            disabled:opacity-50 min-w-[120px] font-semibold text-base px-4 py-2 rounded-lg shadow-lg hover:shadow-xl active:shadow-md active:translate-y-0.5 transition-all duration-200 border-2 transform hover:-translate-y-0.5
+          `}
+        >
+          {isLoadingHint ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          ) : (
+            <>
+              {hasUsedHint ? '✅' : '💡'} Indice
+            </>
+          )}
+        </Button>
+        
+        {/* Dialog séparée du bouton */}
         <Dialog 
           open={hintModalOpen} 
           onOpenChange={setHintModalOpen}
         >
-          <DialogTrigger asChild>
-            <Button
-              onClick={onGetHint}
-              disabled={isLoadingHint || isCorrectAnswer}
-              className={`
-                ${hasUsedHint
-                  ? 'bg-green-600 hover:bg-green-500 text-white border-green-500 shadow-green-500/30' 
-                  : 'bg-yellow-600 hover:bg-yellow-500 text-white border-yellow-500 shadow-yellow-500/30'
-                } 
-                disabled:opacity-50 min-w-[120px] font-semibold text-base px-4 py-2 rounded-lg shadow-lg hover:shadow-xl active:shadow-md active:translate-y-0.5 transition-all duration-200 border-2 transform hover:-translate-y-0.5
-              `}
-            >
-              {isLoadingHint ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  {hasUsedHint ? '✅' : '💡'} Indice
-                </>
-              )}
-            </Button>
-          </DialogTrigger>
           <DialogContent className="bg-gradient-to-br from-amber-900 via-yellow-900 to-orange-900 border-amber-300/30 text-white max-w-lg w-full min-h-[40vh] flex flex-col justify-between">
             <DialogHeader className="space-y-6 pt-8">
               <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-amber-200">

@@ -66,7 +66,7 @@ const QuizPage = () => {
   const [isStepEntering, setIsStepEntering] = useState(false);
 
   // Hook pour le timer
-  const elapsedTime = useTimer(sessionInfo?.startedAt || null);
+  const { formattedTime: elapsedTime, addTimePenalty, showPenaltyAnimation } = useTimer(sessionInfo?.startedAt || null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
@@ -90,11 +90,14 @@ const QuizPage = () => {
     }
   };
 
-  // Ouvrir la modale quand un nouvel indice est chargé
+  // Ouvrir la modale quand un nouvel indice est chargé (avec délai pour laisser l'animation se terminer)
   useEffect(() => {
     if (isLoadingHint && hints.length > 0) {
-      setHintModalOpen(true);
-      setIsLoadingHint(false);
+      // Attendre 2.2 secondes que l'animation du timer soit terminée avant d'ouvrir la modale
+      setTimeout(() => {
+        setHintModalOpen(true);
+        setIsLoadingHint(false);
+      }, 2200); // 2.2s pour être sûr que l'animation de 2s soit terminée
     }
   }, [hints, isLoadingHint]);
 
@@ -272,8 +275,10 @@ const QuizPage = () => {
   const getHint = async () => {
     if (!stepData) return;
 
-    // Si l'indice a déjà été utilisé (selon la BDD), juste ouvrir la modale
+    // Si l'indice a déjà été utilisé (selon la BDD), juste ouvrir la modale avec délai
     if (stepData.stepSession.hasUsedHint && hints.length > 0) {
+      // Pas de pénalité si l'indice a déjà été utilisé précédemment
+      // Ouvrir directement la modale (pas d'animation de timer)
       setHintModalOpen(true);
       return;
     }
@@ -295,6 +300,16 @@ const QuizPage = () => {
       const data = await response.json();
       if (response.ok) {
         setHints([data]);
+        // Ajouter la pénalité de temps lors de l'utilisation d'un indice
+        addTimePenalty(1); // Ajouter 1 minute
+        // Mettre à jour immédiatement l'état local pour que le bouton devienne vert
+        setStepData(prev => prev ? {
+          ...prev,
+          stepSession: {
+            ...prev.stepSession,
+            hasUsedHint: true
+          }
+        } : null);
         // La modale s'ouvrira automatiquement via useEffect
       } else {
         setIsLoadingHint(false);
@@ -397,7 +412,8 @@ const QuizPage = () => {
       <QuizHeader 
         pseudo={sessionInfo?.pseudo || null} 
         sessionId={sessionId} 
-        elapsedTime={elapsedTime} 
+        elapsedTime={elapsedTime}
+        showPenaltyAnimation={showPenaltyAnimation}
       />
 
       {/* Contenu principal */}

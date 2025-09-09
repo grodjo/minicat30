@@ -27,6 +27,9 @@ const Home = () => {
 
   const handleStartGame = async () => {
     setShowStartModal(false);
+    
+    // Déclencher l'animation de sortie immédiatement à la fermeture de la modale
+    setIsExiting(true);
     setIsLoading(true);
     
     try {
@@ -40,18 +43,16 @@ const Home = () => {
 
       if (response.ok) {
         const { sessionId } = await response.json();
-        
-        // Arrêter le loading et déclencher l'animation de sortie
         setIsLoading(false);
-        setIsExiting(true);
         
-        // Attendre la fin de l'animation avant de naviguer
+        // Attendre la fin de l'animation avant de naviguer (animation déjà en cours)
         setTimeout(() => {
           router.push(`/quiz/${sessionId}`);
-        }, 800);
+        }, 600); // Réduit de 800ms à 600ms car l'animation a déjà commencé
       } else {
         const errorData = await response.json();
         setIsLoading(false);
+        setIsExiting(false); // Arrêter l'animation en cas d'erreur
         
         // Afficher l'erreur avec un toast
         if (response.status === 409) {
@@ -63,6 +64,7 @@ const Home = () => {
     } catch (error) {
       console.error('Error:', error);
       setIsLoading(false);
+      setIsExiting(false); // Arrêter l'animation en cas d'erreur
       toast.error('Erreur lors de la création de la session');
     }
   };

@@ -12,7 +12,7 @@ export interface WrongAnswerToastRef {
 }
 
 export const WrongAnswerToast = forwardRef<WrongAnswerToastRef, WrongAnswerToastProps>(
-  ({ message = "❌ C'est raté !" }, ref) => {
+  ({ message }, ref) => {
     const [mounted, setMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [shouldRender, setShouldRender] = useState(false);

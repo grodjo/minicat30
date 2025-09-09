@@ -220,29 +220,19 @@ const QuizPage = () => {
       } else {
         // Vérifier si c'est un bonus raté qui doit passer à la suite
         if (data.moveToNext) {
-          // Afficher un message informatif puis charger la prochaine étape
-          toast(`⏭️ ${data.message}`, {
-            className: quizToastClass,
-            style: {
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: '600',
-              padding: '16px 20px',
-              borderRadius: '12px'
-            }
-          });
+          // Pour les bonus, utiliser le WrongAnswerToast au lieu du toast système
+          wrongAnswerToastRef.current?.show();
           
-          // Attendre un peu puis charger la prochaine étape
+          // Attendre que le toast disparaisse (3 secondes) puis charger la prochaine étape
           setTimeout(async () => {
             if (data.completed) {
               setCompleted(true);
             } else {
               await loadCurrentStep();
             }
-          }, 1500);
+          }, 1500); // 1.5 secondes pour laisser le toast disparaître
         } else {
-          // Afficher notre toast custom pour mauvaise réponse
+          // Afficher notre toast custom pour mauvaise réponse (énigmes)
           wrongAnswerToastRef.current?.show();
         }
       }
@@ -411,7 +401,7 @@ const QuizPage = () => {
       {/* Toast custom pour mauvaise réponse */}
       <WrongAnswerToast 
         ref={wrongAnswerToastRef}
-        message="❌ C'est raté !"
+        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté ! On enchâine !" : "❌ Nope !"}
       />
     </div>
   );

@@ -14,6 +14,7 @@ import { DirectionSubStep } from '@/components/substeps/DirectionSubStep';
 import { EnigmaSubStep } from '@/components/substeps/EnigmaSubStep';
 import { BonusSubStep } from '@/components/substeps/BonusSubStep';
 import { KeySubStep } from '@/components/substeps/KeySubStep';
+import { FinalSubStep } from '@/components/substeps/FinalSubStep';
 import { WrongAnswerToast, WrongAnswerToastRef } from '@/components/ui/wrong-answer-toast';
 
 interface StepData {
@@ -100,7 +101,7 @@ const QuizPage = () => {
         setStepData(stepData);
         
         // Si l'indice a été utilisé pour cette étape, le charger
-        if (stepData.stepSession.hasUsedHint && stepData.subStepData.type === 'enigma') {
+        if (stepData.stepSession.hasUsedHint && (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final')) {
           setHints([{
             hint: stepData.subStepData.hint,
             hintIndex: 0,
@@ -373,6 +374,15 @@ const QuizPage = () => {
             content={stepData.subStepData.content!}
             buttonText={stepData.subStepData.buttonText!}
             onComplete={handleSubStepComplete}
+          />
+        );
+
+      case 'final':
+        return (
+          <FinalSubStep
+            {...commonProps}
+            question={stepData.subStepData.question!}
+            onSubmit={handleAnswerSubmit}
           />
         );
 

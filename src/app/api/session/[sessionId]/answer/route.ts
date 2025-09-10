@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { completeSubStep, completeSession, getCurrentStepWithSubStep } from '@/lib/game';
-import { validateStepAnswer } from '@/lib/steps';
+import { validateStepAnswer, validateFinalStepAnswer, isLastStep } from '@/lib/steps';
 
 export async function POST(
   request: NextRequest,
@@ -18,8 +18,18 @@ export async function POST(
       );
     }
 
-    // Valider la réponse selon le type de sous-étape
-    const isCorrect = validateStepAnswer(stepName, subStepType, answer);
+    // Récupérer les données de l'étape actuelle pour déterminer si c'est l'étape finale
+    const currentStepData = await getCurrentStepWithSubStep(sessionId);
+    
+    let isCorrect = false;
+    
+    if (currentStepData && isLastStep(currentStepData.stepSession.stepRank)) {
+      // C'est l'étape finale, utiliser la validation spéciale
+      isCorrect = validateFinalStepAnswer(subStepType, answer);
+    } else {
+      // Étape normale
+      isCorrect = validateStepAnswer(stepName, subStepType, answer);
+    }
 
     if (isCorrect) {
       // Marquer la sous-étape comme complétée

@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { getStepByOrder, getStepByName, getTotalSteps } from './steps'
+import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep } from './steps'
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
@@ -43,14 +43,7 @@ export async function getCurrentStep(sessionId: string) {
 }
 
 export async function validateAnswer(sessionId: string, stepName: string, answer: string) {
-  const step = getStepByName(stepName)
-  if (!step) throw new Error('Étape introuvable')
-
-  const normalizedAnswer = answer.trim().toLowerCase()
-  const normalizedExpected = step.enigma.answer.trim().toLowerCase()
-  const isCorrect = normalizedAnswer === normalizedExpected
-
-  // Récupérer la StepSession
+  // Récupérer la StepSession pour déterminer si c'est l'étape finale
   const stepSession = await prisma.stepSession.findUnique({
     where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
   })
@@ -58,6 +51,23 @@ export async function validateAnswer(sessionId: string, stepName: string, answer
   if (!stepSession) {
     throw new Error('Session d\'étape introuvable')
   }
+
+  let step;
+  let normalizedExpected;
+
+  // Si c'est l'étape finale (dernière étape de la liste)
+  if (isLastStep(stepSession.stepRank)) {
+    step = getFinalStep();
+    if (!step) throw new Error('Étape finale introuvable');
+    normalizedExpected = step.enigma.answer.trim().toLowerCase();
+  } else {
+    step = getStepByName(stepName);
+    if (!step) throw new Error('Étape introuvable');
+    normalizedExpected = step.enigma.answer.trim().toLowerCase();
+  }
+
+  const normalizedAnswer = answer.trim().toLowerCase()
+  const isCorrect = normalizedAnswer === normalizedExpected
 
   // Si la réponse est correcte, marquer la StepSession comme terminée
   if (isCorrect) {
@@ -199,13 +209,13 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
   })
 
   if (currentStepSession) {
-    const step = getStepByName(currentStepSession.stepName)
-    if (!step) throw new Error('Étape introuvable')
+    const step = getStepByOrder(currentStepSession.stepRank);
+    if (!step) throw new Error('Étape introuvable');
     
     return {
       step,
       stepSession: currentStepSession,
-      currentSubStep: currentStepSession.currentSubStep as 'direction' | 'enigma' | 'bonus' | 'key'
+      currentSubStep: currentStepSession.currentSubStep as 'direction' | 'enigma' | 'bonus' | 'key' | 'final'
     }
   }
 
@@ -217,10 +227,15 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
   })
   
   const nextRank = completedSteps.length + 1
+  
+  // Si on a dépassé le nombre total d'étapes, le jeu est terminé
   if (nextRank > getTotalSteps()) return null
   
   const step = getStepByOrder(nextRank)
   if (!step) return null
+
+  // Pour l'étape finale (dernière étape), commencer directement par le substep 'final'
+  const initialSubStep = isLastStep(nextRank) ? 'final' : 'direction';
 
   // Créer la nouvelle StepSession
   const stepSession = await prisma.stepSession.create({
@@ -228,7 +243,7 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
       gameSessionId: sessionId,
       stepName: step.name,
       stepRank: nextRank,
-      currentSubStep: 'direction',
+      currentSubStep: initialSubStep,
       hasUsedHint: false,
       isBonusCorrect: false
     }
@@ -237,14 +252,14 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
   return {
     step,
     stepSession,
-    currentSubStep: 'direction' as const
+    currentSubStep: initialSubStep as 'direction' | 'final'
   }
 }
 
 export async function completeSubStep(
   sessionId: string, 
   stepName: string, 
-  subStepType: 'direction' | 'enigma' | 'bonus' | 'key', 
+  subStepType: 'direction' | 'enigma' | 'bonus' | 'key' | 'final', 
   data?: { isCorrect?: boolean; key?: string }
 ) {
   const stepSession = await prisma.stepSession.findUnique({
@@ -284,6 +299,13 @@ export async function completeSubStep(
       updateData.keyCompletedAt = now
       updateData.collectedKey = data?.key || ''
       // L'étape est maintenant complètement terminée
+      break
+    case 'final':
+      updateData.keyCompletedAt = now
+      // Pour l'étape finale (dernière étape), marquer la session comme terminée
+      if (isLastStep(stepSession.stepRank)) {
+        await completeSession(sessionId);
+      }
       break
   }
 

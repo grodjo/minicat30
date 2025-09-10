@@ -15,7 +15,7 @@ export interface Step {
 }
 
 // Types pour gérer les sous-étapes
-export type SubStepType = 'direction' | 'enigma' | 'bonus' | 'key';
+export type SubStepType = 'direction' | 'enigma' | 'bonus' | 'key' | 'final';
 
 export interface StepProgress {
   stepName: string;
@@ -72,6 +72,21 @@ export const steps: Step[] = [
       question: "Combien y a-t-il de planètes dans notre système solaire ?",
       answer: "8"
     }
+  },
+  {
+    stepRank: 4,
+    name: "FINAL | Le grand défi",
+    direction: "",
+    key: "",
+    enigma: {
+      question: "Avec toutes les clés que vous avez trouvées, quelle est la réponse finale ?",
+      answer: "VICTOIRE",
+      hint: ""
+    },
+    bonus: {
+      question: "",
+      answer: ""
+    }
   }
 ];
 
@@ -85,6 +100,14 @@ export const getStepByOrder = (order: number): Step | undefined => {
 
 export const getTotalSteps = (): number => {
   return steps.length;
+};
+
+export const isLastStep = (stepRank: number): boolean => {
+  return stepRank === steps.length;
+};
+
+export const getFinalStep = (): Step | undefined => {
+  return steps[steps.length - 1];
 };
 
 export const getNextStep = (currentOrder: number): Step | undefined => {
@@ -131,6 +154,13 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
         content: step.key,
         buttonText: 'On a la clé !'
       };
+    case 'final':
+      return {
+        type: 'final',
+        question: step.enigma.question,
+        hint: step.enigma.hint,
+        requiresAnswer: true
+      };
     default:
       return null;
   }
@@ -144,11 +174,26 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
 
   switch (subStepType) {
     case 'enigma':
+    case 'final':
       return normalizedAnswer === step.enigma.answer.toLowerCase();
     case 'bonus':
       return normalizedAnswer === step.bonus.answer.toLowerCase();
     default:
       // Les sous-étapes 'direction' et 'key' ne nécessitent pas de validation de réponse
       return true;
+  }
+};
+
+export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string): boolean => {
+  const finalStep = getFinalStep(); // Utilise la dernière étape de la liste
+  if (!finalStep) return false;
+  
+  const normalizedAnswer = answer.trim().toLowerCase();
+
+  switch (subStepType) {
+    case 'final':
+      return normalizedAnswer === finalStep.enigma.answer.toLowerCase();
+    default:
+      return false;
   }
 };

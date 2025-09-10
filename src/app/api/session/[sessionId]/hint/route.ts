@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addHintUsage } from '@/lib/game';
-import { getStepByName } from '@/lib/steps';
+import { addHintUsage, getCurrentStepWithSubStep } from '@/lib/game';
+import { getStepByName, isLastStep, getFinalStep } from '@/lib/steps';
 
 export async function POST(
   request: NextRequest,
@@ -18,7 +18,19 @@ export async function POST(
       );
     }
 
-    const step = getStepByName(stepName);
+    // Récupérer les données de l'étape actuelle pour déterminer si c'est l'étape finale
+    const currentStepData = await getCurrentStepWithSubStep(sessionId);
+    
+    let step;
+    
+    if (currentStepData && isLastStep(currentStepData.stepSession.stepRank)) {
+      // C'est l'étape finale, utiliser getFinalStep()
+      step = getFinalStep();
+    } else {
+      // Étape normale
+      step = getStepByName(stepName);
+    }
+    
     if (!step) {
       return NextResponse.json(
         { error: 'Étape non trouvée' },

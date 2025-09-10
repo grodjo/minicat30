@@ -1,12 +1,9 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SubStep } from './SubStep';
 
-interface BonusSubStepProps {
-  stepName: string;
+interface FinalSubStepProps {
   question: string;
   onSubmit: (answer: string) => void;
   isSubmitting: boolean;
@@ -14,14 +11,13 @@ interface BonusSubStepProps {
   isStepEntering: boolean;
 }
 
-export const BonusSubStep = ({
-  stepName,
+export const FinalSubStep = ({
   question,
   onSubmit,
   isSubmitting,
   isCorrectAnswer,
   isStepEntering
-}: BonusSubStepProps) => {
+}: FinalSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -30,14 +26,6 @@ export const BonusSubStep = ({
     onSubmit(answer.trim());
   };
 
-  const bonusWarning = (
-    <div className="text-center mb-6">
-      <p className="text-amber-400 text-lg font-semibold">
-        ⚠️ Une seule tentative !
-      </p>
-    </div>
-  );
-
   const bottomContent = (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="flex gap-3">
@@ -45,20 +33,20 @@ export const BonusSubStep = ({
           type="text"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          className="flex-1 h-14 bg-slate-50/95 border-amber-300/50 text-amber-700 placeholder:text-amber-600/70 text-lg font-semibold focus:border-amber-400 focus:ring-2 focus:ring-amber-400/70 rounded-xl shadow-sm"
-          placeholder="Votre réponse (une seule chance)..."
+          className="flex-1 h-14 bg-slate-50/95 border-violet-300/50 text-violet-700 placeholder:text-violet-500/70 text-lg font-semibold focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl shadow-sm"
+          placeholder="Votre réponse finale..."
           required
           disabled={isSubmitting || isCorrectAnswer}
         />
         <Button
           type="submit"
           disabled={!answer.trim() || isSubmitting || isCorrectAnswer}
-          className="h-14 px-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+          className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
         >
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
           ) : (
-            <span className="text-xl">🎯</span>
+            <span className="text-xl">🏁</span>
           )}
         </Button>
       </div>
@@ -67,15 +55,20 @@ export const BonusSubStep = ({
 
   return (
     <SubStep
-      stepName={stepName}
-      typeIcon="🎯"
-      typeLabel="Question Bonus"
+      stepName="Étape finale"
+      typeIcon="🏁"
+      typeLabel="Question finale"
       title={question}
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
     >
-      {bonusWarning}
+      {/* Pas d'indice disponible pour l'étape finale */}
+      <div className="text-center mb-8">
+        <p className="text-violet-200/70 text-lg font-medium">
+          Utilisez toutes les clés que vous avez collectées ! 🗝️
+        </p>
+      </div>
     </SubStep>
   );
 };

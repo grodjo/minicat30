@@ -39,6 +39,14 @@ export async function GET(
     const { step, stepSession, currentSubStep } = stepData;
     const subStepData = getSubStepData(step, currentSubStep);
 
+    // Si la sous-étape actuelle n'est pas disponible, il y a un problème
+    if (!subStepData) {
+      return NextResponse.json(
+        { error: 'Sous-étape non disponible pour cette étape' },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json({
       stepName: step.name,
       stepRank: step.stepRank,

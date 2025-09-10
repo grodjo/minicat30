@@ -46,6 +46,13 @@ export async function POST(
       );
     }
 
+    if (!step.enigma) {
+      return NextResponse.json(
+        { error: 'Cette étape n\'a pas d\'énigme avec indice' },
+        { status: 400 }
+      );
+    }
+
     await addHintUsage(sessionId, stepName);
 
     return NextResponse.json({

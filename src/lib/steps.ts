@@ -1,14 +1,14 @@
 export interface Step {
   stepRank: number;
   name: string;
-  direction: string; // Sous-étape 1: indication pour se rendre au lieu
-  key: string;       // Sous-étape 4: indication pour trouver l'objet caché
-  enigma: {          // Sous-étape 2: énigme principale (obligatoire)
+  direction?: string; // Sous-étape 1: indication pour se rendre au lieu (optionnelle)
+  key?: string;       // Sous-étape 4: indication pour trouver l'objet caché (optionnelle)
+  enigma?: {          // Sous-étape 2: énigme principale (optionnelle)
     question: string;
     answer: string;
     hint: string;
   };
-  bonus: {           // Sous-étape 3: question bonus (1 seul essai)
+  bonus?: {           // Sous-étape 3: question bonus (optionnelle)
     question: string;
     answer: string;
   };
@@ -76,16 +76,10 @@ export const steps: Step[] = [
   {
     stepRank: 4,
     name: "FINAL | Le grand défi",
-    direction: "",
-    key: "",
     enigma: {
       question: "Avec toutes les clés que vous avez trouvées, quelle est la réponse finale ?",
       answer: "VICTOIRE",
-      hint: ""
-    },
-    bonus: {
-      question: "",
-      answer: ""
+      hint: "Réfléchissez à ce que toutes ces clés ont en commun..."
     }
   }
 ];
@@ -120,7 +114,40 @@ export const getCurrentStepOrder = (stepName: string): number => {
 };
 
 // Fonctions pour gérer la progression des sous-étapes
-export const getNextSubStep = (currentSubStep: SubStepType): SubStepType | null => {
+export const getAvailableSubSteps = (step: Step): SubStepType[] => {
+  const availableSubSteps: SubStepType[] = [];
+  
+  if (step.direction) availableSubSteps.push('direction');
+  if (step.enigma) availableSubSteps.push('enigma');
+  if (step.bonus) availableSubSteps.push('bonus');
+  if (step.key) availableSubSteps.push('key');
+  
+  return availableSubSteps;
+};
+
+export const getAvailableSubStepsForFinalStep = (step: Step): SubStepType[] => {
+  // Pour l'étape finale, on utilise le type 'final' au lieu de 'enigma'
+  if (step.enigma) return ['final'];
+  return [];
+};
+
+export const getNextSubStep = (step: Step, currentSubStep: SubStepType): SubStepType | null => {
+  // Si c'est l'étape finale, elle n'a qu'une seule sous-étape
+  if (isLastStep(step.stepRank)) {
+    return null; // Pas de sous-étape suivante pour l'étape finale
+  }
+  
+  const availableSubSteps = getAvailableSubSteps(step);
+  const currentIndex = availableSubSteps.indexOf(currentSubStep);
+  
+  if (currentIndex === -1 || currentIndex >= availableSubSteps.length - 1) {
+    return null; // Pas de sous-étape suivante
+  }
+  
+  return availableSubSteps[currentIndex + 1];
+};
+
+export const getNextSubStep_old = (currentSubStep: SubStepType): SubStepType | null => {
   const sequence: SubStepType[] = ['direction', 'enigma', 'bonus', 'key'];
   const currentIndex = sequence.indexOf(currentSubStep);
   return currentIndex < sequence.length - 1 ? sequence[currentIndex + 1] : null;
@@ -129,12 +156,14 @@ export const getNextSubStep = (currentSubStep: SubStepType): SubStepType | null 
 export const getSubStepData = (step: Step, subStepType: SubStepType) => {
   switch (subStepType) {
     case 'direction':
+      if (!step.direction) return null;
       return {
         type: 'direction',
         content: step.direction,
         buttonText: 'On y est !'
       };
     case 'enigma':
+      if (!step.enigma) return null;
       return {
         type: 'enigma',
         question: step.enigma.question,
@@ -142,6 +171,7 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
         requiresAnswer: true
       };
     case 'bonus':
+      if (!step.bonus) return null;
       return {
         type: 'bonus',
         question: step.bonus.question,
@@ -149,12 +179,14 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
         singleAttempt: true
       };
     case 'key':
+      if (!step.key) return null;
       return {
         type: 'key',
         content: step.key,
         buttonText: 'On a la clé !'
       };
     case 'final':
+      if (!step.enigma) return null;
       return {
         type: 'final',
         question: step.enigma.question,
@@ -175,8 +207,10 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
   switch (subStepType) {
     case 'enigma':
     case 'final':
+      if (!step.enigma) return false;
       return normalizedAnswer === step.enigma.answer.toLowerCase();
     case 'bonus':
+      if (!step.bonus) return false;
       return normalizedAnswer === step.bonus.answer.toLowerCase();
     default:
       // Les sous-étapes 'direction' et 'key' ne nécessitent pas de validation de réponse
@@ -192,6 +226,7 @@ export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string
 
   switch (subStepType) {
     case 'final':
+      if (!finalStep.enigma) return false;
       return normalizedAnswer === finalStep.enigma.answer.toLowerCase();
     default:
       return false;

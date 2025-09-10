@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep } from './steps'
+import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep } from './steps'
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
@@ -58,11 +58,11 @@ export async function validateAnswer(sessionId: string, stepName: string, answer
   // Si c'est l'étape finale (dernière étape de la liste)
   if (isLastStep(stepSession.stepRank)) {
     step = getFinalStep();
-    if (!step) throw new Error('Étape finale introuvable');
+    if (!step || !step.enigma) throw new Error('Étape finale introuvable ou sans énigme');
     normalizedExpected = step.enigma.answer.trim().toLowerCase();
   } else {
     step = getStepByName(stepName);
-    if (!step) throw new Error('Étape introuvable');
+    if (!step || !step.enigma) throw new Error('Étape introuvable ou sans énigme');
     normalizedExpected = step.enigma.answer.trim().toLowerCase();
   }
 
@@ -234,8 +234,16 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
   const step = getStepByOrder(nextRank)
   if (!step) return null
 
-  // Pour l'étape finale (dernière étape), commencer directement par le substep 'final'
-  const initialSubStep = isLastStep(nextRank) ? 'final' : 'direction';
+  // Déterminer la première sous-étape disponible
+  let initialSubStep: string;
+  if (isLastStep(nextRank)) {
+    // Pour l'étape finale, commencer par 'final' si elle a une énigme
+    initialSubStep = step.enigma ? 'final' : 'direction';
+  } else {
+    // Pour les étapes normales, commencer par la première sous-étape disponible
+    const availableSubSteps = getAvailableSubSteps(step);
+    initialSubStep = availableSubSteps.length > 0 ? availableSubSteps[0] : 'direction';
+  }
 
   // Créer la nouvelle StepSession
   const stepSession = await prisma.stepSession.create({
@@ -270,6 +278,11 @@ export async function completeSubStep(
     throw new Error('Session d\'étape introuvable')
   }
 
+  const step = getStepByName(stepName);
+  if (!step) {
+    throw new Error('Étape introuvable')
+  }
+
   const now = new Date()
   const updateData: {
     directionCompletedAt?: Date;
@@ -284,16 +297,22 @@ export async function completeSubStep(
   switch (subStepType) {
     case 'direction':
       updateData.directionCompletedAt = now
-      updateData.currentSubStep = 'enigma'
+      // Trouve la prochaine sous-étape disponible
+      const nextAfterDirection = getNextSubStep(step, 'direction');
+      if (nextAfterDirection) updateData.currentSubStep = nextAfterDirection;
       break
     case 'enigma':
       updateData.enigmaCompletedAt = now
-      updateData.currentSubStep = 'bonus'
+      // Trouve la prochaine sous-étape disponible
+      const nextAfterEnigma = getNextSubStep(step, 'enigma');
+      if (nextAfterEnigma) updateData.currentSubStep = nextAfterEnigma;
       break
     case 'bonus':
       updateData.bonusAttemptedAt = now
       updateData.isBonusCorrect = data?.isCorrect || false
-      updateData.currentSubStep = 'key'
+      // Trouve la prochaine sous-étape disponible
+      const nextAfterBonus = getNextSubStep(step, 'bonus');
+      if (nextAfterBonus) updateData.currentSubStep = nextAfterBonus;
       break
     case 'key':
       updateData.keyCompletedAt = now

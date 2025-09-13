@@ -15,6 +15,7 @@ import { EnigmaSubStep } from '@/components/substeps/EnigmaSubStep';
 import { BonusSubStep } from '@/components/substeps/BonusSubStep';
 import { KeySubStep } from '@/components/substeps/KeySubStep';
 import { FinalSubStep } from '@/components/substeps/FinalSubStep';
+import { Timer } from '@/components/ui/timer';
 import { WrongAnswerToast, WrongAnswerToastRef } from '@/components/ui/wrong-answer-toast';
 
 interface StepData {
@@ -219,22 +220,28 @@ const QuizPage = () => {
           setIsCorrectAnswer(false);
         }, 2000); // 2 secondes pour les confettis
       } else {
-        // Vérifier si c'est un bonus raté qui doit passer à la suite
-        if (data.moveToNext) {
-          // Pour les bonus, utiliser le WrongAnswerToast au lieu du toast système
+        // Vérifier si c'est l'étape finale pour ajouter une pénalité
+        if (stepData.subStepData.type === 'final') {
+          addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse finale
           wrongAnswerToastRef.current?.show();
-          
-          // Attendre que le toast disparaisse (3 secondes) puis charger la prochaine étape
-          setTimeout(async () => {
-            if (data.completed) {
-              setCompleted(true);
-            } else {
-              await loadCurrentStep();
-            }
-          }, 1500); // 1.5 secondes pour laisser le toast disparaître
         } else {
-          // Afficher notre toast custom pour mauvaise réponse (énigmes)
-          wrongAnswerToastRef.current?.show();
+          // Vérifier si c'est un bonus raté qui doit passer à la suite
+          if (data.moveToNext) {
+            // Pour les bonus, utiliser le WrongAnswerToast au lieu du toast système
+            wrongAnswerToastRef.current?.show();
+            
+            // Attendre que le toast disparaisse (3 secondes) puis charger la prochaine étape
+            setTimeout(async () => {
+              if (data.completed) {
+                setCompleted(true);
+              } else {
+                await loadCurrentStep();
+              }
+            }, 1500); // 1.5 secondes pour laisser le toast disparaître
+          } else {
+            // Afficher notre toast custom pour mauvaise réponse (énigmes)
+            wrongAnswerToastRef.current?.show();
+          }
         }
       }
     } catch (error) {
@@ -321,8 +328,10 @@ const QuizPage = () => {
 
   // Rendu du composant approprié selon le type de sous-étape
   const renderSubStep = () => {
-    // Utilisation directe du stepRank pour un formatage propre
-    const formattedStepName = `Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
+    // Formatage du nom de l'étape - "Étape finale" pour l'étape finale, sinon numérotée
+    const formattedStepName = stepData.subStepData.type === 'final' 
+      ? 'Étape finale' 
+      : `Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
     
     const commonProps = {
       stepName: formattedStepName,
@@ -393,16 +402,24 @@ const QuizPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative overflow-hidden">
-      {/* Header avec pseudo et timer */}
+      {/* Header avec pseudo */}
       <QuizHeader 
         pseudo={sessionInfo?.pseudo || null} 
         sessionId={sessionId} 
-        elapsedTime={elapsedTime}
-        showPenaltyAnimation={showPenaltyAnimation}
       />
 
+      {/* Timer positionné juste sous le header */}
+      <div className="absolute top-20 left-0 right-0 z-10 text-center pt-4">
+        <Timer 
+          elapsedTime={elapsedTime}
+          showPenaltyAnimation={showPenaltyAnimation}
+          size="large"
+          className="justify-center"
+        />
+      </div>
+
       {/* Contenu principal */}
-      <div className="min-h-screen flex flex-col pt-20 pb-32 px-4">
+      <div className="min-h-screen flex flex-col pt-32 pb-32 px-4">
         <div className="flex-1 flex items-center justify-center">
           {renderSubStep()}
         </div>
@@ -411,7 +428,7 @@ const QuizPage = () => {
       {/* Toast custom pour mauvaise réponse */}
       <WrongAnswerToast 
         ref={wrongAnswerToastRef}
-        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté ! On enchâine !" : "❌ Nope !"}
+        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté ! On enchâine !" : stepData.subStepData.type === 'final' ? "❌ Mauvaise réponse ! +1 minute !" : "❌ Nope !"}
       />
     </div>
   );

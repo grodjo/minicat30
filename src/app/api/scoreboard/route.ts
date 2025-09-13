@@ -10,13 +10,16 @@ export async function GET() {
       pseudo: score.pseudo,
       totalTime: formatTime(score.totalTime),
       totalTimeMs: score.totalTime,
-      totalHints: score.totalHints,
+      totalBonusCorrect: score.totalBonusCorrect,
+      totalBonusAvailable: score.totalBonusAvailable,
       completedAt: score.completedAt,
-      attempts: score.attempts.map(attempt => ({
-        stepName: attempt.stepName,
-        timeSpent: formatTime(attempt.timeSpent),
-        timeSpentMs: attempt.timeSpent,
-        hintsUsed: attempt.hintsUsed
+      steps: score.steps.map(step => ({
+        stepName: step.stepName,
+        timeSpent: formatTime(step.timeSpent),
+        timeSpentMs: step.timeSpent,
+        penaltyTime: formatTime(step.penaltyTime),
+        penaltyTimeMs: step.penaltyTime,
+        bonusCorrect: step.bonusCorrect
       }))
     }));
 
@@ -37,6 +40,9 @@ function formatTime(milliseconds: number): string {
   const remainingSeconds = seconds % 60;
 
   if (minutes > 0) {
+    if (remainingSeconds === 0) {
+      return `${minutes}min`;
+    }
     return `${minutes}min ${remainingSeconds}s`;
   }
   return `${remainingSeconds}s`;

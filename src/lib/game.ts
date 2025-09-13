@@ -1,5 +1,6 @@
 import { prisma } from './prisma'
-import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep } from './steps'
+import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE } from './steps'
+import { HINT_PENALTY_TIME_MS } from './constants'
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
@@ -137,17 +138,19 @@ export async function getSessionStats(sessionId: string) {
   return { user: session.user, totalTime, attempts, completedAt: session.completedAt }
 }
 
-interface ScoreboardAttemptRow {
+interface ScoreboardStepRow {
   stepName: string
   timeSpent: number
-  hintsUsed: number
+  penaltyTime: number
+  bonusCorrect: boolean
 }
 interface ScoreboardRow {
   pseudo: string
   totalTime: number
-  totalHints: number
+  totalBonusCorrect: number
+  totalBonusAvailable: number
   completedAt: Date
-  attempts: ScoreboardAttemptRow[]
+  steps: ScoreboardStepRow[]
 }
 
 export async function getScoreboard(): Promise<ScoreboardRow[]> {
@@ -156,29 +159,40 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
     include: {
       user: true,
       stepSessions: { 
-        where: { enigmaCompletedAt: { not: null } }, 
-        orderBy: { enigmaCompletedAt: 'asc' } 
+        where: { keyCompletedAt: { not: null } }, 
+        orderBy: { stepRank: 'asc' } 
       }
     }
   })
 
   const scoreboard = sessions.map((s): ScoreboardRow => {
     const totalTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
-    const totalHints = s.stepSessions.reduce((sum: number, ss): number => {
-      return sum + (ss.hasUsedHint ? 1 : 0)
+    const totalBonusCorrect = s.stepSessions.reduce((sum: number, ss): number => {
+      return sum + (ss.isBonusCorrect ? 1 : 0)
     }, 0)
+    const totalBonusAvailable = TOTAL_BONUS_AVAILABLE
     
     return {
       pseudo: s.user.pseudo,
       totalTime,
-      totalHints,
+      totalBonusCorrect,
+      totalBonusAvailable,
       completedAt: s.completedAt!,
-      attempts: s.stepSessions.map((ss): ScoreboardAttemptRow => ({
-        stepName: ss.stepName,
-        timeSpent: ss.enigmaCompletedAt && ss.directionCompletedAt ? 
-          ss.enigmaCompletedAt.getTime() - ss.directionCompletedAt.getTime() : 0,
-        hintsUsed: ss.hasUsedHint ? 1 : 0
-      }))
+      steps: s.stepSessions.map((ss): ScoreboardStepRow => {
+        // Calculer le temps total de l'étape depuis le début jusqu'à la fin
+        const timeSpent = ss.keyCompletedAt && ss.startedAt ?
+          ss.keyCompletedAt.getTime() - ss.startedAt.getTime() : 0
+        
+        // Calculer le temps de malus (constante par indice utilisé)
+        const penaltyTime = ss.hasUsedHint ? HINT_PENALTY_TIME_MS : 0
+        
+        return {
+          stepName: isLastStep(ss.stepRank) ? 'Étape finale' : ss.stepName,
+          timeSpent,
+          penaltyTime,
+          bonusCorrect: ss.isBonusCorrect || false
+        }
+      })
     }
   })
 

@@ -8,13 +8,16 @@ interface ScoreboardEntry {
   pseudo: string;
   totalTime: string;
   totalTimeMs: number;
-  totalHints: number;
+  totalBonusCorrect: number;
+  totalBonusAvailable: number;
   completedAt: string;
-  attempts: {
-    questionId: string;
+  steps: {
+    stepName: string;
     timeSpent: string;
     timeSpentMs: number;
-    hintsUsed: number;
+    penaltyTime: string;
+    penaltyTimeMs: number;
+    bonusCorrect: boolean;
   }[];
 }
 
@@ -79,7 +82,7 @@ export default function ScoreboardPage() {
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4 drop-shadow-2xl">
               🏆 CLASSEMENT
             </h1>
-            <div className="w-24 h-0.5 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto"></div>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50"></div>
           </div>
 
           {scoreboard.length === 0 ? (
@@ -108,7 +111,7 @@ export default function ScoreboardPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-lg ${
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base shadow-lg flex-shrink-0 ${
                         entry.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
                         entry.rank === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800' :
                         entry.rank === 3 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900' :
@@ -116,29 +119,22 @@ export default function ScoreboardPage() {
                       }`}>
                         {entry.rank}
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <h3 className="font-semibold text-lg text-white mb-1">
                           👤 {entry.pseudo}
                         </h3>
-                        <p className="text-sm text-violet-200/80">
-                          <span className="mr-1">📅</span>  {new Date(entry.completedAt).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-6">
                       <div className="text-right">
-                        <div className="text-lg font-bold text-yellow-300 mb-1">
+                        <div className="text-lg font-semibold text-yellow-300 mb-1">
                           ⏱️ {entry.totalTime}
                         </div>
-                        <div className="text-sm text-violet-200/80">
-                          💡 {entry.totalHints} indice{entry.totalHints !== 1 ? 's' : ''} utilisé{entry.totalHints !== 1 ? 's' : ''}
+                        <div className="flex space-x-4 text-lg font-semibold text-violet-200/80">
+                          <span>🎯 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}</span>
                         </div>
                       </div>
-                      <div className={`text-violet-300 transition-transform duration-300 ${
+                      <div className={`text-violet-300 transition-transform duration-300 flex-shrink-0 ${
                         selectedPlayer?.pseudo === entry.pseudo ? 'rotate-180' : ''
                       }`}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,27 +146,46 @@ export default function ScoreboardPage() {
 
                   {selectedPlayer?.pseudo === entry.pseudo && (
                     <div className="mt-8 pt-6 border-t border-violet-300/20">
+                      <h4 className="text-lg font-semibold text-violet-200 mb-4 flex items-center gap-2">
+                        Détail par étape
+                      </h4>
                       <div className="grid gap-4">
-                        {entry.attempts.map((attempt, index) => (
-                          <div
-                            key={`${entry.pseudo}-attempt-${index}`}
-                            className="bg-white/5 rounded-xl p-4 border border-violet-300/10"
-                          >
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium text-violet-100">
-                                Question {index + 1}
-                              </span>
-                              <div className="flex items-center space-x-6">
-                                <span className="text-yellow-300 font-semibold">
-                                  ⏱️ {attempt.timeSpent}
+                        {entry.steps.map((step, index) => {
+                          const stepNumber = step.stepName === "Étape finale" ? "finale" : String(index + 1).padStart(2, '0');
+                          const stepDisplay = step.stepName === "Étape finale" ? "🏁 Étape finale" : `Étape ${stepNumber}`;
+                          
+                          return (
+                            <div
+                              key={`${entry.pseudo}-step-${index}`}
+                              className="bg-white/5 rounded-xl p-6 border border-violet-300/10"
+                            >
+                              <div className="flex justify-between items-center mb-4">
+                                <span className="font-medium text-violet-100 text-xl">
+                                  {stepDisplay}
                                 </span>
-                                <span className="text-violet-200/80 text-sm">
-                                  💡 {attempt.hintsUsed} indice{attempt.hintsUsed !== 1 ? 's' : ''}
+                                <span className="text-yellow-300 font-semibold text-lg">
+                                  ⏱️ {step.timeSpent}
                                 </span>
                               </div>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  {step.stepName !== "Étape finale" && (
+                                    <span className={`flex items-center gap-2 font-semibold text-lg ${step.bonusCorrect ? 'text-green-400' : 'text-orange-400'}`}>
+                                      {step.bonusCorrect ? '🎯 ✅' : '🎯 ❌'}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center">
+                                  {step.penaltyTimeMs > 0 && (
+                                    <span className="flex items-center gap-2 text-orange-400 font-semibold text-lg">
+                                      ⚠️ +{step.penaltyTime}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

@@ -96,6 +96,9 @@ export const getTotalSteps = (): number => {
   return steps.length;
 };
 
+// Compter le nombre d'étapes avec des bonus
+export const TOTAL_BONUS_AVAILABLE = steps.filter(step => step.bonus).length;
+
 export const isLastStep = (stepRank: number): boolean => {
   return stepRank === steps.length;
 };

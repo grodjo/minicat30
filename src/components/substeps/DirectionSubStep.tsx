@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { SubStep } from './SubStep';
+import { playEventSound, EventSound } from '@/lib/sounds';
 
 interface DirectionSubStepProps {
   stepName: string;
@@ -22,9 +23,15 @@ export const DirectionSubStep = ({
   isCorrectAnswer,
   isStepEntering
 }: DirectionSubStepProps) => {
+  const handleDirectionComplete = () => {
+    // Jouer le son pokemonCaught à la fin de l'étape de direction
+    playEventSound(EventSound.directionComplete);
+    onComplete();
+  };
+
   const bottomContent = (
     <Button
-      onClick={onComplete}
+      onClick={handleDirectionComplete}
       disabled={isSubmitting || isCorrectAnswer}
       className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
     >

@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
+import { playEventSound, EventSound } from '@/lib/sounds';
 
 // Composants
 import { QuizHeader } from '@/components/quiz/QuizHeader';
@@ -68,6 +69,13 @@ const QuizPage = () => {
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isStepEntering, setIsStepEntering] = useState(false);
   
+  // État pour détecter les changements d'étape vs sous-étape
+  const [previousStep, setPreviousStep] = useState<{stepName: string, currentSubStep: string} | null>(null);
+  
+  // État pour l'écran de transition des nouvelles étapes
+  const [showStepTransition, setShowStepTransition] = useState(false);
+  const [transitionStepName, setTransitionStepName] = useState<string>('');
+  
   // Ref pour le toast d'erreur
   const wrongAnswerToastRef = useRef<WrongAnswerToastRef>(null);
 
@@ -82,6 +90,8 @@ const QuizPage = () => {
     if (isLoadingHint && hints.length > 0) {
       // Attendre 2.2 secondes que l'animation du timer soit terminée avant d'ouvrir la modale
       setTimeout(() => {
+        // Jouer le son ps2Reveal quand la modale d'indice apparaît
+        playEventSound(EventSound.hintRevealed);
         setHintModalOpen(true);
         setIsLoadingHint(false);
       }, 2200); // 2.2s pour être sûr que l'animation de 2s soit terminée
@@ -99,7 +109,44 @@ const QuizPage = () => {
         // Séparer les données de session et d'étape
         const { pseudo, startedAt, ...stepData } = data;
         setSessionInfo({ pseudo, startedAt });
+        
+        // Détecter le type de changement
+        const isNewStep = !previousStep || previousStep.stepName !== stepData.stepName;
+        const isNewSubStep = previousStep && 
+          previousStep.stepName === stepData.stepName && 
+          previousStep.currentSubStep !== stepData.currentSubStep;
+        
         setStepData(stepData);
+        
+        // Jouer le son approprié ou afficher l'écran de transition
+        if (isNewStep) {
+          // Nouvelle étape : afficher l'écran de transition avec le son marioKartGridIntro
+          // Déterminer le nom à afficher selon si c'est l'étape finale ou non
+          const transitionName = stepData.subStepData.type === 'final' 
+            ? 'Étape finale' 
+            : `Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
+          setTransitionStepName(transitionName);
+          setShowStepTransition(true);
+          playEventSound(EventSound.stepTransition); // marioKartGridIntro
+          
+          // Déclencher l'animation d'entrée de la sous-étape après 6 secondes (quand la transition se termine)
+          setTimeout(() => {
+            setShowStepTransition(false);
+            setIsStepEntering(true);
+            setTimeout(() => setIsStepEntering(false), 600); // Animation de 600ms
+            // Jouer le son de sous-étape pour la première sous-étape
+            playEventSound(EventSound.newSubStep);
+          }, 6000);
+        } else if (isNewSubStep) {
+          // Nouvelle sous-étape dans la même étape : jouer le son ps2Expand
+          playEventSound(EventSound.newSubStep);
+        }
+        
+        // Mettre à jour l'étape précédente
+        setPreviousStep({
+          stepName: stepData.stepName,
+          currentSubStep: stepData.currentSubStep
+        });
         
         // Si l'indice a été utilisé pour cette étape, le charger
         if (stepData.stepSession.hasUsedHint && (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final')) {
@@ -112,9 +159,11 @@ const QuizPage = () => {
           setHints([]);
         }
         
-        // Déclencher l'animation d'entrée
-        setIsStepEntering(true);
-        setTimeout(() => setIsStepEntering(false), 600); // Animation de 600ms
+        // Déclencher l'animation d'entrée seulement pour les nouvelles sous-étapes (pas les nouvelles étapes)
+        if (isNewSubStep) {
+          setIsStepEntering(true);
+          setTimeout(() => setIsStepEntering(false), 600); // Animation de 600ms
+        }
       }
     } catch (error) {
       console.error('Error loading step:', error);
@@ -188,6 +237,13 @@ const QuizPage = () => {
       const data = await response.json();
       
       if (data.isCorrect) {
+        // Jouer le son approprié selon le type de question
+        if (stepData.subStepData.type === 'bonus') {
+          playEventSound(EventSound.bonusSuccess); // dbzKiBlast pour bonus réussi
+        } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
+          playEventSound(EventSound.enigmaSuccess); // airHornWin pour énigme réussie
+        }
+        
         // Début de la transition - masquer immédiatement l'ancienne question
         setIsCorrectAnswer(true);
         
@@ -220,6 +276,13 @@ const QuizPage = () => {
           setIsCorrectAnswer(false);
         }, 2000); // 2 secondes pour les confettis
       } else {
+        // Jouer le son approprié selon le type de question en cas d'erreur
+        if (stepData.subStepData.type === 'bonus') {
+          playEventSound(EventSound.bonusFailed); // dbzGhost pour bonus raté
+        } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
+          playEventSound(EventSound.enigmaFailed); // wrong3 pour énigme ratée
+        }
+        
         // Vérifier si c'est l'étape finale pour ajouter une pénalité
         if (stepData.subStepData.type === 'final') {
           addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse finale
@@ -418,6 +481,22 @@ const QuizPage = () => {
           className="justify-center"
         />
       </div>
+
+      {/* Écran de transition pour les nouvelles étapes */}
+      {showStepTransition && (
+        <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
+          <div className="text-center space-y-8">
+            <div className="text-6xl animate-bounce">🚀</div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white tracking-wide animate-pulse">
+              C&apos;est parti pour
+            </h1>
+            <h2 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 tracking-wider">
+              {transitionStepName}
+            </h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      )}
 
       {/* Contenu principal */}
       <div className="min-h-screen flex flex-col pt-32 pb-32 px-4">

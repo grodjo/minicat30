@@ -1,6 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useEffect } from 'react';
+import { playEventSound, EventSound } from '@/lib/sounds';
 
 interface LoadingStateProps {
   message?: string;
@@ -22,6 +24,11 @@ interface CompletedStateProps {
 }
 
 export const CompletedState = ({ onGoToScoreboard }: CompletedStateProps) => {
+  // Jouer le son de victoire épique dès l'affichage de l'écran de félicitations
+  useEffect(() => {
+    playEventSound(EventSound.victory); // epicVictory
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
       <div className="text-8xl mb-8 animate-bounce">🎉</div>

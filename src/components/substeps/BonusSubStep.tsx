@@ -46,7 +46,7 @@ export const BonusSubStep = ({
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           className="flex-1 h-14 bg-slate-50/95 border-amber-300/50 text-amber-700 placeholder:text-amber-600/70 text-lg font-semibold focus:border-amber-400 focus:ring-2 focus:ring-amber-400/70 rounded-xl shadow-sm"
-          placeholder="Votre réponse (une seule chance)..."
+          placeholder="Votre réponse"
           required
           disabled={isSubmitting || isCorrectAnswer}
         />

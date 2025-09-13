@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { playEventSound, EventSound } from '@/lib/sounds';
 
 const Home = () => {
   const [pseudo, setPseudo] = useState('');
@@ -23,6 +24,9 @@ const Home = () => {
   const handleShowModal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pseudo.trim()) return;
+    
+    // Jouer le son ps2Login au clic du bouton "Go!"
+    playEventSound(EventSound.buttonClick);
     
     try {
       // Vérifier s'il y a une session active avant d'ouvrir la modale
@@ -48,6 +52,9 @@ const Home = () => {
   };
 
   const handleStartGame = async () => {
+    // Jouer le son "duck" au clic du bouton start
+    playEventSound(EventSound.gameStart);
+    
     setShowStartModal(false);
     
     // Déclencher l'animation de sortie immédiatement à la fermeture de la modale

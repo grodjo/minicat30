@@ -401,7 +401,8 @@ const QuizPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
+
       {/* Header avec pseudo */}
       <QuizHeader 
         pseudo={sessionInfo?.pseudo || null} 

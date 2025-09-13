@@ -8,7 +8,7 @@ interface LoadingStateProps {
 
 export const LoadingState = ({ message = "Chargement..." }: LoadingStateProps = {}) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-400 mx-auto mb-4"></div>
         <p className="text-violet-100">{message}</p>
@@ -23,7 +23,7 @@ interface CompletedStateProps {
 
 export const CompletedState = ({ onGoToScoreboard }: CompletedStateProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex flex-col items-center justify-center p-4 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
       <div className="text-8xl mb-8 animate-bounce">🎉</div>
       <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-wide">
         Félicitations !
@@ -49,12 +49,12 @@ interface ErrorStateProps {
 
 export const ErrorState = ({ message = "Impossible de charger l'étape" }: ErrorStateProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-500 via-pink-600 to-rose-700 flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md p-8 text-center border border-red-400/30">
+        <h1 className="text-2xl font-bold text-red-400 mb-4">
           Erreur
         </h1>
-        <p className="text-gray-600">
+        <p className="text-red-200">
           {message}
         </p>
       </div>

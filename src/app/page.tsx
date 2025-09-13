@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 const Home = () => {
   const [pseudo, setPseudo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [showStartModal, setShowStartModal] = useState(false);
   const [hasActiveSession, setHasActiveSession] = useState(false);
@@ -24,8 +23,6 @@ const Home = () => {
   const handleShowModal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pseudo.trim()) return;
-    
-    setIsCheckingSession(true);
     
     try {
       // Vérifier s'il y a une session active avant d'ouvrir la modale
@@ -47,8 +44,6 @@ const Home = () => {
     } catch (error) {
       console.error('Error checking session:', error);
       toast.error('Erreur de connexion');
-    } finally {
-      setIsCheckingSession(false);
     }
   };
 
@@ -97,9 +92,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Grille futuriste en arrière-plan - plus visible */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(147,51,234,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(147,51,234,0.08)_1px,transparent_1px)] bg-[size:60px_60px] opacity-60"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
       {/* Bouton classement en haut à droite */}
       <div className="absolute top-8 right-4 z-20 pt-4">

@@ -47,9 +47,16 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 min-h-screen relative`}
       >
-        {children}
+        {/* Grille futuriste en arrière-plan - toujours présente */}
+        <div className="fixed inset-0 bg-[linear-gradient(rgba(147,51,234,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(147,51,234,0.08)_1px,transparent_1px)] bg-[size:60px_60px] opacity-80 pointer-events-none z-0"></div>
+        
+        {/* Contenu de l'application */}
+        <div className="relative z-10">
+          {children}
+        </div>
+        
         <Toaster />
       </body>
     </html>

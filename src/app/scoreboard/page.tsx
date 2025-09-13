@@ -49,7 +49,7 @@ export default function ScoreboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-400 mx-auto mb-4"></div>
           <p className="text-violet-100">Chargement du classement...</p>
@@ -59,9 +59,7 @@ export default function ScoreboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 relative">
-      {/* Grille futuriste en arrière-plan */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(147,51,234,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(147,51,234,0.08)_1px,transparent_1px)] bg-[size:60px_60px] opacity-60"></div>
+    <div className="min-h-screen relative">
       
       <div className="relative z-10 p-4">
         <div className="max-w-4xl mx-auto">

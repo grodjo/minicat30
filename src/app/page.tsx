@@ -25,7 +25,7 @@ const Home = () => {
     e.preventDefault();
     if (!pseudo.trim()) return;
     
-    // Jouer le son ps2Login au clic du bouton "Go!"
+    // Jouer le son ps2Login au clic du bouton "Go!" - maintenant instantané par défaut
     playEventSound(EventSound.buttonClick);
     
     try {
@@ -52,7 +52,7 @@ const Home = () => {
   };
 
   const handleStartGame = async () => {
-    // Jouer le son "duck" au clic du bouton start
+    // Jouer le son "duck" au clic du bouton start - maintenant instantané par défaut
     playEventSound(EventSound.gameStart);
     
     setShowStartModal(false);

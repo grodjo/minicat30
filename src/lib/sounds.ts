@@ -32,10 +32,10 @@ interface ISoundCache {
 	[soundName: string]: HTMLAudioElement;
 }
 
-// Cache des éléments audio - créés à la demande pour optimiser les performances
+// Cache des éléments audio - un seul élément par son pour éviter la surcharge
 const soundCache: ISoundCache = {};
 
-// Fonction pour créer ou récupérer un élément audio du cache
+// Fonction pour créer un élément audio simple et optimisé
 const getAudioElement = (soundName: string): HTMLAudioElement | null => {
 	// Vérification côté client
 	if (typeof window === 'undefined') {
@@ -47,10 +47,12 @@ const getAudioElement = (soundName: string): HTMLAudioElement | null => {
 		return soundCache[soundName];
 	}
 
-	// Créer un nouvel élément audio et l'ajouter au cache
+	// Créer un nouvel élément audio optimisé
 	try {
 		const audioElement = new Audio(`/sounds/${soundName}.mov`);
-		audioElement.preload = 'auto'; // Précharger pour une lecture plus fluide
+		audioElement.preload = 'metadata'; // Précharger seulement les métadonnées pour la rapidité
+		audioElement.volume = 1.0;
+		
 		soundCache[soundName] = audioElement;
 		return audioElement;
 	} catch (error) {
@@ -59,19 +61,10 @@ const getAudioElement = (soundName: string): HTMLAudioElement | null => {
 	}
 };
 
-export const getEventSoundName = (eventName: EventSound): string => {
-	return eventName;
-};
-
-export const playSound = (
-	soundName: string,
-	shouldPlay?: boolean
-): void => {
-	if (shouldPlay === false) return;
-
+export const playSound = (soundName: string): void => {
 	const audioElement = getAudioElement(soundName);
 	if (audioElement) {
-		// Reset l'audio au début pour permettre de rejouer rapidement
+		// Reset et jouer immédiatement - version ultra simplifiée
 		audioElement.currentTime = 0;
 		audioElement.play().catch((error: unknown) => {
 			console.warn(`Failed to play sound ${soundName}:`, error);
@@ -80,35 +73,24 @@ export const playSound = (
 };
 
 export const pauseSound = (soundName: string): void => {
-	const audioElement = getAudioElement(soundName);
-	if (audioElement) {
-		audioElement.pause();
-	}
+	if (!soundCache[soundName]) return;
+	
+	// Mettre en pause l'élément audio
+	soundCache[soundName].pause();
 };
 
-// Fonction utilitaire pour jouer un son d'événement
-export const playEventSound = (
-	eventName: EventSound,
-	shouldPlay?: boolean
-): void => {
-	playSound(eventName, shouldPlay);
+// Fonction principale pour jouer un son d'événement
+export const playEventSound = (eventName: EventSound): void => {
+	playSound(eventName);
 };
 
-// Fonction pour précharger tous les sons (optionnel - à appeler au démarrage de l'app)
-export const preloadAllSounds = (): void => {
-	if (typeof window === 'undefined') return;
-
-	Object.values(EventSound).forEach((soundName) => {
-		getAudioElement(soundName);
-	});
-};
-
-// Fonction pour nettoyer le cache (utile lors du démontage de l'app)
+// Fonction pour nettoyer le cache
 export const clearSoundCache = (): void => {
 	Object.values(soundCache).forEach((audioElement) => {
 		audioElement.pause();
 		audioElement.src = '';
 	});
+	
 	Object.keys(soundCache).forEach((key) => {
 		delete soundCache[key];
 	});

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SoundPreloader } from "@/components/SoundPreloader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,6 +52,9 @@ export default function RootLayout({
       >
         {/* Grille futuriste en arrière-plan - toujours présente */}
         <div className="fixed inset-0 bg-[linear-gradient(rgba(147,51,234,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(147,51,234,0.08)_1px,transparent_1px)] bg-[size:60px_60px] opacity-80 pointer-events-none z-0"></div>
+        
+        {/* Préchargement des sons */}
+        <SoundPreloader />
         
         {/* Contenu de l'application */}
         <div className="relative z-10">

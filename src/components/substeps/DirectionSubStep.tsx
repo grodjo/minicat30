@@ -24,7 +24,7 @@ export const DirectionSubStep = ({
   isStepEntering
 }: DirectionSubStepProps) => {
   const handleDirectionComplete = () => {
-    // Jouer le son pokemonCaught à la fin de l'étape de direction
+    // Jouer le son pokemonCaught à la fin de l'étape de direction - maintenant instantané par défaut
     playEventSound(EventSound.directionComplete);
     onComplete();
   };

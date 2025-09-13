@@ -9,8 +9,10 @@ import { toast } from 'sonner';
 const Home = () => {
   const [pseudo, setPseudo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [showStartModal, setShowStartModal] = useState(false);
+  const [hasActiveSession, setHasActiveSession] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
@@ -19,10 +21,35 @@ const Home = () => {
     setIsMounted(true);
   }, []);
 
-  const handleShowModal = (e: React.FormEvent) => {
+  const handleShowModal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pseudo.trim()) return;
-    setShowStartModal(true);
+    
+    setIsCheckingSession(true);
+    
+    try {
+      // Vérifier s'il y a une session active avant d'ouvrir la modale
+      const response = await fetch('/api/check-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pseudo: pseudo.trim() }),
+      });
+
+      if (response.ok) {
+        const { hasActiveSession: hasActive } = await response.json();
+        setHasActiveSession(hasActive);
+        setShowStartModal(true);
+      } else {
+        toast.error('Erreur lors de la vérification');
+      }
+    } catch (error) {
+      console.error('Error checking session:', error);
+      toast.error('Erreur de connexion');
+    } finally {
+      setIsCheckingSession(false);
+    }
   };
 
   const handleStartGame = async () => {
@@ -55,11 +82,7 @@ const Home = () => {
         setIsExiting(false); // Arrêter l'animation en cas d'erreur
         
         // Afficher l'erreur avec un toast
-        if (response.status === 409) {
-          toast.error(errorData.error || 'Déjà pris ! Creusez vous le ciboulot !');
-        } else {
-          toast.error(errorData.error || 'Erreur lors de la création de la session');
-        }
+        toast.error(errorData.error || 'Erreur lors de la création de la session');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -134,41 +157,43 @@ const Home = () => {
           <form onSubmit={handleShowModal} className={`space-y-8 ${isExiting ? 'animate-exit-content-down' : ''}`}>
             <div className="space-y-6">
               <div className="relative">
-                {/* Input moderne avec ligne */}
-                <div className="relative group">
-                  <input
-                    type="text"
-                    value={pseudo}
-                    onChange={(e) => setPseudo(e.target.value)}
-                    required
-                    minLength={3}
-                    maxLength={50}
-                    disabled={isLoading || isExiting}
-                    className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-bold text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50 placeholder:text-lg tracking-wide font-mono"
-                    placeholder="Choisissez un nom d'équipe"
-                    style={{
-                      textShadow: '0 0 10px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.2)',
-                      letterSpacing: '0.1em'
-                    }}
-                  />
-                  
-                  {/* Ligne animée au focus */}
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 transition-all duration-300 w-0 group-focus-within:w-3/4 shadow-lg shadow-violet-400/50 pointer-events-none"></div>
-                  
-                  {/* Effet de brillance subtil */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 rounded pointer-events-none"></div>
+                {/* Input moderne avec ligne et bouton à droite */}
+                <div className="flex items-center gap-4">
+                  <div className="relative group flex-1">
+                    <input
+                      type="text"
+                      value={pseudo}
+                      onChange={(e) => setPseudo(e.target.value)}
+                      required
+                      minLength={3}
+                      maxLength={50}
+                      disabled={isLoading || isExiting}
+                      className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-bold text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50 placeholder:text-lg tracking-wide font-mono"
+                      placeholder="Votre nom d'équipe"
+                      style={{
+                        textShadow: '0 0 10px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.2)',
+                        letterSpacing: '0.1em'
+                      }}
+                    />
+                    
+                    {/* Ligne animée au focus */}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 transition-all duration-300 w-0 group-focus-within:w-3/4 shadow-lg shadow-violet-400/50 pointer-events-none"></div>
+                    
+                    {/* Effet de brillance subtil */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 rounded pointer-events-none"></div>
+                  </div>
+
+                  {/* Bouton carré à droite */}
+                  <Button
+                    type="submit"
+                    disabled={!pseudo.trim() || pseudo.trim().length < 3 || isLoading || isExiting}
+                    className="w-16 h-16 rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl disabled:from-slate-600 disabled:to-slate-600 disabled:text-slate-300 flex items-center justify-center p-0 hover:scale-105 active:scale-95"
+                  >
+                    {isLoading ? '⏳' : 'Go!'}
+                  </Button>
                 </div>
               </div>
             </div>
-
-            {/* Bouton classique "Je veux jouer !" */}
-            <Button
-              type="submit"
-              disabled={!pseudo.trim() || pseudo.trim().length < 3 || isLoading || isExiting}
-              className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg tracking-wide transition-all duration-300 shadow-xl hover:shadow-2xl disabled:from-slate-600 disabled:to-slate-600 disabled:text-slate-300 rounded-2xl"
-            >
-              {isLoading ? 'Chargement...' : isExiting ? 'Connexion...' : 'On est chaud patate 🔥🥔'}
-            </Button>
           </form>
         )}
 
@@ -177,11 +202,14 @@ const Home = () => {
           <DialogContent className="bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 border-violet-300/30 text-white max-w-lg w-full min-h-[50vh] flex flex-col justify-between">
             <DialogHeader className="space-y-6 pt-8">
               <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-violet-200">
-                Bienvenue équipe {pseudo}&nbsp;!
+                {hasActiveSession ? `Bon retour équipe ${pseudo} !` : `Bienvenue équipe ${pseudo} !`}
               </DialogTitle>
               <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full"></div>
               <DialogDescription className="text-violet-200/80 text-center text-lg md:text-xl leading-relaxed px-6">
-                Ce bouton vous donnera accès à la première étape et déclenchera le chronomètre
+                {hasActiveSession 
+                  ? "Vous avez une partie en cours. Vous allez reprendre là où vous en étiez."
+                  : "Ce bouton vous donnera accès à la première étape et déclenchera le chronomètre"
+                }
               </DialogDescription>
             </DialogHeader>
             
@@ -203,7 +231,7 @@ const Home = () => {
                 <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
                   <div className="text-4xl mb-2">🦆</div>
                   <div className="text-sm font-bold text-center leading-tight">
-                    {isLoading ? 'GO!' : 'START'}
+                    {isLoading ? 'GO!' : (hasActiveSession ? 'REPRENDRE' : 'START')}
                   </div>
                 </div>
                 

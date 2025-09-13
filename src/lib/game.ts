@@ -7,6 +7,38 @@ export async function createUser(pseudo: string) {
   return prisma.user.create({ data: { pseudo } })
 }
 
+// Vérifier s'il existe une session en cours pour ce pseudo
+export async function findActiveSession(pseudo: string) {
+  const user = await prisma.user.findUnique({
+    where: { pseudo },
+    include: {
+      sessions: {
+        where: { completedAt: null }, // Sessions non terminées
+        orderBy: { startedAt: 'desc' }, // La plus récente en premier
+        take: 1,
+        include: {
+          stepSessions: {
+            where: { keyCompletedAt: null },
+            take: 1
+          }
+        }
+      }
+    }
+  })
+
+  if (!user || user.sessions.length === 0) {
+    return null
+  }
+
+  const activeSession = user.sessions[0]
+  return {
+    sessionId: activeSession.id,
+    userId: user.id,
+    pseudo: user.pseudo,
+    hasActiveSteps: activeSession.stepSessions.length > 0
+  }
+}
+
 // Création d'une nouvelle session de jeu
 export async function createGameSession(userId: string) {
   return prisma.gameSession.create({ data: { userId } })

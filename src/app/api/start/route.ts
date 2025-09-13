@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createUser, createGameSession } from '@/lib/game';
+import { createUser, createGameSession, findActiveSession } from '@/lib/game';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,20 +12,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Créer utilisateur (gérer pseudo déjà pris)
+    const trimmedPseudo = pseudo.trim();
+
+    // D'abord, vérifier s'il existe une session active pour ce pseudo
+    const activeSession = await findActiveSession(trimmedPseudo);
+    
+    if (activeSession) {
+      return NextResponse.json({
+        sessionId: activeSession.sessionId,
+        userId: activeSession.userId,
+        pseudo: activeSession.pseudo,
+        isResuming: true
+      });
+    }
+
+    // Si pas de session active, créer un nouvel utilisateur et une nouvelle session
     let user;
     try {
-      user = await createUser(pseudo.trim());
+      user = await createUser(trimmedPseudo);
     } catch (e) {
+      // Si l'utilisateur existe déjà mais n'a pas de session active, 
+      // récupérer l'utilisateur existant
       interface KnownError { code?: string }
       const k = e as KnownError
       if (k.code === 'P2002') {
-        return NextResponse.json(
-          { error: 'Ce pseudonyme est déjà pris. Veuillez en choisir un autre.' },
-          { status: 409 }
-        );
+        // L'utilisateur existe mais n'a pas de session active, on peut créer une nouvelle session
+        const { prisma } = await import('@/lib/prisma');
+        user = await prisma.user.findUnique({ where: { pseudo: trimmedPseudo } });
+        if (!user) {
+          return NextResponse.json(
+            { error: 'Erreur lors de la récupération de l\'utilisateur' },
+            { status: 500 }
+          );
+        }
+      } else {
+        throw e;
       }
-      throw e;
     }
 
     const session = await createGameSession(user.id);
@@ -33,7 +55,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sessionId: session.id,
       userId: user.id,
-      pseudo: user.pseudo
+      pseudo: user.pseudo,
+      isResuming: false
     });
 
   } catch (error: unknown) {

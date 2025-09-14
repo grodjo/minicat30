@@ -53,12 +53,12 @@ export const BonusSubStep = ({
         <Button
           type="submit"
           disabled={!answer.trim() || isSubmitting || isCorrectAnswer}
-          className="h-14 px-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+          className="h-14 px-4 bg-gradient-to-r from-pink-600 via-rose-600 to-red-600 hover:from-pink-500 hover:via-rose-500 hover:to-red-500 text-white font-semibold text-lg rounded-xl shadow-lg"
         >
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
           ) : (
-            <span className="text-xl">🎯</span>
+            <span className="text-xl">🧠</span>
           )}
         </Button>
       </div>
@@ -68,7 +68,7 @@ export const BonusSubStep = ({
   return (
     <SubStep
       stepName={stepName}
-      typeIcon="🎓"
+      typeIcon="🧠"
       typeLabel="Bonus"
       title={question}
       isCorrectAnswer={isCorrectAnswer}

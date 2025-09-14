@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { playSound } from '@/lib/sounds';
 
 interface HintsProps {
   sessionId: string;
@@ -59,12 +60,20 @@ export const Hints: React.FC<HintsProps> = ({
 
         const data = await response.json();
         if (response.ok) {
-          setCurrentHint(data);
-          setHintModalOpen(true);
-          // Ajouter la pénalité de temps lors de l'utilisation d'un nouvel indice (3 minutes)
+          // Jouer le son "ah" immédiatement lors de l'utilisation d'un nouvel indice
+          playSound('ah');
+          
+          // Ajouter la pénalité de temps (cela déclenche l'animation de pénalité)
           onTimePenalty(3);
+          
           // Notifier le parent du nouvel index
           onHintUsed(data.hintIndex + 1);
+          
+          // Attendre que l'animation de pénalité se termine avant d'ouvrir la modale
+          setTimeout(() => {
+            setCurrentHint(data);
+            setHintModalOpen(true);
+          }, 2000); // 2 secondes pour laisser l'animation de pénalité se terminer
         } else {
           toast.error(data.error, {
             className: quizToastClass

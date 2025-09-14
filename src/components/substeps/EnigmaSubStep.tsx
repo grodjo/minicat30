@@ -85,12 +85,12 @@ export const EnigmaSubStep = ({
         <Button
           type="submit"
           disabled={!answer.trim() || isSubmitting || isCorrectAnswer}
-          className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+          className="h-14 px-4 bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 hover:from-blue-500 hover:via-cyan-500 hover:to-teal-500 text-white font-semibold text-lg rounded-xl shadow-lg"
         >
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
           ) : (
-            <span className="text-xl">🎯</span>
+            <span className="text-xl">🔍</span>
           )}
         </Button>
       </div>
@@ -100,7 +100,7 @@ export const EnigmaSubStep = ({
   return (
     <SubStep
       stepName={stepName}
-      typeIcon="❓"
+      typeIcon="🔍"
       typeLabel="Énigme"
       title={question}
       isCorrectAnswer={isCorrectAnswer}

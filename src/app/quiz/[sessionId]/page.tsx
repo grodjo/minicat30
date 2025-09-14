@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
-import { playEventSound, EventSound } from '@/lib/sounds';
+import { playEventSound, EventSound, playSound } from '@/lib/sounds';
 
 // Composants
 import { QuizHeader } from '@/components/quiz/QuizHeader';
@@ -258,9 +258,10 @@ const QuizPage = () => {
         if (stepData.subStepData.type === 'bonus') {
           playEventSound(EventSound.bonusFailed); // dbzGhost pour bonus raté
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
-          playEventSound(EventSound.enigmaFailed); // wrong3 pour énigme ratée
+          // Utiliser directement le son 'duck' pour les énigmes
+          playSound('duck');
         } else if (stepData.subStepData.type === 'direction') {
-          playEventSound(EventSound.enigmaFailed); // wrong3 pour direction ratée aussi
+          playEventSound(EventSound.directionWrongAnswer); // wrong3 pour direction ratée
         }
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité

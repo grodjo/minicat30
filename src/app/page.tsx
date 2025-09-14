@@ -53,7 +53,7 @@ const Home = () => {
 
   const handleStartGame = async () => {
     // Jouer le son "duck" au clic du bouton start - maintenant instantané par défaut
-    playEventSound(EventSound.gameStart);
+    playEventSound(EventSound.startGame);
     
     setShowStartModal(false);
     

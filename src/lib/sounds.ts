@@ -1,7 +1,7 @@
 export enum EventSound {
 	/** Interface sounds */
 	buttonClick = 'ps2Login',              // Bouton "Go!" principal
-	gameStart = 'duck',                    // Bouton "START/REPRENDRE"
+	startGame = 'duck',                    // Bouton "START/REPRENDRE" (renommé pour éviter conflit)
 	
 	/** Navigation sounds */
 	stepTransition = 'marioKartGridIntro', // Écran de transition nouvelle étape
@@ -11,8 +11,10 @@ export enum EventSound {
 	/** Feedback sounds */
 	enigmaSuccess = 'airHornWin',          // Énigme réussie
 	bonusSuccess = 'dbzKiBlast',           // Bonus réussi
-	enigmaFailed = 'wrong3',               // Énigme ratée
+	enigmaWrongAnswer = 'wrong1',          // Énigme ratée (temporaire - sera 'duck' dans l'usage)
+	directionWrongAnswer = 'wrong3',       // Direction ratée (utilise "wrong3")
 	bonusFailed = 'dbzGhost',              // Bonus raté
+	hintPenalty = 'wrong2',                // Indice utilisé avec pénalité (temporaire - sera 'ah' dans l'usage)
 	hintRevealed = 'ps2Reveal',            // Indice révélé dans la modale
 	
 	/** Legacy sounds (unused in current implementation) */
@@ -24,7 +26,6 @@ export enum EventSound {
 	alarm = 'alarmEnd',
 	victory = 'epicVictory',
 	notification = 'ps2Notif',
-	enable = 'ah',
 	stop = 'scratchStop',
 };
 

@@ -39,22 +39,47 @@ export async function POST(
     
     console.log('Debug hint API:');
     console.log('- stepRank:', currentStepData.stepSession.stepRank);
+    console.log('- currentSubStep:', currentStepData.stepSession.currentSubStep);
     console.log('- step:', step);
+    console.log('- step.direction:', step?.direction);
     console.log('- step.enigma:', step?.enigma);
-    console.log('- step.enigma.hints:', step?.enigma?.hints);
     
-    if (!step || !step.enigma || !step.enigma.hints) {
+    if (!step) {
       return NextResponse.json(
-        { error: 'Cette étape n\'a pas d\'énigme avec indices' },
+        { error: 'Étape introuvable' },
+        { status: 404 }
+      );
+    }
+    
+    // Détermine quels hints utiliser selon la sous-étape actuelle
+    const currentSubStep = currentStepData.stepSession.currentSubStep;
+    let hints: string[] = [];
+    
+    if (currentSubStep === 'direction' && step.direction?.hints) {
+      hints = step.direction.hints;
+    } else if ((currentSubStep === 'enigma' || currentSubStep === 'final') && step.enigma?.hints) {
+      hints = step.enigma.hints;
+    }
+    
+    if (hints.length === 0) {
+      return NextResponse.json(
+        { error: 'Cette sous-étape n\'a pas d\'indices disponibles' },
         { status: 400 }
       );
     }
 
-    // Vérifier l'index d'indice actuel
-    const currentHintIndex = currentStepData.stepSession.currentHintIndex;
+    // Vérifier l'index d'indice actuel selon la sous-étape
+    let currentHintIndex: number;
+    if (currentSubStep === 'direction') {
+      currentHintIndex = currentStepData.stepSession.directionHintIndex;
+    } else if (currentSubStep === 'enigma' || currentSubStep === 'final') {
+      currentHintIndex = currentStepData.stepSession.enigmaHintIndex;
+    } else {
+      currentHintIndex = 0; // fallback
+    }
     
     // Vérifier s'il y a encore des indices disponibles
-    if (currentHintIndex >= step.enigma.hints.length) {
+    if (currentHintIndex >= hints.length) {
       return NextResponse.json(
         { error: 'Tous les indices ont déjà été utilisés' },
         { status: 400 }
@@ -65,10 +90,10 @@ export async function POST(
     await addHintPenalty(sessionId, step.name);
 
     return NextResponse.json({
-      hint: step.enigma.hints[currentHintIndex],
+      hint: hints[currentHintIndex],
       hintIndex: currentHintIndex,
-      totalHints: step.enigma.hints.length,
-      remainingHints: step.enigma.hints.length - currentHintIndex - 1
+      totalHints: hints.length,
+      remainingHints: hints.length - currentHintIndex - 1
     });
 
   } catch (error) {

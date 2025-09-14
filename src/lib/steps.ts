@@ -1,7 +1,10 @@
 export interface Step {
   stepRank: number;
   name: string;
-  direction?: string; // Sous-étape 1: indication pour se rendre au lieu (optionnelle)
+  direction?: {       // Sous-étape 1: indication pour se rendre au lieu (optionnelle)
+    instruction: string;
+    hints: string[];  // Tableau d'indices pour la direction
+  };
   key?: string;       // Sous-étape 4: indication pour trouver l'objet caché (optionnelle)
   enigma?: {          // Sous-étape 2: énigme principale (optionnelle)
     question: string;
@@ -31,7 +34,14 @@ export const steps: Step[] = [
   {
     stepRank: 1,
     name: "01 | Animal domestique",
-    direction: "Rendez-vous dans le parc le plus proche de votre position",
+    direction: {
+      instruction: "Rendez-vous dans le parc le plus proche de votre position",
+      hints: [
+        "Cherchez un espace vert avec des arbres et de l'herbe",
+        "Il peut y avoir des bancs, des aires de jeux ou des chemins de promenade",
+        "Utilisez une application de carte pour localiser les parcs autour de vous"
+      ]
+    },
     key: "Cherchez sous le banc le plus proche de l'aire de jeux",
     enigma: {
       question: "Quel animal domestique aboie ?",
@@ -50,7 +60,14 @@ export const steps: Step[] = [
   {
     stepRank: 2,
     name: "02 | Couleur primaire",
-    direction: "Dirigez-vous vers la fontaine la plus proche",
+    direction: {
+      instruction: "Dirigez-vous vers la fontaine la plus proche",
+      hints: [
+        "Cherchez un point d'eau décoratif, souvent au centre d'une place ou d'un parc",
+        "Les fontaines sont généralement visibles et audibles à distance",
+        "Elles peuvent être dans des squares, places publiques ou jardins"
+      ]
+    },
     key: "Regardez derrière la plaque commémorative de la fontaine",
     enigma: {
       question: "Quelle couleur obtient-on en mélangeant le jaune et le bleu ?",
@@ -69,7 +86,14 @@ export const steps: Step[] = [
   {
     stepRank: 3,
     name: "03 | Planète rouge",
-    direction: "Trouvez le café ou restaurant le plus proche",
+    direction: {
+      instruction: "Trouvez le café ou restaurant le plus proche",
+      hints: [
+        "Cherchez un établissement où l'on peut boire et manger",
+        "Regardez les enseignes, panneaux ou terrasses",
+        "Les cafés ont souvent une terrasse ou des tables à l'extérieur"
+      ]
+    },
     key: "Vérifiez sous la table en terrasse la plus éloignée de l'entrée",
     enigma: {
       question: "Quelle planète est surnommée la planète rouge ?",
@@ -178,7 +202,8 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
       if (!step.direction) return null;
       return {
         type: 'direction',
-        content: step.direction,
+        content: step.direction.instruction,
+        hints: step.direction.hints,
         buttonText: 'On y est !'
       };
     case 'enigma':

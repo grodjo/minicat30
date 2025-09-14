@@ -44,7 +44,7 @@ export const EnigmaSubStep = ({
     onSubmit(answer.trim());
   };
 
-  const content = (
+  const bodyContent = (
     <div className="w-full">
       {/* Section des indices */}
       <Hints
@@ -107,7 +107,7 @@ export const EnigmaSubStep = ({
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
     >
-      {content}
+      {bodyContent}
     </SubStep>
   );
 };

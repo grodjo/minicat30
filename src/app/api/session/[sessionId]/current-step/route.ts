@@ -58,12 +58,28 @@ export async function GET(
         bonusCompleted: !!stepSession.bonusAttemptedAt,
         bonusCorrect: stepSession.isBonusCorrect,
         keyCompleted: !!stepSession.keyCompletedAt,
-        hasUsedHint: stepSession.hasUsedHint,
+        hasUsedHint: stepSession.directionHintIndex > 0 || stepSession.enigmaHintIndex > 0,
         enigmaAttemptsCount: stepSession.enigmaAttemptsCount,
         penaltyTimeMs: stepSession.penaltyTimeMs,
-        currentHintIndex: stepSession.currentHintIndex
+        currentHintIndex: (() => {
+          const currentSubStep = stepSession.currentSubStep;
+          if (currentSubStep === 'direction') {
+            return stepSession.directionHintIndex;
+          } else if (currentSubStep === 'enigma' || currentSubStep === 'final') {
+            return stepSession.enigmaHintIndex;
+          }
+          return 0; // fallback
+        })()
       },
-      totalHints: step.enigma?.hints.length || 0, // Ajouter le nombre total d'indices
+      totalHints: (() => {
+        const currentSubStep = stepSession.currentSubStep;
+        if (currentSubStep === 'direction' && step.direction?.hints) {
+          return step.direction.hints.length;
+        } else if ((currentSubStep === 'enigma' || currentSubStep === 'final') && step.enigma?.hints) {
+          return step.enigma.hints.length;
+        }
+        return 0;
+      })(),
       pseudo: session.user.pseudo,
       startedAt: session.startedAt.toISOString()
     });

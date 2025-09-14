@@ -121,34 +121,6 @@ export async function completeSession(sessionId: string) {
   })
 }
 
-export async function getSessionStats(sessionId: string) {
-  const session = await prisma.gameSession.findUnique({
-    where: { id: sessionId },
-    include: {
-      user: true,
-      stepSessions: {
-        orderBy: { stepRank: 'asc' }
-      }
-    }
-  })
-  if (!session) throw new Error('Session introuvable')
-
-  // Créer des données d'attempt à partir des stepSessions
-  const attempts = session.stepSessions.map(ss => ({
-    id: ss.id,
-    isCorrect: ss.enigmaCompletedAt !== null,
-    timeTaken: ss.enigmaCompletedAt ? 
-      (ss.enigmaCompletedAt.getTime() - ss.directionCompletedAt!.getTime()) / 1000 : 0,
-    stepName: ss.stepName,
-    hasUsedHint: ss.hasUsedHint,
-    isBonusCorrect: ss.isBonusCorrect
-  }))
-  
-  const totalTime = (session.completedAt?.getTime() || Date.now()) - session.startedAt.getTime()
-
-  return { user: session.user, totalTime, attempts, completedAt: session.completedAt }
-}
-
 interface ScoreboardStepRow {
   stepName: string
   timeSpent: number
@@ -287,7 +259,6 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
       stepName: step.name,
       stepRank: nextRank,
       currentSubStep: initialSubStep,
-      hasUsedHint: false,
       isBonusCorrect: false
     }
   })
@@ -398,13 +369,25 @@ export async function addHintPenalty(sessionId: string, stepName: string) {
     throw new Error('Session d\'étape introuvable')
   }
 
+  // Détermine quel champ mettre à jour selon la sous-étape actuelle
+  const currentSubStep = stepSession.currentSubStep;
+  const updateData: {
+    penaltyTimeMs: number;
+    directionHintIndex?: number;
+    enigmaHintIndex?: number;
+  } = {
+    penaltyTimeMs: stepSession.penaltyTimeMs + HINT_PENALTY_TIME_MS
+  };
+
+  if (currentSubStep === 'direction') {
+    updateData.directionHintIndex = stepSession.directionHintIndex + 1;
+  } else if (currentSubStep === 'enigma' || currentSubStep === 'final') {
+    updateData.enigmaHintIndex = stepSession.enigmaHintIndex + 1;
+  }
+
   return prisma.stepSession.update({
     where: { id: stepSession.id },
-    data: {
-      hasUsedHint: true,
-      currentHintIndex: stepSession.currentHintIndex + 1,
-      penaltyTimeMs: stepSession.penaltyTimeMs + HINT_PENALTY_TIME_MS
-    }
+    data: updateData
   })
 }
 

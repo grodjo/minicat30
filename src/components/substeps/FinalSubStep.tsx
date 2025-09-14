@@ -32,7 +32,7 @@ export const FinalSubStep = ({
     onSubmit(answer.trim());
   };
 
-  const finalContent = (
+  const bodyContent = (
     <div className="text-center mb-6 space-y-4">
       <p className="text-red-300/80 text-lg font-semibold">
         Chaque mauvaise réponse coûte 1 minute supplémentaire !
@@ -88,7 +88,7 @@ export const FinalSubStep = ({
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
     >
-      {finalContent}
+      {bodyContent}
     </SubStep>
   );
 };

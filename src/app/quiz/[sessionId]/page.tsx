@@ -385,6 +385,11 @@ const QuizPage = () => {
             content={stepData.subStepData.content!}
             buttonText={stepData.subStepData.buttonText!}
             onComplete={handleSubStepComplete}
+            totalHints={stepData.totalHints}
+            currentHintIndex={stepData.stepSession.currentHintIndex}
+            onHintUsed={handleHintUsed}
+            onTimePenalty={handleTimePenalty}
+            sessionId={sessionId}
           />
         );
 

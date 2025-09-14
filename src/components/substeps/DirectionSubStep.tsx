@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { SubStep } from './SubStep';
+import { Hints } from './Hints';
 import { playEventSound, EventSound } from '@/lib/sounds';
 
 interface DirectionSubStepProps {
@@ -12,6 +13,11 @@ interface DirectionSubStepProps {
   isSubmitting: boolean;
   isCorrectAnswer: boolean;
   isStepEntering: boolean;
+  totalHints: number;
+  currentHintIndex: number;
+  onHintUsed: (newHintIndex: number) => void;
+  onTimePenalty: (minutes: number) => void;
+  sessionId: string;
 }
 
 export const DirectionSubStep = ({
@@ -21,13 +27,31 @@ export const DirectionSubStep = ({
   onComplete,
   isSubmitting,
   isCorrectAnswer,
-  isStepEntering
+  isStepEntering,
+  totalHints,
+  currentHintIndex,
+  onHintUsed,
+  onTimePenalty,
+  sessionId
 }: DirectionSubStepProps) => {
   const handleDirectionComplete = () => {
     // Jouer le son pokemonCaught à la fin de l'étape de direction - maintenant instantané par défaut
     playEventSound(EventSound.directionComplete);
     onComplete();
   };
+
+  const bodyContent = (
+    <div className="w-full">
+      {/* Section des indices */}
+      <Hints
+        sessionId={sessionId}
+        totalHints={totalHints}
+        currentHintIndex={currentHintIndex}
+        onHintUsed={onHintUsed}
+        onTimePenalty={onTimePenalty}
+      />
+    </div>
+  );
 
   const bottomContent = (
     <Button
@@ -52,6 +76,8 @@ export const DirectionSubStep = ({
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
-    />
+    >
+      {bodyContent}
+    </SubStep>
   );
 };

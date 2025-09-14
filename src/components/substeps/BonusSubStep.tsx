@@ -30,7 +30,7 @@ export const BonusSubStep = ({
     onSubmit(answer.trim());
   };
 
-  const bonusWarning = (
+  const bodyContent = (
     <div className="text-center mb-6">
       <p className="text-amber-400 text-lg font-semibold">
         ⚠️ Une seule tentative !
@@ -75,7 +75,7 @@ export const BonusSubStep = ({
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
     >
-      {bonusWarning}
+      {bodyContent}
     </SubStep>
   );
 };

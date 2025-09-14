@@ -39,23 +39,49 @@ export async function GET(
       step = getStepByName(stepName);
     }
     
-    if (!step || !step.enigma || !step.enigma.hints) {
+    if (!step) {
       return NextResponse.json(
-        { error: 'Cette étape n\'a pas d\'énigme avec indices' },
+        { error: 'Étape introuvable' },
+        { status: 404 }
+      );
+    }
+    
+    // Détermine quels hints utiliser selon la sous-étape actuelle
+    const currentSubStep = currentStepData.stepSession.currentSubStep;
+    let hints: string[] = [];
+    
+    if (currentSubStep === 'direction' && step.direction?.hints) {
+      hints = step.direction.hints;
+    } else if ((currentSubStep === 'enigma' || currentSubStep === 'final') && step.enigma?.hints) {
+      hints = step.enigma.hints;
+    }
+    
+    if (hints.length === 0) {
+      return NextResponse.json(
+        { error: 'Cette sous-étape n\'a pas d\'indices disponibles' },
         { status: 400 }
       );
     }
 
     // Vérifier que l'index d'indice est valide
-    if (hintIndexNum >= step.enigma.hints.length) {
+    if (hintIndexNum >= hints.length) {
       return NextResponse.json(
         { error: 'Index d\'indice invalide' },
         { status: 400 }
       );
     }
 
-    // Vérifier que l'indice a été débloqué
-    if (hintIndexNum >= currentStepData.stepSession.currentHintIndex) {
+    // Vérifier que l'indice a été débloqué selon la sous-étape
+    let currentHintIndex: number;
+    if (currentSubStep === 'direction') {
+      currentHintIndex = currentStepData.stepSession.directionHintIndex;
+    } else if (currentSubStep === 'enigma' || currentSubStep === 'final') {
+      currentHintIndex = currentStepData.stepSession.enigmaHintIndex;
+    } else {
+      currentHintIndex = 0; // fallback
+    }
+
+    if (hintIndexNum >= currentHintIndex) {
       return NextResponse.json(
         { error: 'Cet indice n\'a pas encore été débloqué' },
         { status: 403 }
@@ -63,9 +89,9 @@ export async function GET(
     }
 
     return NextResponse.json({
-      hint: step.enigma.hints[hintIndexNum],
+      hint: hints[hintIndexNum],
       hintIndex: hintIndexNum,
-      totalHints: step.enigma.hints.length
+      totalHints: hints.length
     });
 
   } catch (error) {

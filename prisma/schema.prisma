@@ -37,8 +37,8 @@ model StepSession {
   stepRank     Int
   startedAt DateTime    @default(now()) // Quand l'étape est présentée à l'utilisateur
   answeredAt DateTime?  // Quand l'utilisateur répond correctement à l'énigme
-  hasUsedHint  Boolean   @default(false) // Si l'utilisateur a utilisé un indice
-  currentHintIndex Int   @default(0) // Index de l'indice actuel (0 = aucun, 1 = premier indice, etc.)
+  directionHintIndex Int @default(0) // Index des indices pour la sous-étape direction
+  enigmaHintIndex Int @default(0) // Index des indices pour la sous-étape énigme
   
   // Nouvelles colonnes pour les sous-étapes
   currentSubStep String @default("direction") // direction, enigma, bonus, key

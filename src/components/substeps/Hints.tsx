@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
 interface HintsProps {
@@ -137,19 +137,17 @@ export const Hints: React.FC<HintsProps> = ({
 
       {/* Modale d'affichage de l'indice */}
       <Dialog open={hintModalOpen} onOpenChange={setHintModalOpen}>
-        <DialogContent className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-amber-500/30 shadow-2xl max-w-lg">
+        <DialogContent className="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 border border-amber-500/30 shadow-2xl max-w-lg">
           <DialogHeader className="space-y-6 pt-8">
             <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-amber-200">
               Indice
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Affichage d&apos;un indice pour vous aider à résoudre l&apos;étape
+            </DialogDescription>
             <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto rounded-full"></div>
             <div className="text-amber-200/90 text-center text-lg md:text-xl leading-relaxed px-6 font-medium">
               <div>{currentHint?.hint || "Aucun indice disponible"}</div>
-              {totalHints > 1 && currentHint && (
-                <div className="mt-4 text-amber-300/80 text-sm">
-                  Indice {currentHint.hintIndex + 1} sur {totalHints}
-                </div>
-              )}
             </div>
           </DialogHeader>
           

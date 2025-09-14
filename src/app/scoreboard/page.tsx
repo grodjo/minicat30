@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { formatScoreboardTime } from '@/lib/time-formatting';
 
 interface ScoreboardEntry {
   rank: number;
@@ -126,7 +127,7 @@ export default function ScoreboardPage() {
                     <div className="flex items-center space-x-6">
                       <div className="text-right">
                         <div className="text-lg font-semibold text-yellow-300 mb-1">
-                          ⏱️ {entry.totalTime}
+                          ⏱️ {formatScoreboardTime(entry.totalTimeMs)}
                         </div>
                         <div className="flex space-x-4 text-lg font-semibold text-violet-200/80">
                           <span>🎯 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}</span>
@@ -162,7 +163,7 @@ export default function ScoreboardPage() {
                                   {stepDisplay}
                                 </span>
                                 <span className="text-yellow-300 font-semibold text-lg">
-                                  ⏱️ {step.timeSpent}
+                                  ⏱️ {formatScoreboardTime(step.timeSpentMs)}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between">
@@ -176,7 +177,7 @@ export default function ScoreboardPage() {
                                 <div className="flex items-center">
                                   {step.penaltyTimeMs > 0 && (
                                     <span className="flex items-center gap-2 text-orange-400 font-semibold text-lg">
-                                      ⚠️ +{step.penaltyTime}
+                                      ⚠️ +{formatScoreboardTime(step.penaltyTimeMs)}
                                     </span>
                                   )}
                                 </div>

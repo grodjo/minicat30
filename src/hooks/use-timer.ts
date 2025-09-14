@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { formatTimerTime } from '@/lib/time-formatting';
 
 export const useTimer = (startedAt: string | null) => {
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -39,16 +40,11 @@ export const useTimer = (startedAt: string | null) => {
     }, 2000);
   }, []);
 
-  // Formatage du temps au format MM:SS
-  const formatTime = (milliseconds: number) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+  // Formatage du temps au format H:MM:SS
+  const elapsedSeconds = Math.floor(elapsedTime / 1000);
 
   return {
-    formattedTime: formatTime(elapsedTime),
+    formattedTime: formatTimerTime(elapsedSeconds),
     addTimePenalty,
     showPenaltyAnimation
   };

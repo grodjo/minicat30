@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE } from './steps'
+import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE, validateStepAnswer, validateFinalStepAnswer } from './steps'
 
 // Constants pour les pénalités
 export const HINT_PENALTY_TIME_MS = 3 * 60 * 1000; // 3 minutes
@@ -90,21 +90,18 @@ export async function validateAnswer(sessionId: string, stepName: string, answer
   }
 
   let step;
-  let normalizedExpected;
+  let isCorrect;
 
   // Si c'est l'étape finale (dernière étape de la liste)
   if (isLastStep(stepSession.stepRank)) {
     step = getFinalStep();
     if (!step || !step.enigma) throw new Error('Étape finale introuvable ou sans énigme');
-    normalizedExpected = step.enigma.answer.trim().toLowerCase();
+    isCorrect = validateFinalStepAnswer('final', answer);
   } else {
     step = getStepByName(stepName);
     if (!step || !step.enigma) throw new Error('Étape introuvable ou sans énigme');
-    normalizedExpected = step.enigma.answer.trim().toLowerCase();
+    isCorrect = validateStepAnswer(stepName, 'enigma', answer);
   }
-
-  const normalizedAnswer = answer.trim().toLowerCase()
-  const isCorrect = normalizedAnswer === normalizedExpected
 
   // Si la réponse est correcte, marquer la StepSession comme terminée
   if (isCorrect) {

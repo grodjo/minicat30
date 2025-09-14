@@ -5,12 +5,12 @@ export interface Step {
   key?: string;       // Sous-étape 4: indication pour trouver l'objet caché (optionnelle)
   enigma?: {          // Sous-étape 2: énigme principale (optionnelle)
     question: string;
-    answer: string;
+    acceptedAnswers: string[]; // Tableau de réponses acceptées
     hints: string[];  // Tableau d'indices
   };
   bonus?: {           // Sous-étape 3: question bonus (optionnelle)
     question: string;
-    answer: string;
+    acceptedAnswers: string[]; // Tableau de réponses acceptées
   };
 }
 
@@ -35,7 +35,7 @@ export const steps: Step[] = [
     key: "Cherchez sous le banc le plus proche de l'aire de jeux",
     enigma: {
       question: "Quel animal domestique aboie ?",
-      answer: "Chien",
+      acceptedAnswers: ["Chien", "chien", "CHIEN", "le chien", "Le chien", "un chien", "Un chien"],
       hints: [
         "Il remue la queue quand il est content et est le meilleur ami de l'homme",
         "Il peut être dressé pour garder la maison",
@@ -44,7 +44,7 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "Combien de pattes a un chien ?",
-      answer: "4"
+      acceptedAnswers: ["4", "quatre", "Quatre", "QUATRE", "4 pattes", "quatre pattes"]
     }
   },
   {
@@ -54,7 +54,7 @@ export const steps: Step[] = [
     key: "Regardez derrière la plaque commémorative de la fontaine",
     enigma: {
       question: "Quelle couleur obtient-on en mélangeant le jaune et le bleu ?",
-      answer: "Vert",
+      acceptedAnswers: ["Vert", "vert", "VERT", "le vert", "Le vert", "du vert", "Du vert"],
       hints: [
         "C'est la couleur de l'herbe et des feuilles au printemps",
         "Cette couleur est obtenue en mélangeant deux couleurs primaires",
@@ -63,7 +63,7 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "Citez une couleur primaire",
-      answer: "Rouge"
+      acceptedAnswers: ["Rouge", "rouge", "ROUGE", "Bleu", "bleu", "BLEU", "Jaune", "jaune", "JAUNE", "le rouge", "le bleu", "le jaune"]
     }
   },
   {
@@ -73,7 +73,7 @@ export const steps: Step[] = [
     key: "Vérifiez sous la table en terrasse la plus éloignée de l'entrée",
     enigma: {
       question: "Quelle planète est surnommée la planète rouge ?",
-      answer: "Mars",
+      acceptedAnswers: ["Mars", "mars", "MARS", "la planète Mars", "La planète Mars", "planète Mars", "Planète Mars"],
       hints: [
         "Elle est la quatrième planète du système solaire et porte le nom du dieu romain de la guerre",
         "Elle doit sa couleur à l'oxyde de fer présent à sa surface",
@@ -82,7 +82,7 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "Combien y a-t-il de planètes dans notre système solaire ?",
-      answer: "8"
+      acceptedAnswers: ["8", "huit", "Huit", "HUIT", "8 planètes", "huit planètes"]
     }
   },
   {
@@ -90,7 +90,7 @@ export const steps: Step[] = [
     name: "FINAL | Le grand défi",
     enigma: {
       question: "Avec toutes les clés que vous avez trouvées, quelle est la réponse finale ?",
-      answer: "VICTOIRE",
+      acceptedAnswers: ["VICTOIRE", "victoire", "Victoire", "la victoire", "La victoire"],
       hints: [
         "Réfléchissez à ce que toutes ces clés ont en commun...",
         "Pensez au but ultime de cette chasse au trésor",
@@ -227,10 +227,14 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
     case 'enigma':
     case 'final':
       if (!step.enigma) return false;
-      return normalizedAnswer === step.enigma.answer.toLowerCase();
+      return step.enigma.acceptedAnswers.some(acceptedAnswer => 
+        normalizedAnswer === acceptedAnswer.toLowerCase()
+      );
     case 'bonus':
       if (!step.bonus) return false;
-      return normalizedAnswer === step.bonus.answer.toLowerCase();
+      return step.bonus.acceptedAnswers.some(acceptedAnswer => 
+        normalizedAnswer === acceptedAnswer.toLowerCase()
+      );
     default:
       // Les sous-étapes 'direction' et 'key' ne nécessitent pas de validation de réponse
       return true;
@@ -246,7 +250,9 @@ export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string
   switch (subStepType) {
     case 'final':
       if (!finalStep.enigma) return false;
-      return normalizedAnswer === finalStep.enigma.answer.toLowerCase();
+      return finalStep.enigma.acceptedAnswers.some(acceptedAnswer => 
+        normalizedAnswer === acceptedAnswer.toLowerCase()
+      );
     default:
       return false;
   }

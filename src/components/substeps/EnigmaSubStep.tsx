@@ -18,6 +18,8 @@ interface EnigmaSubStepProps {
   isCorrectAnswer: boolean;
   isStepEntering: boolean;
   hasUsedHint: boolean;
+  attemptsCount?: number;
+  maxAttempts?: number;
 }
 
 export const EnigmaSubStep = ({
@@ -33,7 +35,9 @@ export const EnigmaSubStep = ({
   setHintModalOpen,
   hints,
   isLoadingHint,
-  hasUsedHint
+  hasUsedHint,
+  attemptsCount = 0,
+  maxAttempts = 10
 }: EnigmaSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -104,6 +108,19 @@ export const EnigmaSubStep = ({
           </DialogContent>
         </Dialog>
       </div>
+      
+      {/* Compteur de tentatives positionné sous l'indice */}
+      <div className="mt-4">
+        <div className={`inline-block px-4 py-2 rounded-lg font-semibold text-sm ${
+          attemptsCount >= maxAttempts 
+            ? 'bg-red-500/20 text-red-300 border border-red-400/30' 
+            : attemptsCount >= maxAttempts * 0.8 
+              ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30'
+              : 'bg-violet-500/20 text-violet-300 border border-violet-400/30'
+        }`}>
+          🎯 Tentatives : {attemptsCount}/{maxAttempts}
+        </div>
+      </div>
     </div>
   );
 
@@ -117,12 +134,12 @@ export const EnigmaSubStep = ({
           className="flex-1 h-14 bg-slate-50/95 border-violet-300/50 text-violet-700 placeholder:text-violet-500/70 text-lg font-semibold focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl shadow-sm"
           placeholder="Votre réponse..."
           required
-          disabled={isSubmitting || isCorrectAnswer}
+          disabled={isSubmitting || isCorrectAnswer || attemptsCount >= maxAttempts}
         />
         <Button
           type="submit"
-          disabled={!answer.trim() || isSubmitting || isCorrectAnswer}
-          className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+          disabled={!answer.trim() || isSubmitting || isCorrectAnswer || attemptsCount >= maxAttempts}
+          className="h-14 px-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg disabled:opacity-50"
         >
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

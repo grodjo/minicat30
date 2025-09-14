@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addHintUsage, getCurrentStepWithSubStep } from '@/lib/game';
+import { addHintPenalty, getCurrentStepWithSubStep } from '@/lib/game';
 import { getStepByName, isLastStep, getFinalStep } from '@/lib/steps';
 
 export async function POST(
@@ -53,7 +53,7 @@ export async function POST(
       );
     }
 
-    await addHintUsage(sessionId, stepName);
+    await addHintPenalty(sessionId, stepName);
 
     return NextResponse.json({
       hint: step.enigma.hint,

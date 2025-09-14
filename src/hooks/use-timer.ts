@@ -7,6 +7,7 @@ export const useTimer = (startedAt: string | null) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [penaltyTime, setPenaltyTime] = useState(0);
   const [showPenaltyAnimation, setShowPenaltyAnimation] = useState(false);
+  const [lastPenaltyMinutes, setLastPenaltyMinutes] = useState(1);
 
   useEffect(() => {
     if (!startedAt) return;
@@ -32,6 +33,7 @@ export const useTimer = (startedAt: string | null) => {
   const addTimePenalty = useCallback((minutes: number = 1) => {
     const penaltyMs = minutes * 60 * 1000;
     setPenaltyTime(prev => prev + penaltyMs);
+    setLastPenaltyMinutes(minutes);
     setShowPenaltyAnimation(true);
     
     // Masquer l'animation après 2 secondes
@@ -46,6 +48,7 @@ export const useTimer = (startedAt: string | null) => {
   return {
     formattedTime: formatTimerTime(elapsedSeconds),
     addTimePenalty,
-    showPenaltyAnimation
+    showPenaltyAnimation,
+    lastPenaltyMinutes
   };
 };

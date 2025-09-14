@@ -43,10 +43,14 @@ model StepSession {
   currentSubStep String @default("direction") // direction, enigma, bonus, key
   directionCompletedAt DateTime?
   enigmaCompletedAt DateTime?
+  enigmaAttemptsCount Int @default(0) // Nombre de tentatives pour l'énigme
   bonusAttemptedAt DateTime?
   isBonusCorrect Boolean?
   keyCompletedAt DateTime?
   collectedKey String? // La clé trouvée dans cette étape
+  
+  // Suivi des pénalités par étape
+  penaltyTimeMs Int @default(0) // Temps de pénalité cumulé pour cette étape (en ms)
   
   @@unique([gameSessionId, stepName])
   @@index([gameSessionId, stepRank])

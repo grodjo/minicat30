@@ -3,6 +3,7 @@
 interface TimerProps {
   elapsedTime: string;
   showPenaltyAnimation?: boolean;
+  penaltyMinutes?: number; // Nombre de minutes de pénalité à afficher
   size?: 'small' | 'large';
   className?: string;
 }
@@ -10,6 +11,7 @@ interface TimerProps {
 export const Timer = ({ 
   elapsedTime, 
   showPenaltyAnimation, 
+  penaltyMinutes = 1,
   size = 'small',
   className = '' 
 }: TimerProps) => {
@@ -24,7 +26,7 @@ export const Timer = ({
       {/* Indicateur de pénalité */}
       {showPenaltyAnimation && (
         <div className={`absolute ${penaltyIndicatorSize} left-1/2 transform -translate-x-1/2 text-red-400 font-black pointer-events-none z-20 animate-penalty-burst`}>
-          +1
+          +{penaltyMinutes}min ⚠️
         </div>
       )}
       

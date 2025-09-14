@@ -126,7 +126,7 @@ export default function ScoreboardPage() {
                     </div>
                     <div className="flex items-center space-x-6">
                       <div className="text-right">
-                        <div className="text-lg font-semibold text-yellow-300 mb-1">
+                        <div className="text-lg font-semibold text-orange-300 mb-1">
                           ⏱️ {formatScoreboardTime(entry.totalTimeMs)}
                         </div>
                         <div className="flex space-x-4 text-lg font-semibold text-violet-200/80">
@@ -176,7 +176,7 @@ export default function ScoreboardPage() {
                                 </div>
                                 <div className="flex items-center">
                                   {step.penaltyTimeMs > 0 && (
-                                    <span className="flex items-center gap-2 text-orange-400 font-semibold text-lg">
+                                    <span className="flex items-center gap-2 text-red-500 font-semibold text-lg">
                                       ⚠️ +{formatScoreboardTime(step.penaltyTimeMs)}
                                     </span>
                                   )}

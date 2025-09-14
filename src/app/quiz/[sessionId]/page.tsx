@@ -39,6 +39,8 @@ interface StepData {
     bonusCorrect: boolean;
     keyCompleted: boolean;
     hasUsedHint: boolean;
+    enigmaAttemptsCount: number;
+    penaltyTimeMs: number;
   };
 }
 
@@ -80,7 +82,7 @@ const QuizPage = () => {
   const wrongAnswerToastRef = useRef<WrongAnswerToastRef>(null);
 
   // Hook pour le timer
-  const { formattedTime: elapsedTime, addTimePenalty, showPenaltyAnimation } = useTimer(sessionInfo?.startedAt || null);
+  const { formattedTime: elapsedTime, addTimePenalty, showPenaltyAnimation, lastPenaltyMinutes } = useTimer(sessionInfo?.startedAt || null);
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
@@ -287,6 +289,48 @@ const QuizPage = () => {
         if (stepData.subStepData.type === 'final') {
           addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse finale
           wrongAnswerToastRef.current?.show();
+          
+          // Jouer le son approprié si spécifié
+          if (data.playSound) {
+            if (data.playSound === 'scratchStop') {
+              playEventSound(EventSound.stop);
+            } else if (data.playSound === 'alarmEnd') {
+              playEventSound(EventSound.alarm);
+            }
+          }
+          
+          // Recharger les données pour mettre à jour le compteur de tentatives
+          if (!data.moveToNext && !data.completed) {
+            await loadCurrentStep();
+          }
+        } else if (stepData.subStepData.type === 'enigma') {
+          // Pour les énigmes, la pénalité est déjà gérée côté serveur
+          // On ajoute la pénalité côté client pour l'affichage immédiat
+          addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse énigme
+          wrongAnswerToastRef.current?.show();
+          
+          // Jouer le son approprié si spécifié
+          if (data.playSound) {
+            if (data.playSound === 'scratchStop') {
+              playEventSound(EventSound.stop);
+            } else if (data.playSound === 'alarmEnd') {
+              playEventSound(EventSound.alarm);
+            }
+          }
+          
+          // Vérifier si on doit passer à l'étape suivante (tentatives épuisées)
+          if (data.moveToNext) {
+            setTimeout(async () => {
+              if (data.completed) {
+                setCompleted(true);
+              } else {
+                await loadCurrentStep();
+              }
+            }, 1500);
+          } else {
+            // Recharger les données pour mettre à jour le compteur de tentatives
+            await loadCurrentStep();
+          }
         } else {
           // Vérifier si c'est un bonus raté qui doit passer à la suite
           if (data.moveToNext) {
@@ -346,8 +390,8 @@ const QuizPage = () => {
       const data = await response.json();
       if (response.ok) {
         setHints([data]);
-        // Ajouter la pénalité de temps lors de l'utilisation d'un indice
-        addTimePenalty(1); // Ajouter 1 minute
+        // Ajouter la pénalité de temps lors de l'utilisation d'un indice (3 minutes)
+        addTimePenalty(3); // Ajouter 3 minutes
         // Mettre à jour immédiatement l'état local pour que le bouton devienne vert
         setStepData(prev => prev ? {
           ...prev,
@@ -427,6 +471,8 @@ const QuizPage = () => {
             hints={hints}
             isLoadingHint={isLoadingHint}
             hasUsedHint={stepData.stepSession.hasUsedHint}
+            attemptsCount={stepData.stepSession.enigmaAttemptsCount}
+            maxAttempts={10}
           />
         );
 
@@ -455,6 +501,8 @@ const QuizPage = () => {
             {...commonProps}
             question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
+            attemptsCount={stepData.stepSession.enigmaAttemptsCount}
+            maxAttempts={10}
           />
         );
 
@@ -477,6 +525,7 @@ const QuizPage = () => {
         <Timer 
           elapsedTime={elapsedTime}
           showPenaltyAnimation={showPenaltyAnimation}
+          penaltyMinutes={lastPenaltyMinutes}
           size="large"
           className="justify-center"
         />

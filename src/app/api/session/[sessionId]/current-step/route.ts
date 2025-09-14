@@ -58,7 +58,9 @@ export async function GET(
         bonusCompleted: !!stepSession.bonusAttemptedAt,
         bonusCorrect: stepSession.isBonusCorrect,
         keyCompleted: !!stepSession.keyCompletedAt,
-        hasUsedHint: stepSession.hasUsedHint
+        hasUsedHint: stepSession.hasUsedHint,
+        enigmaAttemptsCount: stepSession.enigmaAttemptsCount,
+        penaltyTimeMs: stepSession.penaltyTimeMs
       },
       pseudo: session.user.pseudo,
       startedAt: session.startedAt.toISOString()

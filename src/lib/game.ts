@@ -1,6 +1,10 @@
 import { prisma } from './prisma'
 import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE } from './steps'
-import { HINT_PENALTY_TIME_MS } from './constants'
+
+// Constants pour les pénalités
+export const HINT_PENALTY_TIME_MS = 3 * 60 * 1000; // 3 minutes
+export const WRONG_ANSWER_PENALTY_TIME_MS = 1 * 60 * 1000; // 1 minute
+export const MAX_ENIGMA_ATTEMPTS = 10;
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
@@ -113,28 +117,6 @@ export async function validateAnswer(sessionId: string, stepName: string, answer
   return { isCorrect }
 }
 
-export async function addHintUsage(sessionId: string, stepName: string) {
-  const step = getStepByName(stepName)
-  if (!step) throw new Error('Étape introuvable')
-
-  // Récupérer la StepSession pour cette étape
-  const stepSession = await prisma.stepSession.findUnique({
-    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
-  })
-
-  if (!stepSession) {
-    throw new Error('Session d\'étape introuvable')
-  }
-
-  // Marquer que l'indice a été utilisé (on ne suit plus les indices individuels)
-  await prisma.stepSession.update({
-    where: { id: stepSession.id },
-    data: { hasUsedHint: true }
-  })
-
-  return { hasUsedHint: true }
-}
-
 export async function completeSession(sessionId: string) {
   return prisma.gameSession.update({
     where: { id: sessionId },
@@ -198,7 +180,17 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
   })
 
   const scoreboard = sessions.map((s): ScoreboardRow => {
-    const totalTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
+    // Calculer le temps de base (durée réelle de la session)
+    const baseTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
+    
+    // Ajouter toutes les pénalités cumulées de toutes les étapes
+    const totalPenalties = s.stepSessions.reduce((sum: number, ss): number => {
+      return sum + ss.penaltyTimeMs
+    }, 0)
+    
+    // Temps total = temps de base + pénalités
+    const totalTime = baseTime + totalPenalties
+    
     const totalBonusCorrect = s.stepSessions.reduce((sum: number, ss): number => {
       return sum + (ss.isBonusCorrect ? 1 : 0)
     }, 0)
@@ -215,8 +207,8 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
         const timeSpent = ss.keyCompletedAt && ss.startedAt ?
           ss.keyCompletedAt.getTime() - ss.startedAt.getTime() : 0
         
-        // Calculer le temps de malus (constante par indice utilisé)
-        const penaltyTime = ss.hasUsedHint ? HINT_PENALTY_TIME_MS : 0
+        // Utiliser le temps de pénalité stocké en base de données (indices + mauvaises réponses)
+        const penaltyTime = ss.penaltyTimeMs
         
         return {
           stepName: isLastStep(ss.stepRank) ? 'Étape finale' : ss.stepName,
@@ -377,6 +369,44 @@ export async function completeSubStep(
   return prisma.stepSession.update({
     where: { id: stepSession.id },
     data: updateData
+  })
+}
+
+// Fonction pour ajouter une tentative d'énigme et une pénalité
+export async function addEnigmaAttempt(sessionId: string, stepName: string) {
+  const stepSession = await prisma.stepSession.findUnique({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
+  })
+
+  if (!stepSession) {
+    throw new Error('Session d\'étape introuvable')
+  }
+
+  return prisma.stepSession.update({
+    where: { id: stepSession.id },
+    data: {
+      enigmaAttemptsCount: stepSession.enigmaAttemptsCount + 1,
+      penaltyTimeMs: stepSession.penaltyTimeMs + WRONG_ANSWER_PENALTY_TIME_MS
+    }
+  })
+}
+
+// Fonction pour ajouter une pénalité d'indice
+export async function addHintPenalty(sessionId: string, stepName: string) {
+  const stepSession = await prisma.stepSession.findUnique({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
+  })
+
+  if (!stepSession) {
+    throw new Error('Session d\'étape introuvable')
+  }
+
+  return prisma.stepSession.update({
+    where: { id: stepSession.id },
+    data: {
+      hasUsedHint: true,
+      penaltyTimeMs: stepSession.penaltyTimeMs + HINT_PENALTY_TIME_MS
+    }
   })
 }
 

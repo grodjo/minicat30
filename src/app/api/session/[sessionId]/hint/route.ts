@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addHintPenalty, getCurrentStepWithSubStep } from '@/lib/game';
-import { getStepByName, isLastStep, getFinalStep } from '@/lib/steps';
+import { getStepByOrder, isLastStep, getFinalStep } from '@/lib/steps';
 
 export async function POST(
   request: NextRequest,
@@ -9,9 +9,8 @@ export async function POST(
   try {
     const params = await context.params;
     const sessionId = params.sessionId;
-    const { stepName, hintIndex } = await request.json();
 
-    if (!sessionId || !stepName || typeof hintIndex !== 'number') {
+    if (!sessionId) {
       return NextResponse.json(
         { error: 'Paramètres manquants' },
         { status: 400 }
@@ -21,44 +20,55 @@ export async function POST(
     // Récupérer les données de l'étape actuelle pour déterminer si c'est l'étape finale
     const currentStepData = await getCurrentStepWithSubStep(sessionId);
     
-    let step;
-    
-    if (currentStepData && isLastStep(currentStepData.stepSession.stepRank)) {
-      // C'est l'étape finale, utiliser getFinalStep()
-      step = getFinalStep();
-    } else {
-      // Étape normale
-      step = getStepByName(stepName);
-    }
-    
-    if (!step) {
+    if (!currentStepData) {
       return NextResponse.json(
-        { error: 'Étape non trouvée' },
+        { error: 'Étape actuelle non trouvée' },
         { status: 404 }
       );
     }
 
-    // Dans la nouvelle structure, il n'y a qu'un seul hint
-    if (hintIndex !== 0) {
+    let step;
+    
+    if (isLastStep(currentStepData.stepSession.stepRank)) {
+      // C'est l'étape finale, utiliser getFinalStep()
+      step = getFinalStep();
+    } else {
+      // Étape normale, utiliser le stepRank pour récupérer l'étape
+      step = getStepByOrder(currentStepData.stepSession.stepRank);
+    }
+    
+    console.log('Debug hint API:');
+    console.log('- stepRank:', currentStepData.stepSession.stepRank);
+    console.log('- step:', step);
+    console.log('- step.enigma:', step?.enigma);
+    console.log('- step.enigma.hints:', step?.enigma?.hints);
+    
+    if (!step || !step.enigma || !step.enigma.hints) {
       return NextResponse.json(
-        { error: "Index d'indice invalide" },
+        { error: 'Cette étape n\'a pas d\'énigme avec indices' },
         { status: 400 }
       );
     }
 
-    if (!step.enigma) {
+    // Vérifier l'index d'indice actuel
+    const currentHintIndex = currentStepData.stepSession.currentHintIndex;
+    
+    // Vérifier s'il y a encore des indices disponibles
+    if (currentHintIndex >= step.enigma.hints.length) {
       return NextResponse.json(
-        { error: 'Cette étape n\'a pas d\'énigme avec indice' },
+        { error: 'Tous les indices ont déjà été utilisés' },
         { status: 400 }
       );
     }
 
-    await addHintPenalty(sessionId, stepName);
+    // Ajouter la pénalité et incrémenter l'index
+    await addHintPenalty(sessionId, step.name);
 
     return NextResponse.json({
-      hint: step.enigma.hint,
-      hintIndex: 0,
-      totalHints: 1
+      hint: step.enigma.hints[currentHintIndex],
+      hintIndex: currentHintIndex,
+      totalHints: step.enigma.hints.length,
+      remainingHints: step.enigma.hints.length - currentHintIndex - 1
     });
 
   } catch (error) {

@@ -6,7 +6,7 @@ export interface Step {
   enigma?: {          // Sous-étape 2: énigme principale (optionnelle)
     question: string;
     answer: string;
-    hint: string;
+    hints: string[];  // Tableau d'indices
   };
   bonus?: {           // Sous-étape 3: question bonus (optionnelle)
     question: string;
@@ -36,7 +36,11 @@ export const steps: Step[] = [
     enigma: {
       question: "Quel animal domestique aboie ?",
       answer: "Chien",
-      hint: "Il remue la queue quand il est content et est le meilleur ami de l'homme"
+      hints: [
+        "Il remue la queue quand il est content et est le meilleur ami de l'homme",
+        "Il peut être dressé pour garder la maison",
+        "Il aime jouer avec une balle ou un bâton"
+      ]
     },
     bonus: {
       question: "Combien de pattes a un chien ?",
@@ -51,7 +55,11 @@ export const steps: Step[] = [
     enigma: {
       question: "Quelle couleur obtient-on en mélangeant le jaune et le bleu ?",
       answer: "Vert",
-      hint: "C'est la couleur de l'herbe et des feuilles au printemps"
+      hints: [
+        "C'est la couleur de l'herbe et des feuilles au printemps",
+        "Cette couleur est obtenue en mélangeant deux couleurs primaires",
+        "C'est la couleur des légumes comme les épinards ou la laitue"
+      ]
     },
     bonus: {
       question: "Citez une couleur primaire",
@@ -66,7 +74,11 @@ export const steps: Step[] = [
     enigma: {
       question: "Quelle planète est surnommée la planète rouge ?",
       answer: "Mars",
-      hint: "Elle est la quatrième planète du système solaire et porte le nom du dieu romain de la guerre"
+      hints: [
+        "Elle est la quatrième planète du système solaire et porte le nom du dieu romain de la guerre",
+        "Elle doit sa couleur à l'oxyde de fer présent à sa surface",
+        "Cette planète possède deux petites lunes : Phobos et Deimos"
+      ]
     },
     bonus: {
       question: "Combien y a-t-il de planètes dans notre système solaire ?",
@@ -79,7 +91,11 @@ export const steps: Step[] = [
     enigma: {
       question: "Avec toutes les clés que vous avez trouvées, quelle est la réponse finale ?",
       answer: "VICTOIRE",
-      hint: "Réfléchissez à ce que toutes ces clés ont en commun..."
+      hints: [
+        "Réfléchissez à ce que toutes ces clés ont en commun...",
+        "Pensez au but ultime de cette chasse au trésor",
+        "Quel mot décrit le sentiment d'avoir accompli quelque chose de difficile ?"
+      ]
     }
   }
 ];
@@ -170,7 +186,7 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
       return {
         type: 'enigma',
         question: step.enigma.question,
-        hint: step.enigma.hint,
+        hints: step.enigma.hints,
         requiresAnswer: true
       };
     case 'bonus':
@@ -193,7 +209,7 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
       return {
         type: 'final',
         question: step.enigma.question,
-        hint: step.enigma.hint,
+        hints: step.enigma.hints,
         requiresAnswer: true
       };
     default:

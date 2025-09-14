@@ -41,18 +41,14 @@ interface StepData {
     hasUsedHint: boolean;
     enigmaAttemptsCount: number;
     penaltyTimeMs: number;
+    currentHintIndex: number;
   };
+  totalHints: number; // Ajouter le nombre total d'indices
 }
 
 interface SessionInfo {
   pseudo: string | null;
   startedAt: string;
-}
-
-interface Hint {
-  hint: string;
-  hintIndex: number;
-  totalHints: number;
 }
 
 const QuizPage = () => {
@@ -62,12 +58,9 @@ const QuizPage = () => {
 
   const [stepData, setStepData] = useState<StepData | null>(null);
   const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null);
-  const [hints, setHints] = useState<Hint[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
-  const [hintModalOpen, setHintModalOpen] = useState(false);
-  const [isLoadingHint, setIsLoadingHint] = useState(false);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isStepEntering, setIsStepEntering] = useState(false);
   
@@ -86,19 +79,6 @@ const QuizPage = () => {
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
-
-  // Ouvrir la modale quand un nouvel indice est chargé (avec délai pour laisser l'animation se terminer)
-  useEffect(() => {
-    if (isLoadingHint && hints.length > 0) {
-      // Attendre 2.2 secondes que l'animation du timer soit terminée avant d'ouvrir la modale
-      setTimeout(() => {
-        // Jouer le son ps2Reveal quand la modale d'indice apparaît
-        playEventSound(EventSound.hintRevealed);
-        setHintModalOpen(true);
-        setIsLoadingHint(false);
-      }, 2200); // 2.2s pour être sûr que l'animation de 2s soit terminée
-    }
-  }, [hints, isLoadingHint]);
 
   const loadCurrentStep = async () => {
     try {
@@ -149,17 +129,6 @@ const QuizPage = () => {
           stepName: stepData.stepName,
           currentSubStep: stepData.currentSubStep
         });
-        
-        // Si l'indice a été utilisé pour cette étape, le charger
-        if (stepData.stepSession.hasUsedHint && (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final')) {
-          setHints([{
-            hint: stepData.subStepData.hint,
-            hintIndex: 0,
-            totalHints: 1
-          }]);
-        } else {
-          setHints([]);
-        }
         
         // Déclencher l'animation d'entrée seulement pour les nouvelles sous-étapes (pas les nouvelles étapes)
         if (isNewSubStep) {
@@ -361,59 +330,20 @@ const QuizPage = () => {
     }
   };
 
-  // Gestion de l'obtention d'un indice
-  const getHint = async () => {
-    if (!stepData) return;
-
-    // Si l'indice a déjà été utilisé (selon la BDD), juste ouvrir la modale avec délai
-    if (stepData.stepSession.hasUsedHint && hints.length > 0) {
-      // Pas de pénalité si l'indice a déjà été utilisé précédemment
-      // Ouvrir directement la modale (pas d'animation de timer)
-      setHintModalOpen(true);
-      return;
-    }
-
-    // Sinon, charger l'indice depuis l'API
-    setIsLoadingHint(true);
-    try {
-      const response = await fetch(`/api/session/${sessionId}/hint`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          stepName: stepData.stepName,
-          hintIndex: 0,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setHints([data]);
-        // Ajouter la pénalité de temps lors de l'utilisation d'un indice (3 minutes)
-        addTimePenalty(3); // Ajouter 3 minutes
-        // Mettre à jour immédiatement l'état local pour que le bouton devienne vert
-        setStepData(prev => prev ? {
-          ...prev,
-          stepSession: {
-            ...prev.stepSession,
-            hasUsedHint: true
-          }
-        } : null);
-        // La modale s'ouvrira automatiquement via useEffect
-      } else {
-        setIsLoadingHint(false);
-        toast.error(data.error, {
-          className: quizToastClass
-        });
+  // Callbacks pour le composant Hints
+  const handleHintUsed = (newHintIndex: number) => {
+    setStepData(prev => prev ? {
+      ...prev,
+      stepSession: {
+        ...prev.stepSession,
+        hasUsedHint: true,
+        currentHintIndex: newHintIndex
       }
-    } catch (error) {
-      console.error('Error getting hint:', error);
-      setIsLoadingHint(false);
-      toast.error('Erreur lors de la récupération de l\'indice', {
-        className: quizToastClass
-      });
-    }
+    } : null);
+  };
+
+  const handleTimePenalty = (minutes: number) => {
+    addTimePenalty(minutes);
   };
 
   const goToScoreboard = () => {
@@ -463,14 +393,12 @@ const QuizPage = () => {
           <EnigmaSubStep
             {...commonProps}
             question={stepData.subStepData.question!}
-            hint={stepData.subStepData.hint!}
             onSubmit={handleAnswerSubmit}
-            onGetHint={getHint}
-            hintModalOpen={hintModalOpen}
-            setHintModalOpen={setHintModalOpen}
-            hints={hints}
-            isLoadingHint={isLoadingHint}
-            hasUsedHint={stepData.stepSession.hasUsedHint}
+            totalHints={stepData.totalHints}
+            currentHintIndex={stepData.stepSession.currentHintIndex}
+            onHintUsed={handleHintUsed}
+            onTimePenalty={handleTimePenalty}
+            sessionId={sessionId}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}
             maxAttempts={10}
           />

@@ -391,7 +391,7 @@ export async function addEnigmaAttempt(sessionId: string, stepName: string) {
   })
 }
 
-// Fonction pour ajouter une pénalité d'indice
+// Fonction pour ajouter une pénalité d'indice et incrémenter l'index d'indice
 export async function addHintPenalty(sessionId: string, stepName: string) {
   const stepSession = await prisma.stepSession.findUnique({
     where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
@@ -405,6 +405,7 @@ export async function addHintPenalty(sessionId: string, stepName: string) {
     where: { id: stepSession.id },
     data: {
       hasUsedHint: true,
+      currentHintIndex: stepSession.currentHintIndex + 1,
       penaltyTimeMs: stepSession.penaltyTimeMs + HINT_PENALTY_TIME_MS
     }
   })

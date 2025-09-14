@@ -68,8 +68,8 @@ export const BonusSubStep = ({
   return (
     <SubStep
       stepName={stepName}
-      typeIcon="🎯"
-      typeLabel="Question Bonus"
+      typeIcon="🎓"
+      typeLabel="Bonus"
       title={question}
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}

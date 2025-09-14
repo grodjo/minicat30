@@ -60,8 +60,10 @@ export async function GET(
         keyCompleted: !!stepSession.keyCompletedAt,
         hasUsedHint: stepSession.hasUsedHint,
         enigmaAttemptsCount: stepSession.enigmaAttemptsCount,
-        penaltyTimeMs: stepSession.penaltyTimeMs
+        penaltyTimeMs: stepSession.penaltyTimeMs,
+        currentHintIndex: stepSession.currentHintIndex
       },
+      totalHints: step.enigma?.hints.length || 0, // Ajouter le nombre total d'indices
       pseudo: session.user.pseudo,
       startedAt: session.startedAt.toISOString()
     });

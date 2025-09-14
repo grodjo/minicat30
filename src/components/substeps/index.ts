@@ -4,3 +4,4 @@ export { EnigmaSubStep } from './EnigmaSubStep';
 export { BonusSubStep } from './BonusSubStep';
 export { KeySubStep } from './KeySubStep';
 export { FinalSubStep } from './FinalSubStep';
+export { Hints } from './Hints';

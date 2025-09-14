@@ -213,6 +213,8 @@ const QuizPage = () => {
           playEventSound(EventSound.bonusSuccess); // dbzKiBlast pour bonus réussi
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
           playEventSound(EventSound.enigmaSuccess); // airHornWin pour énigme réussie
+        } else if (stepData.subStepData.type === 'direction') {
+          playEventSound(EventSound.directionComplete); // pokemonCaught pour direction réussie
         }
         
         // Début de la transition - masquer immédiatement l'ancienne question
@@ -252,6 +254,8 @@ const QuizPage = () => {
           playEventSound(EventSound.bonusFailed); // dbzGhost pour bonus raté
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
           playEventSound(EventSound.enigmaFailed); // wrong3 pour énigme ratée
+        } else if (stepData.subStepData.type === 'direction') {
+          playEventSound(EventSound.enigmaFailed); // wrong3 pour direction ratée aussi
         }
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité
@@ -315,7 +319,7 @@ const QuizPage = () => {
               }
             }, 1500); // 1.5 secondes pour laisser le toast disparaître
           } else {
-            // Afficher notre toast custom pour mauvaise réponse (énigmes)
+            // Afficher notre toast custom pour mauvaise réponse (énigmes et directions)
             wrongAnswerToastRef.current?.show();
           }
         }
@@ -383,8 +387,7 @@ const QuizPage = () => {
           <DirectionSubStep
             {...commonProps}
             content={stepData.subStepData.content!}
-            buttonText={stepData.subStepData.buttonText!}
-            onComplete={handleSubStepComplete}
+            onSubmit={handleAnswerSubmit}
             totalHints={stepData.totalHints}
             currentHintIndex={stepData.stepSession.currentHintIndex}
             onHintUsed={handleHintUsed}

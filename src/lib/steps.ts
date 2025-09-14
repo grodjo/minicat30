@@ -4,6 +4,7 @@ export interface Step {
   direction?: {       // Sous-étape 1: indication pour se rendre au lieu (optionnelle)
     instruction: string;
     hints: string[];  // Tableau d'indices pour la direction
+    acceptedAnswers: string[]; // Pour les directions avec validation
   };
   key?: string;       // Sous-étape 4: indication pour trouver l'objet caché (optionnelle)
   enigma?: {          // Sous-étape 2: énigme principale (optionnelle)
@@ -39,7 +40,8 @@ export const steps: Step[] = [
       hints: [
         "Son entrée se trouve place de la Bastille",
         "Son numéro correspond au nombre d'apôtres de Jésus",
-      ]
+      ],
+      acceptedAnswers: ["Cour Damoye", "Damoye"]
     },
     enigma: {
       question: "Pas loin de la fontaine se cache une statue, mais qui est-ce ?",
@@ -62,7 +64,8 @@ export const steps: Step[] = [
       hints: [
         "Mon entrée se fait par la rue Saint Antoine",
         "J'héberge le centre des monuments nationaux",
-      ]
+      ],
+      acceptedAnswers: ["Hôtel de Sully"]
     },
     enigma: {
       question: "Combien de tétons à l'air libre pouvez-vous apercevoir dans la cour ?",
@@ -82,7 +85,8 @@ export const steps: Step[] = [
       instruction: "Dans un petit village avoisinant, le père de Gargantua a sa cour",
       hints: [
         "L'église d'à côté porte le même nom que le village",
-      ]
+      ],
+      acceptedAnswers: ["Saint Paul", "Saint-Paul", "Village Saint-Paul"]
     },
     enigma: {
       question: "Un bistro pas si bien caché propose une carte convenable. Toutefois Célia se jetterait un seul des plats les yeux fermés. Combien coûte-t-il ?",
@@ -90,7 +94,8 @@ export const steps: Step[] = [
       hints: [
         "C'est du sale !",
         "Des féculents, de la viande, des crudités, un laitage, c'est un plat complet",
-      ]
+      ],
+
     },
     bonus: {
       question: "De quelle ville provient cette délicate spécialité culinaire ?",
@@ -105,7 +110,8 @@ export const steps: Step[] = [
       instruction: "À quelques pas de là, rendez-vous devant l'établissement scolaire du roi des Francs",
       hints: [
         "Son daron s'appelait Pépin",
-      ]
+      ],
+      acceptedAnswers: ["Charlemagne"]
     },
     enigma: {
       question: "Oh la belle fontaine ! En quelle année fut-elle construite ?",
@@ -128,7 +134,8 @@ export const steps: Step[] = [
       instruction: "On peut passer la nuit dans mon premier. Mon deuxième est bien à sa place. À ma connaissance, vous possédez tous cinq de mon troisième. Rendez-vous dans le jardin de mon tout.",
       hints: [
         "Rapprochez-vous de la Seine",
-      ]
+      ],
+      acceptedAnswers: ["Hôtel de Sens"]
     },
     enigma: {
       question: "En faisant abstraction des arrondis dans les coins, combien de triangles sont dessinés par les chemins ?",
@@ -146,7 +153,8 @@ export const steps: Step[] = [
     name: "06",
     direction: {
       instruction: "Dirigez-vous vers la petite soeur de la Cité où se trouve une boutique qui aurait pu être celle de Gepetto",
-      hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"]
+      hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
+      acceptedAnswers: ["Clair de rêve"]
     },
     enigma: {
       question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
@@ -164,7 +172,8 @@ export const steps: Step[] = [
     name: "07",
     direction: {
       instruction: "AB°CD’CE.C. E°EF’C.C\n\nA=E^2\nC=B-A+F\nD=C-A-F\nF=B^0*A^0\nE=∛B",
-      hints: ["E=2", "Google Maps accepte les coordonnées"]
+      hints: ["E=2", "Google Maps accepte les coordonnées"],
+      acceptedAnswers: ["Place Maurice Audin"]
     },
     enigma: {
       question: "Comment s'appelle la femme de ce bon vieux Maurice ?",
@@ -313,6 +322,11 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
   const normalizedAnswer = answer.trim().toLowerCase();
 
   switch (subStepType) {
+    case 'direction':
+      if (!step.direction) return false;
+      return step.direction.acceptedAnswers.some(acceptedAnswer => 
+        normalizedAnswer === acceptedAnswer.toLowerCase()
+      );
     case 'enigma':
     case 'final':
       if (!step.enigma) return false;
@@ -324,9 +338,11 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
       return step.bonus.acceptedAnswers.some(acceptedAnswer => 
         normalizedAnswer === acceptedAnswer.toLowerCase()
       );
-    default:
-      // Les sous-étapes 'direction' et 'key' ne nécessitent pas de validation de réponse
+    case 'key':
+      // Les sous-étapes 'key' ne nécessitent pas de validation de réponse
       return true;
+    default:
+      return false;
   }
 };
 

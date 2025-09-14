@@ -1,7 +1,7 @@
 {
-  "name": "Quiz Course d'Orientation",
-  "short_name": "Quiz Orientation",
-  "description": "Application quiz pour course d'orientation avec questions chronométrées",
+  "name": "Minicat30",
+  "short_name": "Minicat30",
+  "description": "Le jeu de piste le plus stylé de l'univers",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#dbeafe",

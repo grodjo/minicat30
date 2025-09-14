@@ -452,6 +452,7 @@ const QuizPage = () => {
             onSubmit={handleAnswerSubmit}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}
             maxAttempts={10}
+            sessionId={sessionId}
           />
         );
 

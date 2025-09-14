@@ -1,15 +1,11 @@
 export interface Step {
-  id?: number;
-  type?: 'substep' | 'final';
-  substepId?: number;
-  stepRank?: number;
+  stepRank: number;
   name: string;
   direction?: {
     instruction: string;
     hints: string[];
     acceptedAnswers: string[];
   };
-  directionText?: string;
   moving?: string;  // Nouveau texte pour l'étape de déplacement
   enigma?: {
     question: string;

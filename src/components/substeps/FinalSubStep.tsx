@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SubStep } from './SubStep';
+import { CollectedKeysModal } from '@/components/substeps/CollectedKeysModal';
 
 interface FinalSubStepProps {
   stepName: string;
@@ -12,6 +13,7 @@ interface FinalSubStepProps {
   isStepEntering: boolean;
   attemptsCount?: number;
   maxAttempts?: number;
+  sessionId: string;
 }
 
 export const FinalSubStep = ({
@@ -22,7 +24,8 @@ export const FinalSubStep = ({
   isCorrectAnswer,
   isStepEntering,
   attemptsCount = 0,
-  maxAttempts = 10
+  maxAttempts = 10,
+  sessionId
 }: FinalSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -34,9 +37,10 @@ export const FinalSubStep = ({
 
   const bodyContent = (
     <div className="text-center mb-6 space-y-4">
-      <p className="text-red-300/80 text-lg font-semibold">
-        Chaque mauvaise réponse coûte 1 minute supplémentaire !
-      </p>
+      {/* Bouton pour voir les clés collectées */}
+      <div className="flex justify-center mb-4">
+        <CollectedKeysModal sessionId={sessionId} />
+      </div>
       
       {/* Compteur de tentatives */}
       <div className={`inline-block px-4 py-2 rounded-lg font-semibold text-sm ${

@@ -33,94 +33,158 @@ export interface StepProgress {
 export const steps: Step[] = [
   {
     stepRank: 1,
-    name: "01 | Animal domestique",
+    name: "01",
     direction: {
-      instruction: "Rendez-vous dans le parc le plus proche de votre position",
+      instruction: "Rendez-vous à l'intérieur de la 🏃 👩🪿",
       hints: [
-        "Cherchez un espace vert avec des arbres et de l'herbe",
-        "Il peut y avoir des bancs, des aires de jeux ou des chemins de promenade",
-        "Utilisez une application de carte pour localiser les parcs autour de vous"
+        "Son entrée se trouve place de la Bastille",
+        "Son numéro correspond au nombre d'apôtres de Jésus",
       ]
     },
-    key: "Cherchez sous le banc le plus proche de l'aire de jeux",
     enigma: {
-      question: "Quel animal domestique aboie ?",
-      acceptedAnswers: ["Chien", "chien", "CHIEN", "le chien", "Le chien", "un chien", "Un chien"],
+      question: "Pas loin de la fontaine se cache une statue, mais qui est-ce ?",
+      acceptedAnswers: ["La vierge Marie", "vierge Marie", "Marie"],
       hints: [
-        "Il remue la queue quand il est content et est le meilleur ami de l'homme",
-        "Il peut être dressé pour garder la maison",
-        "Il aime jouer avec une balle ou un bâton"
+        "Levez la tête !",
       ]
     },
     bonus: {
-      question: "Combien de pattes a un chien ?",
-      acceptedAnswers: ["4", "quatre", "Quatre", "QUATRE", "4 pattes", "quatre pattes"]
-    }
+      question: "Farouchement vierge également, qui était la déesse grecque protectrice des femmes et de la chasse ?",
+      acceptedAnswers: ["artémis", "artemis"]
+    },
+    key: "Quelle est l'heure d'ouverture de la cour le jeudi ?"
   },
   {
     stepRank: 2,
-    name: "02 | Couleur primaire",
+    name: "02",
     direction: {
-      instruction: "Dirigez-vous vers la fontaine la plus proche",
+      instruction: "Je partage mon nom avec un pont. À l'ombre de la place des Vosges, mes jardins et ma cour valent le détour",
       hints: [
-        "Cherchez un point d'eau décoratif, souvent au centre d'une place ou d'un parc",
-        "Les fontaines sont généralement visibles et audibles à distance",
-        "Elles peuvent être dans des squares, places publiques ou jardins"
+        "Mon entrée se fait par la rue Saint Antoine",
+        "J'héberge le centre des monuments nationaux",
       ]
     },
-    key: "Regardez derrière la plaque commémorative de la fontaine",
     enigma: {
-      question: "Quelle couleur obtient-on en mélangeant le jaune et le bleu ?",
-      acceptedAnswers: ["Vert", "vert", "VERT", "le vert", "Le vert", "du vert", "Du vert"],
-      hints: [
-        "C'est la couleur de l'herbe et des feuilles au printemps",
-        "Cette couleur est obtenue en mélangeant deux couleurs primaires",
-        "C'est la couleur des légumes comme les épinards ou la laitue"
-      ]
+      question: "Combien de tétons à l'air libre pouvez-vous apercevoir dans la cour ?",
+      acceptedAnswers: ["13", "14", "treize", "quatorze"],
+      hints: []
     },
     bonus: {
-      question: "Citez une couleur primaire",
-      acceptedAnswers: ["Rouge", "rouge", "ROUGE", "Bleu", "bleu", "BLEU", "Jaune", "jaune", "JAUNE", "le rouge", "le bleu", "le jaune"]
-    }
+      question: "Oh les belles sphinges ! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
+      acceptedAnswers: ["Oedipe", "oedipe"]
+    },
+    key: "Étrange ce cadran solaire, il manque un chiffre non ?"
   },
   {
     stepRank: 3,
-    name: "03 | Planète rouge",
+    name: "03",
     direction: {
-      instruction: "Trouvez le café ou restaurant le plus proche",
+      instruction: "Dans un petit village avoisinant, le père de Gargantua a sa cour",
       hints: [
-        "Cherchez un établissement où l'on peut boire et manger",
-        "Regardez les enseignes, panneaux ou terrasses",
-        "Les cafés ont souvent une terrasse ou des tables à l'extérieur"
+        "L'église d'à côté porte le même nom que le village",
       ]
     },
-    key: "Vérifiez sous la table en terrasse la plus éloignée de l'entrée",
     enigma: {
-      question: "Quelle planète est surnommée la planète rouge ?",
-      acceptedAnswers: ["Mars", "mars", "MARS", "la planète Mars", "La planète Mars", "planète Mars", "Planète Mars"],
+      question: "Un bistro pas si bien caché propose une carte convenable. Toutefois Célia se jetterait un seul des plats les yeux fermés. Combien coûte-t-il ?",
+      acceptedAnswers: ["18", "18€", "18 euros", "dix-huit", "dix huit"],
       hints: [
-        "Elle est la quatrième planète du système solaire et porte le nom du dieu romain de la guerre",
-        "Elle doit sa couleur à l'oxyde de fer présent à sa surface",
-        "Cette planète possède deux petites lunes : Phobos et Deimos"
+        "C'est du sale !",
+        "Des féculents, de la viande, des crudités, un laitage, c'est un plat complet",
       ]
     },
     bonus: {
-      question: "Combien y a-t-il de planètes dans notre système solaire ?",
-      acceptedAnswers: ["8", "huit", "Huit", "HUIT", "8 planètes", "huit planètes"]
-    }
+      question: "De quelle ville provient cette délicate spécialité culinaire ?",
+      acceptedAnswers: ["Hamburg"]
+    },
+    key: "Le numéro de rue de la cour Saint-Paul"
   },
   {
     stepRank: 4,
-    name: "FINAL | Le grand défi",
-    enigma: {
-      question: "Avec toutes les clés que vous avez trouvées, quelle est la réponse finale ?",
-      acceptedAnswers: ["VICTOIRE", "victoire", "Victoire", "la victoire", "La victoire"],
+    name: "04",
+    direction: {
+      instruction: "À quelques pas de là, rendez-vous devant l'établissement scolaire du roi des Francs",
       hints: [
-        "Réfléchissez à ce que toutes ces clés ont en commun...",
-        "Pensez au but ultime de cette chasse au trésor",
-        "Quel mot décrit le sentiment d'avoir accompli quelque chose de difficile ?"
+        "Son daron s'appelait Pépin",
       ]
-    }
+    },
+    enigma: {
+      question: "Oh la belle fontaine ! En quelle année fut-elle construite ?",
+      acceptedAnswers: ["1840", "Mille huit cent quarante", "MDCCCXL"],
+      hints: [
+        "M: 1000, D: 500, C: 100, L: 50, X: 10, V: 5, I: 1",
+        "Un siècle plus tard commençait le régime de Vichy"
+      ]
+    },
+    bonus: {
+      question: "Des serpents, de l'eau, des canalisations, mais que dirait Harry devant cette fontaine ?",
+      acceptedAnswers: ["Ouvre", "Ouvre toi"]
+    },
+    key: "Combien y a-t-il de poteaux oranges dans cette rue ?"
+  },
+  {
+    stepRank: 5,
+    name: "05",
+    direction: {
+      instruction: "On peut passer la nuit dans mon premier. Mon deuxième est bien à sa place. À ma connaissance, vous possédez tous cinq de mon troisième. Rendez-vous dans le jardin de mon tout.",
+      hints: [
+        "Rapprochez-vous de la Seine",
+      ]
+    },
+    enigma: {
+      question: "En faisant abstraction des arrondis dans les coins, combien de triangles sont dessinés par les chemins ?",
+      acceptedAnswers: ["16", "seize"],
+      hints: []
+    },
+    bonus: {
+      question: "À propos de jardins, connaissez-vous le prénom du célèbre jardinier de Versailles ?",
+      acceptedAnswers: ["André"]
+    },
+    key: "J'espère que vous êtes au courant qu'il est interdit de nourrir les oiseaux dans les parcs! Votre prochaine clé est le numero de l'article de la réglementation associée."
+  },
+  {
+    stepRank: 6,
+    name: "06",
+    direction: {
+      instruction: "Dirigez-vous vers la petite soeur de la Cité où se trouve une boutique qui aurait pu être celle de Gepetto",
+      hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"]
+    },
+    enigma: {
+      question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
+      acceptedAnswers: ["jaune", "orange"],
+      hints: ["Il est en train de peindre un couple", "Ils ne sont pas hyper solaires"]
+    },
+    bonus: {
+      question: "En quelle année est sorti le dessin animé Pinocchio de Disney ?",
+      acceptedAnswers: ["1940"]
+    },
+    key: "Le numéro du roi de France ayant donné son nom à cette île"
+  },
+  {
+    stepRank: 7,
+    name: "07",
+    direction: {
+      instruction: "AB°CD’CE.C. E°EF’C.C\n\nA=E^2\nC=B-A+F\nD=C-A-F\nF=B^0*A^0\nE=∛B",
+      hints: ["E=2", "Google Maps accepte les coordonnées"]
+    },
+    enigma: {
+      question: "Comment s'appelle la femme de ce bon vieux Maurice ?",
+      acceptedAnswers: ["Josette"],
+      hints: ["Il y a bien un panneau sur cette place !"]
+    },
+    bonus: {
+      question: "Dans une pub pour quelle marque, Maurice le poisson rouge poussait-il le bouchon un peu trop loin ?",
+      acceptedAnswers: ["Nestlé"]
+    },
+    key: "Oups je ne sais pas encore"
+  },
+  {
+    stepRank: 8,
+    name: "FINAL",
+    enigma: {
+      question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !",
+      acceptedAnswers: ["Prout"],
+      hints: []
+    },
   }
 ];
 

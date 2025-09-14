@@ -12,6 +12,7 @@ import { playEventSound, EventSound } from '@/lib/sounds';
 import { QuizHeader } from '@/components/quiz/QuizHeader';
 import { LoadingState, CompletedState, ErrorState } from '@/components/quiz/QuizStates';
 import { DirectionSubStep } from '@/components/substeps/DirectionSubStep';
+import { MovingSubStep } from '@/components/substeps/MovingSubStep';
 import { EnigmaSubStep } from '@/components/substeps/EnigmaSubStep';
 import { BonusSubStep } from '@/components/substeps/BonusSubStep';
 import { KeySubStep } from '@/components/substeps/KeySubStep';
@@ -393,6 +394,15 @@ const QuizPage = () => {
             onHintUsed={handleHintUsed}
             onTimePenalty={handleTimePenalty}
             sessionId={sessionId}
+          />
+        );
+
+      case 'moving':
+        return (
+          <MovingSubStep
+            {...commonProps}
+            text={stepData.subStepData.content!}
+            onComplete={handleSubStepComplete}
           />
         );
 

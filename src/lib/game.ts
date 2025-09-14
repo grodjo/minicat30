@@ -222,7 +222,7 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
     return {
       step,
       stepSession: currentStepSession,
-      currentSubStep: currentStepSession.currentSubStep as 'direction' | 'enigma' | 'bonus' | 'key' | 'final'
+      currentSubStep: currentStepSession.currentSubStep as 'direction' | 'moving' | 'enigma' | 'bonus' | 'key' | 'final'
     }
   }
 
@@ -266,14 +266,14 @@ export async function getCurrentStepWithSubStep(sessionId: string) {
   return {
     step,
     stepSession,
-    currentSubStep: initialSubStep as 'direction' | 'final'
+    currentSubStep: initialSubStep as 'direction' | 'moving' | 'final'
   }
 }
 
 export async function completeSubStep(
   sessionId: string, 
   stepName: string, 
-  subStepType: 'direction' | 'enigma' | 'bonus' | 'key' | 'final', 
+  subStepType: 'direction' | 'moving' | 'enigma' | 'bonus' | 'key' | 'final', 
   data?: { isCorrect?: boolean; key?: string }
 ) {
   const stepSession = await prisma.stepSession.findUnique({
@@ -303,9 +303,18 @@ export async function completeSubStep(
   switch (subStepType) {
     case 'direction':
       updateData.directionCompletedAt = now
-      // Trouve la prochaine sous-étape disponible
-      const nextAfterDirection = getNextSubStep(step, 'direction');
-      if (nextAfterDirection) updateData.currentSubStep = nextAfterDirection;
+      // Si l'étape a un "moving", aller vers moving, sinon vers la prochaine sous-étape
+      if (step.moving) {
+        updateData.currentSubStep = 'moving';
+      } else {
+        const nextAfterDirection = getNextSubStep(step, 'direction');
+        if (nextAfterDirection) updateData.currentSubStep = nextAfterDirection;
+      }
+      break
+    case 'moving':
+      // Le moving ne marque pas de completion spécifique, juste passage à la prochaine étape
+      const nextAfterMoving = getNextSubStep(step, 'moving');
+      if (nextAfterMoving) updateData.currentSubStep = nextAfterMoving;
       break
     case 'enigma':
       updateData.enigmaCompletedAt = now

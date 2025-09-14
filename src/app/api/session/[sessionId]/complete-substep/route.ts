@@ -17,7 +17,7 @@ export async function POST(
       );
     }
 
-    const validSubSteps = ['direction', 'enigma', 'bonus', 'key'];
+    const validSubSteps = ['direction', 'moving', 'enigma', 'bonus', 'key'];
     if (!validSubSteps.includes(subStepType)) {
       return NextResponse.json(
         { error: 'Type de sous-étape invalide' },

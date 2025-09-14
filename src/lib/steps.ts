@@ -1,25 +1,32 @@
 export interface Step {
-  stepRank: number;
+  id?: number;
+  type?: 'substep' | 'final';
+  substepId?: number;
+  stepRank?: number;
   name: string;
-  direction?: {       // Sous-étape 1: indication pour se rendre au lieu (optionnelle)
+  direction?: {
     instruction: string;
-    hints: string[];  // Tableau d'indices pour la direction
-    acceptedAnswers: string[]; // Pour les directions avec validation
+    hints: string[];
+    acceptedAnswers: string[];
   };
-  key?: string;       // Sous-étape 4: indication pour trouver l'objet caché (optionnelle)
-  enigma?: {          // Sous-étape 2: énigme principale (optionnelle)
+  directionText?: string;
+  moving?: string;  // Nouveau texte pour l'étape de déplacement
+  enigma?: {
     question: string;
-    acceptedAnswers: string[]; // Tableau de réponses acceptées
-    hints: string[];  // Tableau d'indices
+    answers?: string[];
+    correctAnswer?: number;
+    acceptedAnswers?: string[];
+    hints?: string[];
   };
-  bonus?: {           // Sous-étape 3: question bonus (optionnelle)
+  key?: string;
+  bonus?: {
     question: string;
-    acceptedAnswers: string[]; // Tableau de réponses acceptées
+    acceptedAnswers: string[];
   };
 }
 
 // Types pour gérer les sous-étapes
-export type SubStepType = 'direction' | 'enigma' | 'bonus' | 'key' | 'final';
+export type SubStepType = 'direction' | 'moving' | 'enigma' | 'bonus' | 'key' | 'final';
 
 export interface StepProgress {
   stepName: string;
@@ -43,18 +50,19 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Cour Damoye", "Damoye"]
     },
+    moving: "Direction la Cour Damoye !",
     enigma: {
-      question: "Pas loin de la fontaine se cache une statue, mais qui est-ce ?",
+      question: "Pas loin de la fontaine se cache une statue, mais qui est-ce ?",
       acceptedAnswers: ["La vierge Marie", "vierge Marie", "Marie"],
       hints: [
-        "Levez la tête !",
+        "Levez la tête !",
       ]
     },
     bonus: {
-      question: "Farouchement vierge également, qui était la déesse grecque protectrice des femmes et de la chasse ?",
+      question: "Farouchement vierge également, qui était la déesse grecque protectrice des femmes et de la chasse ?",
       acceptedAnswers: ["artémis", "artemis"]
     },
-    key: "Quelle est l'heure d'ouverture de la cour le jeudi ?"
+    key: "Quelle est l'heure d'ouverture de la cour le jeudi ?"
   },
   {
     stepRank: 2,
@@ -67,16 +75,17 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Hôtel de Sully"]
     },
+    moving: "En route vers l'Hôtel Sully !",
     enigma: {
-      question: "Combien de tétons à l'air libre pouvez-vous apercevoir dans la cour ?",
+      question: "Combien de tétons à l'air libre pouvez-vous apercevoir dans la cour ?",
       acceptedAnswers: ["13", "14", "treize", "quatorze"],
       hints: []
     },
     bonus: {
-      question: "Oh les belles sphinges ! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
+      question: "Oh les belles sphinges ! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
       acceptedAnswers: ["Oedipe", "oedipe"]
     },
-    key: "Étrange ce cadran solaire, il manque un chiffre non ?"
+    key: "Étrange ce cadran solaire, il manque un chiffre non ?"
   },
   {
     stepRank: 3,
@@ -88,8 +97,9 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Saint Paul", "Saint-Paul", "Village Saint-Paul"]
     },
+    moving: "Direction le Village Saint-Paul !",
     enigma: {
-      question: "Un bistro pas si bien caché propose une carte convenable. Toutefois Célia se jetterait un seul des plats les yeux fermés. Combien coûte-t-il ?",
+      question: "Un bistro pas si bien caché propose une carte convenable. Toutefois Célia se jetterait un seul des plats les yeux fermés. Combien coûte-t-il ?",
       acceptedAnswers: ["18", "18€", "18 euros", "dix-huit", "dix huit"],
       hints: [
         "C'est du sale !",
@@ -98,7 +108,7 @@ export const steps: Step[] = [
 
     },
     bonus: {
-      question: "De quelle ville provient cette délicate spécialité culinaire ?",
+      question: "De quelle ville provient cette délicate spécialité culinaire ?",
       acceptedAnswers: ["Hamburg"]
     },
     key: "Le numéro de rue de la cour Saint-Paul"
@@ -113,8 +123,9 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Charlemagne"]
     },
+    moving: "Direction le lycée Charlemagne !",
     enigma: {
-      question: "Oh la belle fontaine ! En quelle année fut-elle construite ?",
+      question: "Oh la belle fontaine ! En quelle année fut-elle construite ?",
       acceptedAnswers: ["1840", "Mille huit cent quarante", "MDCCCXL"],
       hints: [
         "M: 1000, D: 500, C: 100, L: 50, X: 10, V: 5, I: 1",
@@ -122,10 +133,10 @@ export const steps: Step[] = [
       ]
     },
     bonus: {
-      question: "Des serpents, de l'eau, des canalisations, mais que dirait Harry devant cette fontaine ?",
+      question: "Des serpents, de l'eau, des canalisations, mais que dirait Harry devant cette fontaine ?",
       acceptedAnswers: ["Ouvre", "Ouvre toi"]
     },
-    key: "Combien y a-t-il de poteaux oranges dans cette rue ?"
+    key: "Combien y a-t-il de poteaux oranges dans cette rue ?"
   },
   {
     stepRank: 5,
@@ -137,13 +148,14 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Hôtel de Sens"]
     },
+    moving: "Direction l'Hôtel de Sens !",
     enigma: {
-      question: "En faisant abstraction des arrondis dans les coins, combien de triangles sont dessinés par les chemins ?",
+      question: "En faisant abstraction des arrondis dans les coins, combien de triangles sont dessinés par les chemins ?",
       acceptedAnswers: ["16", "seize"],
       hints: []
     },
     bonus: {
-      question: "À propos de jardins, connaissez-vous le prénom du célèbre jardinier de Versailles ?",
+      question: "À propos de jardins, connaissez-vous le prénom du célèbre jardinier de Versailles ?",
       acceptedAnswers: ["André"]
     },
     key: "J'espère que vous êtes au courant qu'il est interdit de nourrir les oiseaux dans les parcs! Votre prochaine clé est le numero de l'article de la réglementation associée."
@@ -156,13 +168,14 @@ export const steps: Step[] = [
       hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
       acceptedAnswers: ["Clair de rêve"]
     },
+    moving: "Direction Clair de Rêve !",
     enigma: {
-      question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
+      question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
       acceptedAnswers: ["jaune", "orange"],
       hints: ["Il est en train de peindre un couple", "Ils ne sont pas hyper solaires"]
     },
     bonus: {
-      question: "En quelle année est sorti le dessin animé Pinocchio de Disney ?",
+      question: "En quelle année est sorti le dessin animé Pinocchio de Disney ?",
       acceptedAnswers: ["1940"]
     },
     key: "Le numéro du roi de France ayant donné son nom à cette île"
@@ -175,10 +188,11 @@ export const steps: Step[] = [
       hints: ["E=2", "Google Maps accepte les coordonnées"],
       acceptedAnswers: ["Place Maurice Audin"]
     },
+    moving: "Direction la place Maurice Audin !",
     enigma: {
-      question: "Comment s'appelle la femme de ce bon vieux Maurice ?",
+      question: "Comment s'appelle la femme de ce bon vieux Maurice ?",
       acceptedAnswers: ["Josette"],
-      hints: ["Il y a bien un panneau sur cette place !"]
+      hints: ["Il y a bien un panneau sur cette place !"]
     },
     bonus: {
       question: "Dans une pub pour quelle marque, Maurice le poisson rouge poussait-il le bouchon un peu trop loin ?",
@@ -234,6 +248,7 @@ export const getAvailableSubSteps = (step: Step): SubStepType[] => {
   const availableSubSteps: SubStepType[] = [];
   
   if (step.direction) availableSubSteps.push('direction');
+  if (step.moving) availableSubSteps.push('moving'); 
   if (step.enigma) availableSubSteps.push('enigma');
   if (step.bonus) availableSubSteps.push('bonus');
   if (step.key) availableSubSteps.push('key');
@@ -249,7 +264,7 @@ export const getAvailableSubStepsForFinalStep = (step: Step): SubStepType[] => {
 
 export const getNextSubStep = (step: Step, currentSubStep: SubStepType): SubStepType | null => {
   // Si c'est l'étape finale, elle n'a qu'une seule sous-étape
-  if (isLastStep(step.stepRank)) {
+  if (step.stepRank && isLastStep(step.stepRank)) {
     return null; // Pas de sous-étape suivante pour l'étape finale
   }
   
@@ -277,6 +292,12 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
         type: 'direction',
         content: step.direction.instruction,
         hints: step.direction.hints,
+        buttonText: 'On y est !'
+      };
+    case 'moving':
+      return {
+        type: 'moving',
+        content: step.moving || 'En route vers la prochaine destination !',
         buttonText: 'On y est !'
       };
     case 'enigma':
@@ -327,9 +348,12 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
       return step.direction.acceptedAnswers.some(acceptedAnswer => 
         normalizedAnswer === acceptedAnswer.toLowerCase()
       );
+    case 'moving':
+      // Les sous-étapes 'moving' ne nécessitent pas de validation de réponse
+      return true;
     case 'enigma':
     case 'final':
-      if (!step.enigma) return false;
+      if (!step.enigma || !step.enigma.acceptedAnswers) return false;
       return step.enigma.acceptedAnswers.some(acceptedAnswer => 
         normalizedAnswer === acceptedAnswer.toLowerCase()
       );
@@ -354,7 +378,7 @@ export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string
 
   switch (subStepType) {
     case 'final':
-      if (!finalStep.enigma) return false;
+      if (!finalStep.enigma || !finalStep.enigma.acceptedAnswers) return false;
       return finalStep.enigma.acceptedAnswers.some(acceptedAnswer => 
         normalizedAnswer === acceptedAnswer.toLowerCase()
       );

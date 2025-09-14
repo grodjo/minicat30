@@ -209,7 +209,7 @@ const QuizPage = () => {
       const data = await response.json();
       
       if (data.isCorrect) {
-        // Jouer le son approprié selon le type de question
+        // Jouer le son approprié selon le type de question (sauf pour les clés)
         if (stepData.subStepData.type === 'bonus') {
           playEventSound(EventSound.bonusSuccess); // dbzKiBlast pour bonus réussi
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
@@ -217,26 +217,30 @@ const QuizPage = () => {
         } else if (stepData.subStepData.type === 'direction') {
           playEventSound(EventSound.directionComplete); // pokemonCaught pour direction réussie
         }
+        // Pas de son pour les clés (type === 'key')
         
         // Début de la transition - masquer immédiatement l'ancienne question
         setIsCorrectAnswer(true);
         
-        // Explosion centrale réaliste avec plus de confettis
-        const fireExplosion = () => {
-          // Explosion principale avec effet de burst
-          confetti({
-            particleCount: 200,
-            spread: 360,
-            origin: { x: 0.5, y: 0.5 },
-            colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'],
-            ticks: 100,
-            gravity: 1.2,
-            scalar: 1.4,
-            startVelocity: 45
-          });
-        };
+        // Confettis seulement si ce n'est pas une clé
+        if (stepData.subStepData.type !== 'key') {
+          // Explosion centrale réaliste avec plus de confettis
+          const fireExplosion = () => {
+            // Explosion principale avec effet de burst
+            confetti({
+              particleCount: 200,
+              spread: 360,
+              origin: { x: 0.5, y: 0.5 },
+              colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'],
+              ticks: 100,
+              gravity: 1.2,
+              scalar: 1.4,
+              startVelocity: 45
+            });
+          };
 
-        fireExplosion();
+          fireExplosion();
+        }
         
         // Charger la nouvelle question en arrière-plan pendant les confettis
         setTimeout(async () => {
@@ -436,8 +440,7 @@ const QuizPage = () => {
           <KeySubStep
             {...commonProps}
             content={stepData.subStepData.content!}
-            buttonText={stepData.subStepData.buttonText!}
-            onComplete={handleSubStepComplete}
+            onSubmit={handleAnswerSubmit}
           />
         );
 

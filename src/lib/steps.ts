@@ -292,7 +292,7 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
         type: 'direction',
         content: step.direction.instruction,
         hints: step.direction.hints,
-        buttonText: 'On y est !'
+        requiresAnswer: true
       };
     case 'moving':
       return {
@@ -321,7 +321,7 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
       return {
         type: 'key',
         content: step.key,
-        buttonText: 'On a la clé !'
+        requiresAnswer: true
       };
     case 'final':
       if (!step.enigma) return null;

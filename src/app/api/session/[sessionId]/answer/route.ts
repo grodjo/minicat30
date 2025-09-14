@@ -23,6 +23,31 @@ export async function POST(
     
     let isCorrect = false;
     
+    // Traitement spécial pour les clés : pas de validation, accepter toujours
+    if (subStepType === 'key') {
+      // Pour les clés, sauvegarder directement la réponse sans validation
+      await completeSubStep(sessionId, stepName, subStepType, { key: answer });
+
+      // Vérifier si toutes les étapes sont terminées
+      const nextStepData = await getCurrentStepWithSubStep(sessionId);
+      
+      if (!nextStepData) {
+        // Toutes les étapes ont été complétées, terminer la session
+        await completeSession(sessionId);
+        return NextResponse.json({
+          isCorrect: true,
+          completed: true,
+          message: 'Félicitations ! Vous avez terminé toutes les étapes !'
+        });
+      }
+
+      return NextResponse.json({
+        isCorrect: true,
+        completed: false,
+        message: 'Clé enregistrée !'
+      });
+    }
+    
     if (currentStepData && isLastStep(currentStepData.stepSession.stepRank)) {
       // C'est l'étape finale, utiliser la validation spéciale
       isCorrect = validateFinalStepAnswer(subStepType, answer);

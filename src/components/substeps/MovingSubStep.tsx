@@ -28,17 +28,22 @@ export const MovingSubStep = ({
   };
 
   const bottomContent = (
-    <Button
-      onClick={handleMovingComplete}
-      disabled={isSubmitting || isCorrectAnswer}
-      className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
-    >
-      {isSubmitting ? (
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-      ) : (
-        "On y est !"
-      )}
-    </Button>
+    <div className="w-full space-y-3">
+      <p className="text-center text-slate-400 text-lg font-medium">
+        Appuyez ici quand vous êtes arrivé
+      </p>
+      <Button
+        onClick={handleMovingComplete}
+        disabled={isSubmitting || isCorrectAnswer}
+        className="w-full h-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+      >
+        {isSubmitting ? (
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+        ) : (
+          "On y est !"
+        )}
+      </Button>
+    </div>
   );
 
   return (

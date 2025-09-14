@@ -202,7 +202,7 @@ const Home = () => {
           <DialogContent className="bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 border-violet-300/30 text-white max-w-lg w-full min-h-[50vh] flex flex-col justify-between">
             <DialogHeader className="space-y-6 pt-8">
               <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-violet-200">
-                {hasActiveSession ? `Bon retour équipe ${pseudo} !` : `Bienvenue équipe ${pseudo} !`}
+                {hasActiveSession ? `Ravie de vous revoir l'équipe ${pseudo} !` : `Bienvenue l'équipe ${pseudo} !`}
               </DialogTitle>
               <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full"></div>
               <DialogDescription className="text-violet-200/80 text-center text-lg md:text-xl leading-relaxed px-6">

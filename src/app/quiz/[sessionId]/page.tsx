@@ -106,8 +106,8 @@ const QuizPage = () => {
           // Nouvelle étape : afficher l'écran de transition avec le son marioKartGridIntro
           // Déterminer le nom à afficher selon si c'est l'étape finale ou non
           const transitionName = stepData.subStepData.type === 'final' 
-            ? 'Étape finale' 
-            : `Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
+            ? 'l\'Étape finale' 
+            : `l\'Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
           setTransitionStepName(transitionName);
           setShowStepTransition(true);
           playEventSound(EventSound.stepTransition); // marioKartGridIntro
@@ -471,7 +471,7 @@ const QuizPage = () => {
       />
 
       {/* Timer positionné juste sous le header */}
-      <div className="absolute top-20 left-0 right-0 z-10 text-center pt-4">
+      <div className="absolute top-20 left-0 right-0 z-10 text-center pt-2">
         <Timer 
           elapsedTime={elapsedTime}
           showPenaltyAnimation={showPenaltyAnimation}
@@ -498,7 +498,7 @@ const QuizPage = () => {
       )}
 
       {/* Contenu principal */}
-      <div className="min-h-screen flex flex-col pt-32 pb-32 px-4">
+      <div className="min-h-screen flex flex-col pt-28 pb-32 px-4">
         <div className="flex-1 flex items-center justify-center">
           {renderSubStep()}
         </div>
@@ -507,7 +507,7 @@ const QuizPage = () => {
       {/* Toast custom pour mauvaise réponse */}
       <WrongAnswerToast 
         ref={wrongAnswerToastRef}
-        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté ! On enchâine !" : stepData.subStepData.type === 'final' ? "❌ Mauvaise réponse ! +1 minute !" : "❌ Nope !"}
+        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté ! On enchâine !" : "❌ Nope !"}
       />
     </div>
   );

@@ -50,7 +50,7 @@ export const SubStep = ({
         </div>
 
         {/* Titre principal */}
-        <h1 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 leading-relaxed">
+        <h1 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 leading-relaxed whitespace-pre-line">
           {title}
         </h1>
 

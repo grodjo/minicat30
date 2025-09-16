@@ -71,7 +71,7 @@ export const steps: Step[] = [
         "Mon entrée se fait par la rue Saint Antoine",
         "J'héberge le centre des monuments nationaux",
       ],
-      acceptedAnswers: ["Hôtel de Sully"]
+      acceptedAnswers: ["Hôtel de Sully", "Hôtel Sully"]
     },
     moving: "En route vers l'Hôtel Sully !",
     enigma: {
@@ -93,7 +93,7 @@ export const steps: Step[] = [
       hints: [
         "L'église d'à côté porte le même nom que le village",
       ],
-      acceptedAnswers: ["Saint Paul", "Saint-Paul", "Village Saint-Paul"]
+      acceptedAnswers: ["Saint-Paul", "Village Saint-Paul"]
     },
     moving: "Direction le Village Saint-Paul !",
     enigma: {
@@ -119,7 +119,7 @@ export const steps: Step[] = [
       hints: [
         "Son daron s'appelait Pépin",
       ],
-      acceptedAnswers: ["Charlemagne"]
+      acceptedAnswers: ["Charlemagne", "Lycée Charlemagne"]
     },
     moving: "Direction le lycée Charlemagne !",
     enigma: {
@@ -140,11 +140,11 @@ export const steps: Step[] = [
     stepRank: 5,
     name: "05",
     direction: {
-      instruction: "On peut passer la nuit dans mon premier. Mon deuxième est bien à sa place. À ma connaissance, vous possédez tous cinq de mon troisième. Rendez-vous dans le jardin de mon tout.",
+      instruction: "Mon 1er peut être particulier ou de passe.\nMon deuxième est bien à sa place.\nÀ ma connaissance, vous possédez tous cinq de mon troisième.\nRendez-vous dans le jardin de mon tout.",
       hints: [
         "Rapprochez-vous de la Seine",
       ],
-      acceptedAnswers: ["Hôtel de Sens"]
+      acceptedAnswers: ["Hôtel de Sens", "Hôtel Sens"]
     },
     moving: "Direction l'Hôtel de Sens !",
     enigma: {
@@ -183,7 +183,7 @@ export const steps: Step[] = [
     name: "07",
     direction: {
       instruction: "AB°CD’CE.C. E°EF’C.C\n\nA=E^2\nC=B-A+F\nD=C-A-F\nF=B^0*A^0\nE=∛B",
-      hints: ["E=2", "Google Maps accepte les coordonnées"],
+      hints: ["Chaque lettre représente un chiffre différent donc E ne peut valoir que 2", "Google Maps accepte les coordonnées"],
       acceptedAnswers: ["Place Maurice Audin"]
     },
     moving: "Direction la place Maurice Audin !",
@@ -255,7 +255,7 @@ export const getAvailableSubSteps = (step: Step): SubStepType[] => {
 };
 
 export const getAvailableSubStepsForFinalStep = (step: Step): SubStepType[] => {
-  // Pour l'étape finale, on utilise le type 'final' 
+  // Pour l'étape finale, on utilise le type 'final' au lieu de 'enigma'
   if (step.enigma) return ['final'];
   return [];
 };

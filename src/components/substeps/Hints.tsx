@@ -155,7 +155,7 @@ export const Hints: React.FC<HintsProps> = ({
               Affichage d&apos;un indice pour vous aider à résoudre l&apos;étape
             </DialogDescription>
             <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-600/60 to-transparent mx-auto rounded-full"></div>
-            <div className="text-amber-900 text-center text-lg md:text-xl leading-relaxed px-6 font-medium">
+            <div className="text-amber-900 text-center text-lg md:text-xl leading-relaxed px-6 font-medium whitespace-pre-line">
               {currentHint?.hint || "Aucun indice disponible"}
             </div>
           </DialogHeader>

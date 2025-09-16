@@ -1,3 +1,4 @@
+import { validateAnswer } from './answer-validation';
 export interface Step {
   stepRank: number;
   name: string;
@@ -21,8 +22,6 @@ export interface Step {
   };
 }
 
-// Types pour gérer les sous-étapes
-import { validateAnswer } from './answer-validation';
 
 export type SubStepType = 'direction' | 'moving' | 'enigma' | 'bonus' | 'key' | 'final';
 
@@ -193,13 +192,53 @@ export const steps: Step[] = [
       hints: ["Il y a bien un panneau sur cette place !"]
     },
     bonus: {
-      question: "Dans une pub pour quelle marque, Maurice le poisson rouge poussait-il le bouchon un peu trop loin ?",
-      acceptedAnswers: ["Nestlé"]
+      question: "Dans quelle ville ont été signé des accords qui ont mis fin a la guerre d'Algérie ?",
+      acceptedAnswers: ["Evian"]
     },
-    key: "Oups je ne sais pas encore"
+    key: "Le chiffre clé correspond à l'écart d'âge entre Maurice et sa femme à la mort de ce dernier"
   },
   {
     stepRank: 8,
+    name: "08",
+    direction: {
+      instruction: "Non loin de là se battait fut un temps des gladiateurs. Allez au centre des combats !",
+      hints: ["Paris ne s'appelait pas encore Paris à cette époque"],
+      acceptedAnswers: ["Arènes de Lutèce"]
+    },
+    moving: "Direction les arènes de Lutèce !",
+    enigma: {
+      question: "Qui est l'auteur de l'unique statue visible dans les arènes ?",
+      acceptedAnswers: ["Gabriel de Mortillet"],
+      hints: []
+    },
+    bonus: {
+      question: "Dans quelle ville ont été signé des accords qui ont mis fin a la guerre d'Algérie ?",
+      acceptedAnswers: ["Evian"]
+    },
+    key: "Durant ce siècle, les arènes furent détruites par les barbares"
+  },
+  {
+    stepRank: 9,
+    name: "09",
+    direction: {
+      instruction: "Rendez-vous au point culminant de la montagne la plus proche",
+      hints: ["Je dirais pas non pour mon nom figure sur la façade"],
+      acceptedAnswers: ["Le Panthéon"]
+    },
+    moving: "Direction le Panthéon !",
+    enigma: {
+      question: "Quel animal se cache dans la fresque au-dessus de la porte principale ?",
+      acceptedAnswers: ["Un coq"],
+      hints: []
+    },
+    bonus: {
+      question: "Dans quelle ville ont été signé des accords qui ont mis fin a la guerre d'Algérie ?",
+      acceptedAnswers: ["Evian"]
+    },
+    key: "Le nombre de poteaux de la première rangée"
+  },
+  {
+    stepRank: 10,
     name: "FINAL",
     enigma: {
       question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !",

@@ -19,6 +19,12 @@ interface EnigmaSubStepProps {
   isStepEntering: boolean;
   attemptsCount?: number;
   maxAttempts?: number;
+  transitionOverlay?: {
+    show: boolean;
+    message: string;
+    success: boolean;
+    fadeOut: boolean;
+  };
 }
 
 export const EnigmaSubStep = ({
@@ -34,7 +40,8 @@ export const EnigmaSubStep = ({
   onTimePenalty,
   sessionId,
   attemptsCount = 0,
-  maxAttempts = 10
+  maxAttempts = 10,
+  transitionOverlay
 }: EnigmaSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -106,6 +113,7 @@ export const EnigmaSubStep = ({
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
+      transitionOverlay={transitionOverlay}
     >
       {bodyContent}
     </SubStep>

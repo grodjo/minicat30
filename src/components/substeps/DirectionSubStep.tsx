@@ -17,7 +17,14 @@ interface DirectionSubStepProps {
   currentHintIndex: number;
   onHintUsed: (newHintIndex: number) => void;
   onTimePenalty: (minutes: number) => void;
+  onGiveUp: () => void;
   sessionId: string;
+  transitionOverlay?: {
+    show: boolean;
+    message: string;
+    success: boolean;
+    fadeOut: boolean;
+  };
 }
 
 export const DirectionSubStep = ({
@@ -31,7 +38,9 @@ export const DirectionSubStep = ({
   currentHintIndex,
   onHintUsed,
   onTimePenalty,
-  sessionId
+  onGiveUp,
+  sessionId,
+  transitionOverlay
 }: DirectionSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -51,6 +60,19 @@ export const DirectionSubStep = ({
         onHintUsed={onHintUsed}
         onTimePenalty={onTimePenalty}
       />
+      
+      {/* Bouton "donner sa langue au chat" - visible seulement quand tous les indices sont utilisés */}
+      {currentHintIndex >= totalHints && !isCorrectAnswer && (
+        <div className="mt-6 text-center">
+          <Button
+            onClick={onGiveUp}
+            disabled={isSubmitting}
+            className="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-semibold rounded-xl shadow-lg transition-all duration-200"
+          >
+            🏳️ Donner sa langue au chat
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -90,6 +112,7 @@ export const DirectionSubStep = ({
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
+      transitionOverlay={transitionOverlay}
     >
       {bodyContent}
     </SubStep>

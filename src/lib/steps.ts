@@ -140,7 +140,7 @@ export const steps: Step[] = [
     stepRank: 5,
     name: "05",
     direction: {
-      instruction: "Mon 1er peut être particulier ou de passe.\nMon deuxième est bien à sa place.\nÀ ma connaissance, vous possédez tous cinq de mon troisième.\nRendez-vous dans le jardin de mon tout.",
+      instruction: "Mon 1er peut être particulier ou de passe.\nMon 2ème est bien à sa place.\nVous possédez tous ici 5 de mon 3ème.\nRendez-vous dans le jardin de mon tout.",
       hints: [
         "Rapprochez-vous de la Seine",
       ],

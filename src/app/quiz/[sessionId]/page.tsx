@@ -72,6 +72,14 @@ const QuizPage = () => {
   const [showStepTransition, setShowStepTransition] = useState(false);
   const [transitionStepName, setTransitionStepName] = useState<string>('');
   
+  // État pour les transitions de sous-étapes
+  const [subStepTransition, setSubStepTransition] = useState<{
+    show: boolean;
+    message: string;
+    success: boolean;
+    fadeOut: boolean;
+  }>({ show: false, message: '', success: true, fadeOut: false });
+  
   // Ref pour le toast d'erreur
   const wrongAnswerToastRef = useRef<WrongAnswerToastRef>(null);
 
@@ -153,6 +161,51 @@ const QuizPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
+  // Fonction pour afficher la transition de sous-étape
+  const showSubStepTransitionMessage = (success: boolean, subStepType: string, skipSound = false) => {
+    const message = success ? 'Bien joué !' : 'Dommage !';
+    setSubStepTransition({
+      show: true,
+      message,
+      success,
+      fadeOut: false
+    });
+    
+    // Jouer le son approprié seulement si pas déjà joué
+    if (!skipSound) {
+      if (success) {
+        if (subStepType === 'enigma') {
+          playEventSound(EventSound.enigmaSuccess);
+        } else if (subStepType === 'bonus') {
+          playEventSound(EventSound.bonusSuccess);
+        } else {
+          playEventSound(EventSound.directionComplete);
+        }
+      } else {
+        if (subStepType === 'enigma') {
+          playEventSound(EventSound.enigmaWrongAnswer);
+        } else if (subStepType === 'bonus') {
+          playEventSound(EventSound.bonusFailed);
+        } else {
+          playEventSound(EventSound.directionWrongAnswer);
+        }
+      }
+    }
+    
+    // Masquer la transition après 3 secondes avec fade-out progressif
+    setTimeout(() => {
+      // Commencer le fade-out
+      setSubStepTransition(prev => ({ ...prev, fadeOut: true }));
+      
+      // Charger l'étape suivante après l'animation de fade-out
+      setTimeout(async () => {
+        await loadCurrentStep();
+        // Réinitialiser complètement l'état après le chargement
+        setSubStepTransition({ show: false, message: '', success: true, fadeOut: false });
+      }, 500); // 500ms pour l'animation de fade-out
+    }, 3000); // 3 secondes d'affichage
+  };
+
   // Gestion de la completion des sous-étapes sans réponse (direction, key)
   const handleSubStepComplete = async () => {
     if (!stepData) return;
@@ -181,6 +234,44 @@ const QuizPage = () => {
     } catch (error) {
       console.error('Error completing substep:', error);
       toast.error('Erreur lors de la validation', { 
+        className: quizToastClass
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Gestion du "donner sa langue au chat" pour les étapes de direction
+  const handleGiveUp = async () => {
+    if (!stepData) return;
+
+    setSubmitting(true);
+    try {
+      // Appliquer une pénalité de 5 minutes
+      handleTimePenalty(5);
+      
+      const response = await fetch(`/api/session/${sessionId}/complete-substep`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          stepName: stepData.stepName,
+          subStepType: stepData.currentSubStep,
+          data: { giveUp: true }
+        }),
+      });
+
+      if (response.ok) {
+        // Afficher la transition "Dommage !" puis charger la prochaine sous-étape
+        showSubStepTransitionMessage(false, 'direction');
+      } else {
+        const data = await response.json();
+        toast.error(data.error, { className: quizToastClass });
+      }
+    } catch (error) {
+      console.error('Error giving up:', error);
+      toast.error('Erreur lors de l\'abandon', { 
         className: quizToastClass
       });
     } finally {
@@ -247,8 +338,15 @@ const QuizPage = () => {
           if (data.completed) {
             setCompleted(true);
           } else {
-            // Charger la nouvelle étape avant de la montrer
-            await loadCurrentStep();
+            // Pour direction, enigma et bonus : utiliser la transition
+            if (stepData.subStepData.type === 'direction' || 
+                stepData.subStepData.type === 'enigma' || 
+                stepData.subStepData.type === 'bonus') {
+              showSubStepTransitionMessage(true, stepData.subStepData.type, true); // skipSound = true car son déjà joué
+            } else {
+              // Pour les autres types (key, final, etc.) : charger directement
+              await loadCurrentStep();
+            }
           }
           // Finir la transition
           setIsCorrectAnswer(false);
@@ -303,7 +401,8 @@ const QuizPage = () => {
               if (data.completed) {
                 setCompleted(true);
               } else {
-                await loadCurrentStep();
+                // Utiliser la transition pour les énigmes échouées
+                showSubStepTransitionMessage(false, 'enigma');
               }
             }, 1500);
           } else {
@@ -321,7 +420,8 @@ const QuizPage = () => {
               if (data.completed) {
                 setCompleted(true);
               } else {
-                await loadCurrentStep();
+                // Utiliser la transition pour les bonus échoués
+                showSubStepTransitionMessage(false, 'bonus');
               }
             }, 1500); // 1.5 secondes pour laisser le toast disparaître
           } else {
@@ -387,17 +487,27 @@ const QuizPage = () => {
       isStepEntering
     };
 
+    // Ajouter l'overlay de transition pour les substeps concernés
+    const shouldShowTransition = stepData.subStepData.type === 'direction' || 
+                                stepData.subStepData.type === 'enigma' || 
+                                stepData.subStepData.type === 'bonus';
+    const propsWithTransition = shouldShowTransition ? {
+      ...commonProps,
+      transitionOverlay: subStepTransition
+    } : commonProps;
+
     switch (stepData.subStepData.type) {
       case 'direction':
         return (
           <DirectionSubStep
-            {...commonProps}
+            {...propsWithTransition}
             content={stepData.subStepData.content!}
             onSubmit={handleAnswerSubmit}
             totalHints={stepData.totalHints}
             currentHintIndex={stepData.stepSession.currentHintIndex}
             onHintUsed={handleHintUsed}
             onTimePenalty={handleTimePenalty}
+            onGiveUp={handleGiveUp}
             sessionId={sessionId}
           />
         );
@@ -414,7 +524,7 @@ const QuizPage = () => {
       case 'enigma':
         return (
           <EnigmaSubStep
-            {...commonProps}
+            {...propsWithTransition}
             question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
             totalHints={stepData.totalHints}
@@ -430,7 +540,7 @@ const QuizPage = () => {
       case 'bonus':
         return (
           <BonusSubStep
-            {...commonProps}
+            {...propsWithTransition}
             question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
           />

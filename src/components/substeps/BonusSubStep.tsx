@@ -12,6 +12,12 @@ interface BonusSubStepProps {
   isSubmitting: boolean;
   isCorrectAnswer: boolean;
   isStepEntering: boolean;
+  transitionOverlay?: {
+    show: boolean;
+    message: string;
+    success: boolean;
+    fadeOut: boolean;
+  };
 }
 
 export const BonusSubStep = ({
@@ -20,7 +26,8 @@ export const BonusSubStep = ({
   onSubmit,
   isSubmitting,
   isCorrectAnswer,
-  isStepEntering
+  isStepEntering,
+  transitionOverlay
 }: BonusSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -74,6 +81,7 @@ export const BonusSubStep = ({
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
+      transitionOverlay={transitionOverlay}
     >
       {bodyContent}
     </SubStep>

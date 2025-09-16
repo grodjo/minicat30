@@ -62,8 +62,8 @@ export const FinalSubStep = ({
           type="text"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          className="flex-1 h-16 bg-slate-50/95 border-violet-300/50 text-violet-700 placeholder:text-violet-500/70 text-xl font-semibold focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-2xl shadow-lg text-center"
-          placeholder="Votre réponse finale..."
+          className="flex-1 h-14 bg-slate-50/95 border-violet-300/50 text-violet-700 placeholder:text-violet-500/70 text-lg font-semibold focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl shadow-sm"
+          placeholder="La réponse finale est..."
           required
           disabled={isSubmitting || isCorrectAnswer || attemptsCount >= maxAttempts}
         />
@@ -75,7 +75,7 @@ export const FinalSubStep = ({
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
           ) : (
-            <span className="text-2xl">🏁</span>
+            <span className="text-2xl">➤</span>
           )}
         </Button>
       </div>

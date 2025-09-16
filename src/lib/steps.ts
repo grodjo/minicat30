@@ -39,7 +39,7 @@ export const steps: Step[] = [
     stepRank: 1,
     name: "01",
     direction: {
-      instruction: "Rendez-vous à l'intérieur de la 🏃 👩🪿",
+      instruction: "Rendez-vous à l'intérieur de la 🏃 👩🪿",
       hints: [
         "Son entrée se trouve place de la Bastille",
         "Son numéro correspond au nombre d'apôtres de Jésus",

@@ -62,7 +62,7 @@ export const DirectionSubStep = ({
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           className="flex-1 h-14 bg-slate-50/95 border-violet-300/50 text-violet-700 placeholder:text-violet-500/70 text-lg font-semibold focus:border-violet-400 focus:ring-2 focus:ring-violet-400/70 rounded-xl shadow-sm"
-          placeholder="Où comptez-vous aller ?"
+          placeholder="Le point de rdv est..."
           required
           disabled={isSubmitting || isCorrectAnswer}
         />

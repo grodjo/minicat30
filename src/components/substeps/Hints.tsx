@@ -146,17 +146,17 @@ export const Hints: React.FC<HintsProps> = ({
 
       {/* Modale d'affichage de l'indice */}
       <Dialog open={hintModalOpen} onOpenChange={setHintModalOpen}>
-        <DialogContent className="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 border border-amber-500/30 shadow-2xl max-w-lg">
+        <DialogContent className="bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300 border border-amber-300/50 shadow-2xl max-w-lg">
           <DialogHeader className="space-y-6 pt-8">
-            <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-amber-200">
-              Indice
+            <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-amber-800 drop-shadow-sm">
+              💡 Indice
             </DialogTitle>
             <DialogDescription className="sr-only">
               Affichage d&apos;un indice pour vous aider à résoudre l&apos;étape
             </DialogDescription>
-            <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto rounded-full"></div>
-            <div className="text-amber-200/90 text-center text-lg md:text-xl leading-relaxed px-6 font-medium">
-              <div>{currentHint?.hint || "Aucun indice disponible"}</div>
+            <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-600/60 to-transparent mx-auto rounded-full"></div>
+            <div className="text-amber-900 text-center text-lg md:text-xl leading-relaxed px-6 font-medium">
+              {currentHint?.hint || "Aucun indice disponible"}
             </div>
           </DialogHeader>
           
@@ -164,9 +164,9 @@ export const Hints: React.FC<HintsProps> = ({
           <div className="flex justify-center pb-8 pt-4">
             <Button 
               onClick={() => setHintModalOpen(false)}
-              className="bg-amber-600 hover:bg-amber-700 text-amber-50 font-semibold px-8 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-amber-500/25"
+              className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-8 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-amber-500/25"
             >
-              Compris !
+               Hin hin !
             </Button>
           </div>
         </DialogContent>

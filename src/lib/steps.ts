@@ -22,6 +22,8 @@ export interface Step {
 }
 
 // Types pour gérer les sous-étapes
+import { validateAnswer } from './answer-validation';
+
 export type SubStepType = 'direction' | 'moving' | 'enigma' | 'bonus' | 'key' | 'final';
 
 export interface StepProgress {
@@ -253,7 +255,7 @@ export const getAvailableSubSteps = (step: Step): SubStepType[] => {
 };
 
 export const getAvailableSubStepsForFinalStep = (step: Step): SubStepType[] => {
-  // Pour l'étape finale, on utilise le type 'final' au lieu de 'enigma'
+  // Pour l'étape finale, on utilise le type 'final' 
   if (step.enigma) return ['final'];
   return [];
 };
@@ -336,31 +338,25 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
   const step = getStepByName(stepName);
   if (!step) return false;
 
-  const normalizedAnswer = answer.trim().toLowerCase();
-
   switch (subStepType) {
     case 'direction':
       if (!step.direction) return false;
-      return step.direction.acceptedAnswers.some(acceptedAnswer => 
-        normalizedAnswer === acceptedAnswer.toLowerCase()
-      );
+      return validateAnswer(answer, step.direction.acceptedAnswers);
     case 'moving':
       // Les sous-étapes 'moving' ne nécessitent pas de validation de réponse
       return true;
     case 'enigma':
-    case 'final':
       if (!step.enigma || !step.enigma.acceptedAnswers) return false;
-      return step.enigma.acceptedAnswers.some(acceptedAnswer => 
-        normalizedAnswer === acceptedAnswer.toLowerCase()
-      );
+      return validateAnswer(answer, step.enigma.acceptedAnswers);
     case 'bonus':
       if (!step.bonus) return false;
-      return step.bonus.acceptedAnswers.some(acceptedAnswer => 
-        normalizedAnswer === acceptedAnswer.toLowerCase()
-      );
+      return validateAnswer(answer, step.bonus.acceptedAnswers);
     case 'key':
       // Les sous-étapes 'key' ne nécessitent pas de validation de réponse
       return true;
+    case 'final':
+      if (!step.enigma || !step.enigma.acceptedAnswers) return false;
+      return validateAnswer(answer, step.enigma.acceptedAnswers);
     default:
       return false;
   }
@@ -369,15 +365,11 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
 export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string): boolean => {
   const finalStep = getFinalStep(); // Utilise la dernière étape de la liste
   if (!finalStep) return false;
-  
-  const normalizedAnswer = answer.trim().toLowerCase();
 
   switch (subStepType) {
-    case 'final':
+    case 'enigma':
       if (!finalStep.enigma || !finalStep.enigma.acceptedAnswers) return false;
-      return finalStep.enigma.acceptedAnswers.some(acceptedAnswer => 
-        normalizedAnswer === acceptedAnswer.toLowerCase()
-      );
+      return validateAnswer(answer, finalStep.enigma.acceptedAnswers);
     default:
       return false;
   }

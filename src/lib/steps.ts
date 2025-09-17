@@ -11,11 +11,13 @@ export interface Step {
   enigma?: {
     question: string;
     answers?: string[];
-    correctAnswer?: number;
-    acceptedAnswers?: string[];
     hints?: string[];
+    acceptedAnswers?: string[];
   };
-  key?: string;
+  key?:{
+    description?: string;
+    acceptedAnswers?: string[];
+  };
   bonus?: {
     question: string;
     acceptedAnswers: string[];
@@ -60,7 +62,10 @@ export const steps: Step[] = [
       question: "À l'instar de Marie, plus je suis vierge, plus je suis bonne ! Je peux même être extra-bonne !\n\nQui suis-je ?",
       acceptedAnswers: ["L'huile d'olive", "huile d'olive", "huile"]
     },
-    key: "Le chiffre clé correspond à l'heure d'ouverture de la cour le jeudi"
+    key: {
+      description: "Le chiffre clé correspond à l'heure d'ouverture de la cour le jeudi",
+      acceptedAnswers: ["9"]
+    }
   },
   {
     stepRank: 2,
@@ -83,7 +88,10 @@ export const steps: Step[] = [
       question: "Oh les belles sphinges! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
       acceptedAnswers: ["Oedipe"]
     },
-    key: "Pratique ce jardin où on peut connaître l'heure sans montre !\n\nLe chiffre clé est justement celui qui manque."
+    key: {
+      description: "Pratique ce jardin où on peut connaître l'heure sans montre !\n\nLe chiffre clé est justement celui qui manque.",
+      acceptedAnswers: ["7"]
+    }
   },
   {
     stepRank: 3,
@@ -111,7 +119,10 @@ export const steps: Step[] = [
       question: "De quelle ville provient cette délicate spécialité culinaire ?",
       acceptedAnswers: ["Hambourg", "Hamburg"]
     },
-    key: "Le chiffre clé est numéro de la cour dans laquelle vous vous trouvez"
+    key: {
+      description: "Le chiffre clé est le numéro de la cour Saint-Paul",
+      acceptedAnswers: ["5"]
+    }
   },
   {
     stepRank: 4,
@@ -136,7 +147,10 @@ export const steps: Step[] = [
       question: "Des serpents, de l'eau, des canalisations, mais que dirait Harry devant cette fontaine ?",
       acceptedAnswers: ["Ouvre toi", "Ouvre", "Open"]
     },
-    key: "Le chiffre clé est aussi le nombre de poteaux oranges dans cette rue ?"
+    key: {
+      description: "Le chiffre clé est aussi le nombre de poteaux oranges dans cette rue ?",
+      acceptedAnswers: ["2"] // ????
+    }
   },
   {
     stepRank: 5,
@@ -159,7 +173,10 @@ export const steps: Step[] = [
       question: "À propos de jardins, vous connaissez sûrement le célèbre jardinier de Versailles. Mais quel était son prénom ?",
       acceptedAnswers: ["André"]
     },
-    key: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous connaissez bien sûr l'article de la réglementation qui porte le numéro du chiffre clé !."
+    key: {
+      description: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous connaissez bien sûr l'article de la réglementation qui porte le numéro du chiffre clé !.",
+      acceptedAnswers: ["3"]
+    }
   },
   {
     stepRank: 6,
@@ -179,7 +196,10 @@ export const steps: Step[] = [
       question: "À dix ans près, en quelle année est sorti le dessin animé Pinocchio de Disney ?",
       acceptedAnswers: ["1940", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950"]
     },
-    key: "Le Louis qui a donné son nom à cette île avait comme numéro le chiffre clé"
+    key: {
+      description: "Le Louis qui a donné son nom à cette île avait comme numéro le chiffre clé",
+      acceptedAnswers: ["9"]
+    }
   },
   {
     stepRank: 7,
@@ -199,7 +219,10 @@ export const steps: Step[] = [
       question: "Dans quelle ville ont été signés les accords qui ont mis fin à la guerre d'Algérie ?",
       acceptedAnswers: ["Evian"]
     },
-    key: "Le chiffre clé correspond à l'écart d'âge entre Maurice et sa femme à la mort de ce dernier"
+    key: {
+      description: "Le chiffre clé correspond à l'écart d'âge entre Maurice et sa femme à la mort de ce dernier",
+      acceptedAnswers: ["1"]
+    }
   },
   {
     stepRank: 8,
@@ -219,7 +242,10 @@ export const steps: Step[] = [
       question: "Qui est l'auteur de la série \"Astérix et Obélix : Le combat des chefs\" sortie en 2025 sur Netflix ?",
       acceptedAnswers: ["Alain Chabat", "Chabat"]
     },
-    key: "Le chiffre clé correspond au siècle durant lequel les arènes furent détruites par les barbares"
+    key: {
+      description: "Le chiffre clé correspond au siècle durant lequel les arènes furent détruites par les barbares",
+      acceptedAnswers: ["3"]
+    }
   },
   {
     stepRank: 9,
@@ -239,7 +265,10 @@ export const steps: Step[] = [
       question: "Citez au choix la première ou la dernière femme en date à être entrée au Panthéon ?",
       acceptedAnswers: ["Marie Curie ou Joséphine Baker", "Marie Curie", "Curie", "Joséphine Baker", "Baker"]
     },
-    key: "Il faut ajouter le chiffre clé à l'animal (vraiment) présent sur le fronton pour obtenir un os du corps humain"
+    key: {
+      description: "Il faut ajouter le chiffre clé à l'animal (vraiment) présent sur le fronton pour obtenir un os du corps humain",
+      acceptedAnswers: ["6"]
+    }
   },
   {
     stepRank: 10,

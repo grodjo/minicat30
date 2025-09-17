@@ -14,7 +14,7 @@ export const SoundPreloader = () => {
         console.log('🔊 Initialisation du système audio...');
         
         // 1. Précharger les sons critiques (métadonnées seulement)
-        const criticalSounds = ['ps2Login', 'duck', 'airHornWin'];
+        const criticalSounds = ['ps2Login', 'wrong1', 'airHornWin'];
         
         criticalSounds.forEach((soundName) => {
           const audio = new Audio(`/sounds/${soundName}.mov`);

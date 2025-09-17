@@ -22,8 +22,8 @@ export const MovingSubStep = ({
   isStepEntering
 }: MovingSubStepProps) => {
   const handleMovingComplete = () => {
-    // Jouer le son directionComplete à la fin de l'étape de déplacement
-    playEventSound(EventSound.directionComplete);
+    // Jouer le son ps2Connection à la fin de l'étape de déplacement
+    playEventSound(EventSound.connection);
     onComplete();
   };
 

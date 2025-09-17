@@ -181,15 +181,8 @@ const QuizPage = () => {
         } else {
           playEventSound(EventSound.directionComplete);
         }
-      } else {
-        if (subStepType === 'enigma') {
-          playEventSound(EventSound.enigmaWrongAnswer);
-        } else if (subStepType === 'bonus') {
-          playEventSound(EventSound.bonusFailed);
-        } else {
-          playEventSound(EventSound.directionWrongAnswer);
-        }
       }
+      // Sons de mauvaise réponse retirés pour les transitions de substep
     }
     
     // Masquer la transition après 3 secondes avec fade-out progressif
@@ -356,8 +349,8 @@ const QuizPage = () => {
         if (stepData.subStepData.type === 'bonus') {
           playEventSound(EventSound.bonusFailed); // dbzGhost pour bonus raté
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
-          // Utiliser directement le son 'duck' pour les énigmes
-          playSound('duck');
+          // Utiliser wrong1 pour les énigmes
+          playSound('wrong1');
         } else if (stepData.subStepData.type === 'direction') {
           playEventSound(EventSound.directionWrongAnswer); // wrong3 pour direction ratée
         }

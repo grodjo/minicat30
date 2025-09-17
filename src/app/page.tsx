@@ -52,7 +52,7 @@ const Home = () => {
   };
 
   const handleStartGame = async () => {
-    // Jouer le son "duck" au clic du bouton start - maintenant instantané par défaut
+    // Jouer le son dbzTeleportation au clic du bouton start - maintenant instantané par défaut
     playEventSound(EventSound.startGame);
     
     setShowStartModal(false);
@@ -213,31 +213,15 @@ const Home = () => {
               </DialogDescription>
             </DialogHeader>
             
-            {/* Bouton START rond dans la modale - centré verticalement */}
-            <div className="flex justify-center items-center flex-1 py-8">
-              <button
+            {/* Bouton classique en bas de la modale */}
+            <div className="pb-8 px-6">
+              <Button
                 onClick={handleStartGame}
                 disabled={isLoading}
-                className={`relative w-40 h-40 rounded-full transition-all duration-200 transform hover:scale-105 active:scale-95 active:translate-y-1 group cursor-pointer`}
-                style={{
-                  background: 'linear-gradient(145deg, #8b5cf6, #7c3aed, #6366f1)',
-                  boxShadow: '12px 12px 24px rgba(30, 27, 75, 0.6), -6px -6px 12px rgba(139, 92, 246, 0.3)'
-                }}
+                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 border-0 rounded-2xl shadow-xl transform transition-all duration-200 hover:scale-[1.02] active:scale-95"
               >
-                {/* Cercle intérieur avec effet de brillance */}
-                <div className="absolute inset-3 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
-                
-                {/* Contenu du bouton */}
-                <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                  <div className="text-4xl mb-2">🦆</div>
-                  <div className="text-sm font-bold text-center leading-tight">
-                    {isLoading ? 'GO!' : (hasActiveSession ? 'REPRENDRE' : 'START')}
-                  </div>
-                </div>
-                
-                {/* Effet de brillance au survol */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 rounded-full transition-opacity duration-300"></div>
-              </button>
+                {isLoading ? 'Chargement...' : (hasActiveSession ? 'Reprendre' : 'Démarrer')}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

@@ -44,13 +44,20 @@ export const Hints: React.FC<HintsProps> = ({
         if (response.ok) {
           setCurrentHint(data);
           setHintModalOpen(true);
+          // Jouer le son de révélation d'indice pour les indices déjà débloqués
+          playSound('ps2Reveal');
         } else {
           toast.error(data.error, {
             className: quizToastClass
           });
         }
       } else {
-        // Sinon, débloquer un nouvel indice
+        // Pour un nouvel indice : jouer le son et déclencher l'animation immédiatement
+        playSound('ah');
+        onTimePenalty(3);
+        onHintUsed(hintIndex + 1);
+        
+        // Récupérer l'indice en arrière-plan pendant que l'animation se joue
         const response = await fetch(`/api/session/${sessionId}/hint`, {
           method: 'POST',
           headers: {
@@ -60,19 +67,12 @@ export const Hints: React.FC<HintsProps> = ({
 
         const data = await response.json();
         if (response.ok) {
-          // Jouer le son "ah" immédiatement lors de l'utilisation d'un nouvel indice
-          playSound('ah');
-          
-          // Ajouter la pénalité de temps (cela déclenche l'animation de pénalité)
-          onTimePenalty(3);
-          
-          // Notifier le parent du nouvel index
-          onHintUsed(data.hintIndex + 1);
-          
           // Attendre que l'animation de pénalité se termine avant d'ouvrir la modale
           setTimeout(() => {
             setCurrentHint(data);
             setHintModalOpen(true);
+            // Jouer le son de révélation une fois l'indice chargé et la modale ouverte
+            playSound('ps2Reveal');
           }, 2000); // 2 secondes pour laisser l'animation de pénalité se terminer
         } else {
           toast.error(data.error, {

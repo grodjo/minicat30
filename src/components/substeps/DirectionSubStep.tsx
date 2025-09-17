@@ -25,6 +25,7 @@ interface DirectionSubStepProps {
     message: string;
     success: boolean;
     fadeOut: boolean;
+    correctAnswer?: string;
   };
 }
 

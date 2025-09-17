@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
+import { successDisplays, failDisplays } from '@/lib/random-displays';
 
 interface SubStepProps {
   stepName: string;
@@ -16,6 +17,7 @@ interface SubStepProps {
     message: string;
     success: boolean;
     fadeOut: boolean;
+    correctAnswer?: string;
   };
 }
 
@@ -30,24 +32,49 @@ export const SubStep = ({
   bottomContent,
   transitionOverlay
 }: SubStepProps) => {
+  // Mémoriser le GIF sélectionné pour qu'il ne change pas pendant l'affichage
+  const randomDisplay = useMemo(() => {
+    if (!transitionOverlay?.show) return null;
+    
+    const displays = transitionOverlay.success ? successDisplays : failDisplays;
+    return displays[Math.floor(Math.random() * displays.length)];
+  }, [transitionOverlay?.show, transitionOverlay?.success]);
+
   return (
     <>
       {/* Overlay de transition pour les sous-étapes */}
       {transitionOverlay?.show && (
-        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-40 backdrop-blur-sm transition-all duration-500 ease-out ${
+        <div className={`fixed inset-0 bg-black/80 flex items-center justify-center z-40 backdrop-blur-sm transition-all duration-500 ease-out ${
           transitionOverlay.fadeOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}>
-          <div className="text-center space-y-6">
-            <div className={`text-7xl transition-all duration-300 ${
-              transitionOverlay.success ? 'text-green-400' : 'text-red-400'
-            } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-bounce'}`}>
-              {transitionOverlay.success ? '🎉' : '😔'}
-            </div>
-            <h2 className={`text-5xl font-bold transition-all duration-300 ${
+          <div className="text-center space-y-6 max-w-md mx-auto px-4">
+            {/* GIF aléatoire */}
+            {randomDisplay && (
+              <div className="w-64 h-64 mx-auto rounded-xl overflow-hidden shadow-2xl">
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  className="w-full h-full object-cover"
+                  src={randomDisplay.gif}
+                />
+              </div>
+            )}
+            
+            {/* Message principal */}
+            <h2 className={`text-4xl font-bold transition-all duration-300 ${
               transitionOverlay.success ? 'text-green-300' : 'text-red-300'
             } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}>
-              {transitionOverlay.message}
+              {transitionOverlay.success ? 'Bien ouej !' : 'Nuuuul !'}
             </h2>
+            
+            {/* Réponse correcte en cas d'échec */}
+            {!transitionOverlay.success && transitionOverlay.correctAnswer && (
+              <p className="text-xl text-red-200 font-medium">
+                La réponse était : <span className="font-bold text-white">{transitionOverlay.correctAnswer}</span>
+              </p>
+            )}
+            
             <div className={`w-32 h-1 mx-auto rounded-full transition-all duration-300 ${
               transitionOverlay.success ? 'bg-gradient-to-r from-green-400 to-emerald-400' : 'bg-gradient-to-r from-red-400 to-rose-400'
             } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}></div>

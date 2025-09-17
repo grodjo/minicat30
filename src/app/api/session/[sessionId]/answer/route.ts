@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { completeSubStep, completeSession, getCurrentStepWithSubStep, addEnigmaAttempt, MAX_ENIGMA_ATTEMPTS } from '@/lib/game';
-import { validateStepAnswer, validateFinalStepAnswer, isLastStep } from '@/lib/steps';
+import { validateStepAnswer, validateFinalStepAnswer, isLastStep, getStepCorrectAnswer } from '@/lib/steps';
 
 export async function POST(
   request: NextRequest,
@@ -76,6 +76,9 @@ export async function POST(
       // Pour les bonus, même si incorrect, marquer comme tenté et passer à l'étape suivante
       await completeSubStep(sessionId, stepName, subStepType, { isCorrect: false });
       
+      // Obtenir la réponse correcte
+      const correctAnswer = getStepCorrectAnswer(stepName, subStepType);
+      
       // Vérifier si toutes les étapes sont terminées après ce bonus raté
       const nextStepData = await getCurrentStepWithSubStep(sessionId);
       
@@ -85,7 +88,8 @@ export async function POST(
         return NextResponse.json({
           isCorrect: false,
           completed: true,
-          message: 'Quiz terminé ! Dommage pour cette question bonus.'
+          message: 'Quiz terminé ! Dommage pour cette question bonus.',
+          correctAnswer
         });
       }
       
@@ -93,7 +97,8 @@ export async function POST(
         isCorrect: false,
         completed: false,
         message: 'Dommage ! Passons à la suite.',
-        moveToNext: true // Indique au frontend de charger la prochaine étape
+        moveToNext: true, // Indique au frontend de charger la prochaine étape
+        correctAnswer
       });
     } else if (subStepType === 'enigma' || subStepType === 'final') {
       // Pour les énigmes, ajouter une tentative et une pénalité
@@ -103,6 +108,9 @@ export async function POST(
       if (updatedStepSession.enigmaAttemptsCount >= MAX_ENIGMA_ATTEMPTS) {
         // Forcer la completion de l'énigme en échec
         await completeSubStep(sessionId, stepName, subStepType, { isCorrect: false });
+        
+        // Obtenir la réponse correcte
+        const correctAnswer = getStepCorrectAnswer(stepName, subStepType);
         
         // Vérifier si toutes les étapes sont terminées
         const nextStepData = await getCurrentStepWithSubStep(sessionId);
@@ -116,7 +124,8 @@ export async function POST(
             message: 'Quiz terminé ! Nombre maximum de tentatives atteint.',
             attemptsCount: updatedStepSession.enigmaAttemptsCount,
             maxAttempts: MAX_ENIGMA_ATTEMPTS,
-            playSound: subStepType === 'final' ? 'alarmEnd' : 'scratchStop'
+            playSound: subStepType === 'final' ? 'alarmEnd' : 'scratchStop',
+            correctAnswer
           });
         }
         
@@ -127,7 +136,8 @@ export async function POST(
           moveToNext: true,
           attemptsCount: updatedStepSession.enigmaAttemptsCount,
           maxAttempts: MAX_ENIGMA_ATTEMPTS,
-          playSound: subStepType === 'final' ? 'alarmEnd' : 'scratchStop'
+          playSound: subStepType === 'final' ? 'alarmEnd' : 'scratchStop',
+          correctAnswer
         });
       }
       

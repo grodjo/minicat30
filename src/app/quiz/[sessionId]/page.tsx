@@ -78,6 +78,7 @@ const QuizPage = () => {
     message: string;
     success: boolean;
     fadeOut: boolean;
+    correctAnswer?: string;
   }>({ show: false, message: '', success: true, fadeOut: false });
   
   // Ref pour le toast d'erreur
@@ -162,13 +163,14 @@ const QuizPage = () => {
   }, [sessionId]);
 
   // Fonction pour afficher la transition de sous-étape
-  const showSubStepTransitionMessage = (success: boolean, subStepType: string, skipSound = false) => {
+  const showSubStepTransitionMessage = (success: boolean, subStepType: string, skipSound = false, correctAnswer?: string) => {
     const message = success ? 'Bien joué !' : 'Dommage !';
     setSubStepTransition({
       show: true,
       message,
       success,
-      fadeOut: false
+      fadeOut: false,
+      correctAnswer
     });
     
     // Jouer le son approprié seulement si pas déjà joué
@@ -185,7 +187,7 @@ const QuizPage = () => {
       // Sons de mauvaise réponse retirés pour les transitions de substep
     }
     
-    // Masquer la transition après 3 secondes avec fade-out progressif
+    // Masquer la transition après 5 secondes avec fade-out progressif
     setTimeout(() => {
       // Commencer le fade-out
       setSubStepTransition(prev => ({ ...prev, fadeOut: true }));
@@ -196,7 +198,7 @@ const QuizPage = () => {
         // Réinitialiser complètement l'état après le chargement
         setSubStepTransition({ show: false, message: '', success: true, fadeOut: false });
       }, 500); // 500ms pour l'animation de fade-out
-    }, 3000); // 3 secondes d'affichage
+    }, 5000); // 5 secondes d'affichage
   };
 
   // Gestion de la completion des sous-étapes sans réponse (direction, key)
@@ -395,7 +397,7 @@ const QuizPage = () => {
                 setCompleted(true);
               } else {
                 // Utiliser la transition pour les énigmes échouées
-                showSubStepTransitionMessage(false, 'enigma');
+                showSubStepTransitionMessage(false, 'enigma', false, data.correctAnswer);
               }
             }, 1500);
           } else {
@@ -414,7 +416,7 @@ const QuizPage = () => {
                 setCompleted(true);
               } else {
                 // Utiliser la transition pour les bonus échoués
-                showSubStepTransitionMessage(false, 'bonus');
+                showSubStepTransitionMessage(false, 'bonus', false, data.correctAnswer);
               }
             }, 1500); // 1.5 secondes pour laisser le toast disparaître
           } else {

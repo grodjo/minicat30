@@ -24,6 +24,7 @@ interface EnigmaSubStepProps {
     message: string;
     success: boolean;
     fadeOut: boolean;
+    correctAnswer?: string;
   };
 }
 

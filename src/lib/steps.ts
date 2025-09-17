@@ -413,3 +413,25 @@ export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string
       return false;
   }
 };
+
+export const getStepCorrectAnswer = (stepName: string, subStepType: SubStepType): string | null => {
+  const step = getStepByName(stepName);
+  if (!step) return null;
+
+  switch (subStepType) {
+    case 'direction':
+      if (!step.direction || !step.direction.acceptedAnswers || step.direction.acceptedAnswers.length === 0) return null;
+      return step.direction.acceptedAnswers[0];
+    case 'enigma':
+      if (!step.enigma || !step.enigma.acceptedAnswers || step.enigma.acceptedAnswers.length === 0) return null;
+      return step.enigma.acceptedAnswers[0];
+    case 'bonus':
+      if (!step.bonus || !step.bonus.acceptedAnswers || step.bonus.acceptedAnswers.length === 0) return null;
+      return step.bonus.acceptedAnswers[0];
+    case 'final':
+      if (!step.enigma || !step.enigma.acceptedAnswers || step.enigma.acceptedAnswers.length === 0) return null;
+      return step.enigma.acceptedAnswers[0];
+    default:
+      return null;
+  }
+};

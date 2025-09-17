@@ -40,122 +40,126 @@ export const steps: Step[] = [
     stepRank: 1,
     name: "01",
     direction: {
-      instruction: "Rendez-vous à l'intérieur de la 🏃 👩🪿",
+      instruction: "Premier rendez-vous à l'intérieur de la \"🏃 👩🪿\"",
       hints: [
         "Son entrée se trouve place de la Bastille",
-        "Son numéro correspond au nombre d'apôtres de Jésus",
+        "Son numéro correspond au nombre d'apôtres à table. Enfin avant que ça ait mal tourné...",
       ],
-      acceptedAnswers: ["Cour Damoye", "Damoye"]
+      acceptedAnswers: ["La Cour Damoye", "Cour Damoye", "Damoye"]
     },
-    moving: "Direction la Cour Damoye !",
+    moving: "Go à la Cour Damoye !\n\nGalopez pendant que vous êtes encore en forme 🐎",
     enigma: {
-      question: "Pas loin de la fontaine se cache une statue, mais qui est-ce ?",
+      question: "Pas loin de la fontaine se cache une statue, mais qui est donc cette gourgandine ?",
       acceptedAnswers: ["La vierge Marie", "vierge Marie", "Marie"],
       hints: [
         "Levez la tête !",
+        "Connue pour avoir conçu de manière immaculée"
       ]
     },
     bonus: {
-      question: "Farouchement vierge également, qui était la déesse grecque protectrice des femmes et de la chasse ?",
-      acceptedAnswers: ["artémis", "artemis"]
+      question: "À l'instar de Marie, plus je suis vierge, plus je suis bonne ! Je peux même être extra-bonne !\n\nQui suis-je ?",
+      acceptedAnswers: ["L'huile d'olive", "huile d'olive", "huile"]
     },
-    key: "Quelle est l'heure d'ouverture de la cour le jeudi ?"
+    key: "Le chiffre clé correspond à l'heure d'ouverture de la cour le jeudi"
   },
   {
     stepRank: 2,
     name: "02",
     direction: {
-      instruction: "Je partage mon nom avec un pont. À l'ombre de la place des Vosges, mes jardins et ma cour valent le détour",
+      instruction: "La place des Vosges n'a pas le monopole du style dans le coin ! Mon jardin et ma cour valent le détour.",
       hints: [
-        "Mon entrée se fait par la rue Saint Antoine",
-        "J'héberge le centre des monuments nationaux",
+        "Je partage mon nom avec un pont",
+        "Avec Morland, mon nom est celui d'une station de métro",
       ],
       acceptedAnswers: ["Hôtel de Sully", "Hôtel Sully"]
     },
-    moving: "En route vers l'Hôtel Sully !",
+    moving: "Go go go à l'Hôtel de Sully !\n\nL'entrée de la cour se fait par la rue Saint Antoine 😇",
     enigma: {
-      question: "Combien de tétons à l'air libre pouvez-vous apercevoir dans la cour ?",
+      question: "Combien de tétons à l'air pouvez-vous apercevoir dans la cour ?",
       acceptedAnswers: ["13", "14", "treize", "quatorze"],
       hints: []
     },
     bonus: {
-      question: "Oh les belles sphinges ! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
-      acceptedAnswers: ["Oedipe", "oedipe"]
+      question: "Oh les belles sphinges! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
+      acceptedAnswers: ["Oedipe"]
     },
-    key: "Étrange ce cadran solaire, il manque un chiffre non ?"
+    key: "Pratique ce jardin où on peut connaître l'heure sans montre !\n\nLe chiffre clé est justement celui qui manque."
   },
   {
     stepRank: 3,
     name: "03",
     direction: {
-      instruction: "Dans un petit village avoisinant, le père de Gargantua a sa cour",
+      instruction: "À quelques pas d'ici, troquez les citadins stressés contre des villageois paisibles !",
       hints: [
-        "L'église d'à côté porte le même nom que le village",
+        "Le père de Gargantua y a une cour à son nom",
+        "L'église et le métro d'à côté porte le même nom",
       ],
-      acceptedAnswers: ["Saint-Paul", "Village Saint-Paul"]
+      acceptedAnswers: ["Village Saint-Paul", "Saint-Paul"]
     },
-    moving: "Direction le Village Saint-Paul !",
+    moving: "Engouffrez-vous dans le village Saint-Paul !\n\nMais vous ferez les galeries et les boutiques un autre jour 😬",
     enigma: {
-      question: "Un bistro pas si bien caché propose une carte convenable. Toutefois Célia se jetterait un seul des plats les yeux fermés. Combien coûte-t-il ?",
-      acceptedAnswers: ["18", "18€", "18 euros", "dix-huit", "dix huit"],
+      question: "Au bistrot, Célia se jetterait sur un seul des plats les yeux fermés. Lequel ?",
+      acceptedAnswers: ["Burger maison bleu d'Auvergne, oignons confits, steak, frites"],
       hints: [
-        "C'est du sale !",
-        "Des féculents, de la viande, des crudités, un laitage, c'est un plat complet",
+        "Oui oui il faut tout écrire jusqu'à la dernière lettre ! 😛",
+        "C'est du sale ! 😱",
+        "En vrai ça a le mérite d'être complet : des féculents, de la viande, des crudités, un laitage, tout y est 👌",
       ],
 
     },
     bonus: {
       question: "De quelle ville provient cette délicate spécialité culinaire ?",
-      acceptedAnswers: ["Hamburg"]
+      acceptedAnswers: ["Hambourg", "Hamburg"]
     },
-    key: "Le numéro de rue de la cour Saint-Paul"
+    key: "Le chiffre clé est numéro de la cour dans laquelle vous vous trouvez"
   },
   {
     stepRank: 4,
     name: "04",
     direction: {
-      instruction: "À quelques pas de là, rendez-vous devant l'établissement scolaire du roi des Francs",
+      instruction: "Rendez-vous à l'entrée du bahut d'à côté où Célia fumait des grosses clopes pendant la prépa !",
       hints: [
-        "Son daron s'appelait Pépin",
+        "L'école du fils à Pépin le Bref quoi",
+        "L'établissement porte le même nom que la rue",
       ],
-      acceptedAnswers: ["Charlemagne", "Lycée Charlemagne"]
+      acceptedAnswers: ["Le lycée Charlemagne", "Charlemagne", "collège et lycée Charlemagne"]
     },
-    moving: "Direction le lycée Charlemagne !",
+    moving: "Direction l'entrée du lycée Charlemagne !\n\nPour info, les autres équipes se débrouillent super bien 🥵",
     enigma: {
-      question: "Oh la belle fontaine ! En quelle année fut-elle construite ?",
-      acceptedAnswers: ["1840", "Mille huit cent quarante", "MDCCCXL"],
+      question: "Pas toute jeune cette fontaine ! En quelle année fut-elle construite ?",
+      acceptedAnswers: ["1840", "Mille huit cent quarante"],
       hints: [
-        "M: 1000, D: 500, C: 100, L: 50, X: 10, V: 5, I: 1",
-        "Un siècle plus tard commençait le régime de Vichy"
+        "M : 1000, D : 500, C : 100, L : 50, X : 10, V : 5, I : 1",
       ]
     },
     bonus: {
       question: "Des serpents, de l'eau, des canalisations, mais que dirait Harry devant cette fontaine ?",
-      acceptedAnswers: ["Ouvre", "Ouvre toi"]
+      acceptedAnswers: ["Ouvre toi", "Ouvre", "Open"]
     },
-    key: "Combien y a-t-il de poteaux oranges dans cette rue ?"
+    key: "Le chiffre clé est aussi le nombre de poteaux oranges dans cette rue ?"
   },
   {
     stepRank: 5,
     name: "05",
     direction: {
-      instruction: "Mon 1er peut être particulier ou de passe.\nMon 2ème est bien à sa place.\nVous possédez tous ici 5 de mon 3ème.\nRendez-vous dans le jardin de mon tout.",
+      instruction: "Mon 1er peut-être particulier ou de passe.\nMon 2ème est bien à sa place.\nVous possédez tous ici 5 de mon 3ème.\nOn se retrouve dans le jardin de mon tout.",
       hints: [
         "Rapprochez-vous de la Seine",
+        "Son jardin est à la française, géométrique à souhait"
       ],
-      acceptedAnswers: ["Hôtel de Sens", "Hôtel Sens"]
+      acceptedAnswers: ["L'Hôtel de Sens", "Hotel des sens", "Jardin de l'hôtel de sens", "Jardin de l'hôtel des sens"],
     },
-    moving: "Direction l'Hôtel de Sens !",
+    moving: "Ça décale aux jardins de l'Hôtel de Sens !\n\nAllez vous avez presque fait la moitié 🔥",
     enigma: {
-      question: "En faisant abstraction des arrondis dans les coins, combien de triangles sont dessinés par les chemins ?",
+      question: "En faisant abstraction des coins, combien de triangles sont dessinés par les allées du jardin ?",
       acceptedAnswers: ["16", "seize"],
-      hints: []
+      hints: ["J'aurais pu faire un schema mais j'ai eu un peu la flemme", "La réponse c'est 16"]
     },
     bonus: {
-      question: "À propos de jardins, connaissez-vous le prénom du célèbre jardinier de Versailles ?",
+      question: "À propos de jardins, vous connaissez sûrement le célèbre jardinier de Versailles. Mais quel était son prénom ?",
       acceptedAnswers: ["André"]
     },
-    key: "J'espère que vous êtes au courant qu'il est interdit de nourrir les oiseaux dans les parcs! Votre prochaine clé est le numero de l'article de la réglementation associée."
+    key: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous connaissez bien sûr l'article de la réglementation qui porte le numéro du chiffre clé !."
   },
   {
     stepRank: 6,
@@ -165,34 +169,34 @@ export const steps: Step[] = [
       hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
       acceptedAnswers: ["Clair de rêve"]
     },
-    moving: "Direction Clair de Rêve !",
+    moving: "Allez zou, à la boutique Clair de Rêve !\n\nDur de résister à un petit crochet par Berthillon 🍨",
     enigma: {
       question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
       acceptedAnswers: ["jaune", "orange"],
       hints: ["Il est en train de peindre un couple", "Ils ne sont pas hyper solaires"]
     },
     bonus: {
-      question: "En quelle année est sorti le dessin animé Pinocchio de Disney ?",
-      acceptedAnswers: ["1940"]
+      question: "À dix ans près, en quelle année est sorti le dessin animé Pinocchio de Disney ?",
+      acceptedAnswers: ["1940", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950"]
     },
-    key: "Le numéro du roi de France ayant donné son nom à cette île"
+    key: "Le Louis qui a donné son nom à cette île avait comme numéro le chiffre clé"
   },
   {
     stepRank: 7,
     name: "07",
     direction: {
       instruction: "AB°CD’CE.C. E°EF’C.C\n\nA=E^2\nC=B-A+F\nD=C-A-F\nF=B^0*A^0\nE=∛B",
-      hints: ["Chaque lettre représente un chiffre différent donc E ne peut valoir que 2", "Google Maps accepte les coordonnées"],
-      acceptedAnswers: ["Place Maurice Audin"]
+      hints: ["Chaque lettre représente un chiffre différent donc E ne peut valoir que 2", "Google Maps accepte les coordonnées 😉"],
+      acceptedAnswers: ["Place Maurice Audin", "Maurice Audin"]
     },
-    moving: "Direction la place Maurice Audin !",
+    moving: "Tracez vers la place Maurice Audin !\n\nC'est le moment d'appuyer sur le champignon 🍄",
     enigma: {
-      question: "Comment s'appelle la femme de ce bon vieux Maurice ?",
+      question: "Quel est le prénom de la femme de ce bon vieux Maurice ?",
       acceptedAnswers: ["Josette"],
       hints: ["Il y a bien un panneau sur cette place !"]
     },
     bonus: {
-      question: "Dans quelle ville ont été signé des accords qui ont mis fin a la guerre d'Algérie ?",
+      question: "Dans quelle ville ont été signés les accords qui ont mis fin à la guerre d'Algérie ?",
       acceptedAnswers: ["Evian"]
     },
     key: "Le chiffre clé correspond à l'écart d'âge entre Maurice et sa femme à la mort de ce dernier"
@@ -201,48 +205,48 @@ export const steps: Step[] = [
     stepRank: 8,
     name: "08",
     direction: {
-      instruction: "Non loin de là se battait fut un temps des gladiateurs. Allez au centre des combats !",
-      hints: ["Paris ne s'appelait pas encore Paris à cette époque"],
-      acceptedAnswers: ["Arènes de Lutèce"]
+      instruction: "Apparemment c'était distrayan de voir des types ",
+      hints: ["Paris ne s'appelait pas encore Paris", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
+      acceptedAnswers: ["Les arènes de Lutèce", "Arène de Lutèce"]
     },
-    moving: "Direction les arènes de Lutèce !",
+    moving: "On file aux arènes de Lutèce !\n\nVotre avance s'amenuise, mais tenez bon 💪",
     enigma: {
-      question: "Qui est l'auteur de l'unique statue visible dans les arènes ?",
+      question: "Qui a sculpté l'unique statue visible dans les arènes ?",
       acceptedAnswers: ["Gabriel de Mortillet"],
-      hints: []
+      hints: ["Il faut le prénom et le nom"]
     },
     bonus: {
-      question: "Dans quelle ville ont été signé des accords qui ont mis fin a la guerre d'Algérie ?",
-      acceptedAnswers: ["Evian"]
+      question: "Qui est l'auteur de la série \"Astérix et Obélix : Le combat des chefs\" sortie en 2025 sur Netflix ?",
+      acceptedAnswers: ["Alain Chabat", "Chabat"]
     },
-    key: "Durant ce siècle, les arènes furent détruites par les barbares"
+    key: "Le chiffre clé correspond au siècle durant lequel les arènes furent détruites par les barbares"
   },
   {
     stepRank: 9,
     name: "09",
     direction: {
-      instruction: "Rendez-vous au point culminant de la montagne la plus proche",
-      hints: ["Je dirais pas non pour mon nom figure sur la façade"],
+      instruction: "Dernier arrêt devant le monument culminant sur la \"montagne\" qui vous surplombe",
+      hints: ["Je ne dirais pas non pour que mon nom figure sur la façade"],
       acceptedAnswers: ["Le Panthéon"]
     },
-    moving: "Direction le Panthéon !",
+    moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\nProfitez du dénivelé pour faire la différence 🥾",
     enigma: {
-      question: "Quel animal se cache dans la fresque au-dessus de la porte principale ?",
-      acceptedAnswers: ["Un coq"],
-      hints: []
+      question: "Wow, toujours aussi impressionnant ce fronton !\n\nEn quelle année est né Pierre Corneille ?",
+      acceptedAnswers: ["1606"],
+      hints: ["La réponse n'est pas sur le fronton"]
     },
     bonus: {
-      question: "Dans quelle ville ont été signé des accords qui ont mis fin a la guerre d'Algérie ?",
-      acceptedAnswers: ["Evian"]
+      question: "Citez au choix la première ou la dernière femme en date à être entrée au Panthéon ?",
+      acceptedAnswers: ["Marie Curie ou Joséphine Baker", "Marie Curie", "Curie", "Joséphine Baker", "Baker"]
     },
-    key: "Le nombre de poteaux de la première rangée"
+    key: "Il faut ajouter le chiffre clé à l'animal (vraiment) présent sur le fronton pour obtenir un os du corps humain"
   },
   {
     stepRank: 10,
     name: "FINAL",
     enigma: {
       question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !",
-      acceptedAnswers: ["Prout"],
+      acceptedAnswers: ["GRANDIOSE"],
       hints: []
     },
   }

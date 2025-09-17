@@ -36,7 +36,7 @@ export const KeySubStep = ({
         <div className="flex gap-3">
           <Input
             type="text"
-            placeholder="Notez la clé ici"
+            placeholder="Le chiffre clé est..."
             value={keyInput}
             onChange={(e) => setKeyInput(e.target.value)}
             disabled={isSubmitting || isCorrectAnswer}
@@ -63,7 +63,7 @@ export const KeySubStep = ({
     <SubStep
       stepName={stepName}
       typeIcon="🗝️"
-      typeLabel="La clé !"
+      typeLabel="Le chiffre clé"
       title={content}
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { completeSubStep, completeSession, getCurrentStepWithSubStep, addEnigmaAttempt, MAX_ENIGMA_ATTEMPTS } from '@/lib/game';
+import { completeSubStep, completeSession, getCurrentStepWithSubStep, addEnigmaAttempt, addKeyPenalty, MAX_ENIGMA_ATTEMPTS } from '@/lib/game';
 import { validateStepAnswer, validateFinalStepAnswer, isLastStep, getStepCorrectAnswer } from '@/lib/steps';
 
 export async function POST(
@@ -23,36 +23,11 @@ export async function POST(
     
     let isCorrect = false;
     
-    // Traitement spécial pour les clés : pas de validation, accepter toujours
-    if (subStepType === 'key') {
-      // Pour les clés, sauvegarder directement la réponse sans validation
-      await completeSubStep(sessionId, stepName, subStepType, { key: answer });
-
-      // Vérifier si toutes les étapes sont terminées
-      const nextStepData = await getCurrentStepWithSubStep(sessionId);
-      
-      if (!nextStepData) {
-        // Toutes les étapes ont été complétées, terminer la session
-        await completeSession(sessionId);
-        return NextResponse.json({
-          isCorrect: true,
-          completed: true,
-          message: 'Félicitations ! Vous avez terminé toutes les étapes !'
-        });
-      }
-
-      return NextResponse.json({
-        isCorrect: true,
-        completed: false,
-        message: 'Clé enregistrée !'
-      });
-    }
-    
     if (currentStepData && isLastStep(currentStepData.stepSession.stepRank)) {
       // C'est l'étape finale, utiliser la validation spéciale
       isCorrect = validateFinalStepAnswer(subStepType, answer);
     } else {
-      // Étape normale
+      // Étape normale (inclut maintenant les clés)
       isCorrect = validateStepAnswer(stepName, subStepType, answer);
     }
 
@@ -147,6 +122,19 @@ export async function POST(
         message: `Réponse incorrecte. Il vous reste ${MAX_ENIGMA_ATTEMPTS - updatedStepSession.enigmaAttemptsCount} tentative(s).`,
         attemptsCount: updatedStepSession.enigmaAttemptsCount,
         maxAttempts: MAX_ENIGMA_ATTEMPTS
+      });
+    } else if (subStepType === 'key' && !isCorrect) {
+      // Pour les clés incorrectes, ajouter une pénalité de 5 minutes
+      await addKeyPenalty(sessionId, stepName);
+      
+      // Obtenir la réponse correcte
+      const correctAnswer = getStepCorrectAnswer(stepName, subStepType);
+      
+      return NextResponse.json({
+        isCorrect: false,
+        completed: false,
+        message: 'Chiffre incorrect ! Pénalité de 5 minutes appliquée.',
+        correctAnswer
       });
     }
 

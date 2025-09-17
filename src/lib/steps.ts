@@ -7,7 +7,7 @@ export interface Step {
     hints: string[];
     acceptedAnswers: string[];
   };
-  moving?: string;  // Nouveau texte pour l'étape de déplacement
+  moving?: string;
   enigma?: {
     question: string;
     answers?: string[];
@@ -390,7 +390,7 @@ export const getSubStepData = (step: Step, subStepType: SubStepType) => {
       if (!step.key) return null;
       return {
         type: 'key',
-        content: step.key,
+        content: step.key.description || 'Trouvez le chiffre clé',
         requiresAnswer: true
       };
     case 'final':
@@ -424,8 +424,9 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
       if (!step.bonus) return false;
       return validateAnswer(answer, step.bonus.acceptedAnswers);
     case 'key':
-      // Les sous-étapes 'key' ne nécessitent pas de validation de réponse
-      return true;
+      // Maintenant les clés nécessitent une validation de réponse
+      if (!step.key || !step.key.acceptedAnswers) return false;
+      return validateAnswer(answer, step.key.acceptedAnswers);
     case 'final':
       if (!step.enigma || !step.enigma.acceptedAnswers) return false;
       return validateAnswer(answer, step.enigma.acceptedAnswers);
@@ -461,6 +462,9 @@ export const getStepCorrectAnswer = (stepName: string, subStepType: SubStepType)
     case 'bonus':
       if (!step.bonus || !step.bonus.acceptedAnswers || step.bonus.acceptedAnswers.length === 0) return null;
       return step.bonus.acceptedAnswers[0];
+    case 'key':
+      if (!step.key || !step.key.acceptedAnswers || step.key.acceptedAnswers.length === 0) return null;
+      return step.key.acceptedAnswers[0];
     case 'final':
       if (!step.enigma || !step.enigma.acceptedAnswers || step.enigma.acceptedAnswers.length === 0) return null;
       return step.enigma.acceptedAnswers[0];

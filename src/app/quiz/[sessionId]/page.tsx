@@ -355,6 +355,9 @@ const QuizPage = () => {
           playSound('wrong1');
         } else if (stepData.subStepData.type === 'direction') {
           playEventSound(EventSound.directionWrongAnswer); // wrong3 pour direction ratée
+        } else if (stepData.subStepData.type === 'key') {
+          // Utiliser wrong2 pour les clés incorrectes
+          playSound('wrong2');
         }
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité
@@ -404,6 +407,15 @@ const QuizPage = () => {
             // Recharger les données pour mettre à jour le compteur de tentatives
             await loadCurrentStep();
           }
+        } else if (stepData.subStepData.type === 'key') {
+          // Pour les clés, une pénalité de 5 minutes est déjà appliquée côté serveur
+          // On ajoute la pénalité côté client pour l'affichage immédiat
+          addTimePenalty(5); // Ajouter 5 minutes pour une mauvaise réponse de clé
+          
+          // Afficher la transition avec la réponse correcte
+          setTimeout(async () => {
+            showSubStepTransitionMessage(false, 'key', false, data.correctAnswer);
+          }, 500); // Court délai pour permettre l'affichage de la pénalité
         } else {
           // Vérifier si c'est un bonus raté qui doit passer à la suite
           if (data.moveToNext) {
@@ -485,7 +497,8 @@ const QuizPage = () => {
     // Ajouter l'overlay de transition pour les substeps concernés
     const shouldShowTransition = stepData.subStepData.type === 'direction' || 
                                 stepData.subStepData.type === 'enigma' || 
-                                stepData.subStepData.type === 'bonus';
+                                stepData.subStepData.type === 'bonus' ||
+                                stepData.subStepData.type === 'key';
     const propsWithTransition = shouldShowTransition ? {
       ...commonProps,
       transitionOverlay: subStepTransition
@@ -544,7 +557,7 @@ const QuizPage = () => {
       case 'key':
         return (
           <KeySubStep
-            {...commonProps}
+            {...propsWithTransition}
             content={stepData.subStepData.content!}
             onSubmit={handleAnswerSubmit}
           />

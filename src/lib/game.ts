@@ -368,6 +368,26 @@ export async function addEnigmaAttempt(sessionId: string, stepName: string) {
   })
 }
 
+// Fonction pour ajouter une pénalité de clé (5 minutes)
+export async function addKeyPenalty(sessionId: string, stepName: string) {
+  const KEY_PENALTY_TIME_MS = 5 * 60 * 1000; // 5 minutes
+  
+  const stepSession = await prisma.stepSession.findUnique({
+    where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
+  })
+
+  if (!stepSession) {
+    throw new Error('Session d\'étape introuvable')
+  }
+
+  return prisma.stepSession.update({
+    where: { id: stepSession.id },
+    data: {
+      penaltyTimeMs: stepSession.penaltyTimeMs + KEY_PENALTY_TIME_MS
+    }
+  })
+}
+
 // Fonction pour ajouter une pénalité d'indice et incrémenter l'index d'indice
 export async function addHintPenalty(sessionId: string, stepName: string) {
   const stepSession = await prisma.stepSession.findUnique({

@@ -198,7 +198,7 @@ const QuizPage = () => {
         // Réinitialiser complètement l'état après le chargement
         setSubStepTransition({ show: false, message: '', success: true, fadeOut: false });
       }, 500); // 500ms pour l'animation de fade-out
-    }, 5000); // 5 secondes d'affichage
+    }, 3000); // 3 secondes d'affichage
   };
 
   // Gestion de la completion des sous-étapes sans réponse (direction, key)
@@ -357,7 +357,7 @@ const QuizPage = () => {
           playEventSound(EventSound.directionWrongAnswer); // wrong3 pour direction ratée
         } else if (stepData.subStepData.type === 'key') {
           // Utiliser wrong2 pour les clés incorrectes
-          playSound('wrong2');
+          playSound('scratchStop');
         }
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité
@@ -626,7 +626,7 @@ const QuizPage = () => {
       {/* Toast custom pour mauvaise réponse */}
       <WrongAnswerToast 
         ref={wrongAnswerToastRef}
-        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté ! On enchâine !" : "❌ Nope !"}
+        message={stepData.subStepData.type === 'bonus' ? "❌ C'est raté !" : "❌ Nope !"}
       />
     </div>
   );

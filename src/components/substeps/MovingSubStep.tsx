@@ -50,7 +50,7 @@ export const MovingSubStep = ({
     <SubStep
       stepName={stepName}
       typeIcon="🏃"
-      typeLabel="En déplacement"
+      typeLabel="Déplacement"
       title={text}
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}

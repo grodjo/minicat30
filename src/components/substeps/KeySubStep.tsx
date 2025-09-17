@@ -69,7 +69,7 @@ export const KeySubStep = ({
             {isSubmitting ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             ) : (
-              <span className="text-xl">💾</span>
+              <span className="text-xl">➤</span>
             )}
           </Button>
         </div>

@@ -85,7 +85,7 @@ export const steps: Step[] = [
       hints: []
     },
     bonus: {
-      question: "Oh les belles sphinges ! Dans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
+      question: "Oh les belles sphinges !\nDans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
       acceptedAnswers: ["Oedipe"]
     },
     key: {
@@ -96,7 +96,7 @@ export const steps: Step[] = [
   {
     stepRank: 3,
     name: "03",
-    direction: { // ⚠️ Warning
+    direction: {
       instruction: "Au sein d'un petit village avoisinant, trouvez la cour portant le nom de l'auteur de Gargantua !",
       hints: [
         "L'église et le métro d'à côté porte le même nom",
@@ -113,7 +113,7 @@ export const steps: Step[] = [
       ],
 
     },
-    bonus: {
+    bonus: { // ⚠️ Warning
       question: "De quelle ville provient cette délicate spécialité culinaire ?",
       acceptedAnswers: ["Hambourg", "Hamburg"]
     },

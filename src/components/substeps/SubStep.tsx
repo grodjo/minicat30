@@ -1,7 +1,6 @@
 'use client';
 
-import { ReactNode, useMemo } from 'react';
-import { successDisplays, failDisplays } from '@/lib/random-displays';
+import { ReactNode } from 'react';
 
 interface SubStepProps {
   stepName: string;
@@ -32,14 +31,6 @@ export const SubStep = ({
   bottomContent,
   transitionOverlay
 }: SubStepProps) => {
-  // Mémoriser le GIF sélectionné pour qu'il ne change pas pendant l'affichage
-  const randomDisplay = useMemo(() => {
-    if (!transitionOverlay?.show) return null;
-    
-    const displays = transitionOverlay.success ? successDisplays : failDisplays;
-    return displays[Math.floor(Math.random() * displays.length)];
-  }, [transitionOverlay?.show, transitionOverlay?.success]);
-
   return (
     <>
       {/* Overlay de transition pour les sous-étapes */}
@@ -48,24 +39,16 @@ export const SubStep = ({
           transitionOverlay.fadeOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}>
           <div className="text-center space-y-6 max-w-md mx-auto px-4">
-            {/* GIF aléatoire */}
-            {randomDisplay && (
-              <div className="w-64 h-64 mx-auto rounded-xl overflow-hidden shadow-2xl">
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  className="w-full h-full object-cover"
-                  src={randomDisplay.gif}
-                />
-              </div>
-            )}
+            {/* Emoji qui rebondit */}
+            <div className="text-8xl animate-bounce">
+              {transitionOverlay.success ? '🥳' : '😖'}
+            </div>
             
             {/* Message principal */}
             <h2 className={`text-4xl font-bold transition-all duration-300 ${
               transitionOverlay.success ? 'text-green-300' : 'text-red-300'
             } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}>
-              {transitionOverlay.success ? 'Bien ouej !' : 'Nuuuul !'}
+              {transitionOverlay.success ? 'Bien joué !' : 'Dommage...'}
             </h2>
             
             {/* Réponse correcte en cas d'échec */}

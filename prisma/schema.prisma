@@ -36,7 +36,8 @@ model StepSession {
   stepName  String
   stepRank     Int
   startedAt DateTime    @default(now()) // Quand l'étape est présentée à l'utilisateur
-  answeredAt DateTime?  // Quand l'utilisateur répond correctement à l'énigme
+  completedAt DateTime?  // Quand l'étape est complètement terminée (toutes sous-étapes finies)
+  answeredAt DateTime?  // Quand l'utilisateur répond correctement à l'énigme (DEPRECATED - utiliser completedAt)
   directionHintIndex Int @default(0) // Index des indices pour la sous-étape direction
   enigmaHintIndex Int @default(0) // Index des indices pour la sous-étape énigme
   

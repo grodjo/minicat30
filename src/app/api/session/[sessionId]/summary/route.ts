@@ -18,15 +18,15 @@ export async function GET(request: Request, context: { params: Promise<{ session
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    // Calculer le temps effectif de la session (durée réelle)
+    // ✅ NOUVEAU: Calculer le temps effectif de la session (durée réelle sans pénalités)
     const effectiveTimeMs = gameSession.completedAt && gameSession.startedAt 
       ? gameSession.completedAt.getTime() - gameSession.startedAt.getTime()
       : 0;
 
-    // Calculer le temps de pénalité total depuis les stepSessions (en millisecondes)
+    // ✅ NOUVEAU: Calculer le temps de pénalité total depuis les stepSessions (en millisecondes)
     const totalPenaltyMs = gameSession.stepSessions.reduce((sum, ss) => sum + ss.penaltyTimeMs, 0);
 
-    // Calculer le temps total final (effectif + pénalités) comme dans le scoreboard
+    // ✅ NOUVEAU: Calculer le temps total final (effectif + pénalités) comme dans le scoreboard
     const totalTimeMs = effectiveTimeMs + totalPenaltyMs;
 
     // Calculer les statistiques des questions bonus

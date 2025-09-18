@@ -49,11 +49,11 @@ export async function createGameSession(userId: string) {
 }
 
 export async function getCurrentStep(sessionId: string) {
-  // Compter le nombre d'étapes complétées via StepSession
+  // ✅ NOUVEAU: Compter le nombre d'étapes complétées via completedAt au lieu d'answeredAt
   const completedSteps = await prisma.stepSession.findMany({
-    where: { gameSessionId: sessionId, answeredAt: { not: null } },
+    where: { gameSessionId: sessionId, completedAt: { not: null } },
     select: { stepRank: true },
-    orderBy: { answeredAt: 'asc' }
+    orderBy: { completedAt: 'asc' }
   })
   
   const nextRank = completedSteps.length + 1
@@ -142,23 +142,23 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
     include: {
       user: true,
       stepSessions: { 
-        where: { keyCompletedAt: { not: null } }, 
+        where: { completedAt: { not: null } }, // ✅ NOUVEAU: Utiliser completedAt au lieu de keyCompletedAt
         orderBy: { stepRank: 'asc' } 
       }
     }
   })
 
   const scoreboard = sessions.map((s): ScoreboardRow => {
-    // Calculer le temps effectif (durée réelle de la session)
-    const effectiveTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
+    // ✅ NOUVEAU: Calcul du temps effectif de la session (durée réelle sans pénalités)
+    const sessionEffectiveTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
     
-    // Calculer toutes les pénalités pures cumulées de toutes les étapes
-    const totalPenalties = s.stepSessions.reduce((sum: number, ss): number => {
+    // ✅ NOUVEAU: Calcul des pénalités totales de la session
+    const sessionTotalPenalties = s.stepSessions.reduce((sum: number, ss): number => {
       return sum + ss.penaltyTimeMs
     }, 0)
     
-    // Temps total = temps effectif + pénalités (sans double comptage)
-    const totalTime = effectiveTime + totalPenalties
+    // ✅ NOUVEAU: Temps final de la session = temps effectif + pénalités
+    const sessionTotalTime = sessionEffectiveTime + sessionTotalPenalties
     
     const totalBonusCorrect = s.stepSessions.reduce((sum: number, ss): number => {
       return sum + (ss.isBonusCorrect ? 1 : 0)
@@ -167,22 +167,22 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
     
     return {
       pseudo: s.user.pseudo,
-      totalTime,
+      totalTime: sessionTotalTime, // ✅ NOUVEAU: Utiliser le temps total calculé correctement
       totalBonusCorrect,
       totalBonusAvailable,
       completedAt: s.completedAt!,
       steps: s.stepSessions.map((ss): ScoreboardStepRow => {
-        // Calculer le temps total de l'étape depuis le début jusqu'à la fin
-        const timeSpent = ss.keyCompletedAt && ss.startedAt ?
-          ss.keyCompletedAt.getTime() - ss.startedAt.getTime() : 0
+        // ✅ NOUVEAU: Calcul du temps effectif de l'étape (durée réelle sans pénalités)
+        const stepEffectiveTime = ss.completedAt && ss.startedAt ?
+          ss.completedAt.getTime() - ss.startedAt.getTime() : 0
         
-        // Utiliser le temps de pénalité stocké en base de données (indices + mauvaises réponses)
-        const penaltyTime = ss.penaltyTimeMs
+        // ✅ NOUVEAU: Temps final de l'étape = temps effectif + pénalités de cette étape
+        const stepTotalTime = stepEffectiveTime + ss.penaltyTimeMs
         
         return {
           stepName: isLastStep(ss.stepRank) ? 'Étape finale' : ss.stepName,
-          timeSpent,
-          penaltyTime,
+          timeSpent: stepTotalTime, // ✅ NOUVEAU: Temps total de l'étape (effectif + pénalités)
+          penaltyTime: ss.penaltyTimeMs, // ✅ Pénalités pures de cette étape
           bonusCorrect: ss.isBonusCorrect || false
         }
       })
@@ -298,6 +298,7 @@ export async function completeSubStep(
     keyCompletedAt?: Date;
     collectedKey?: string;
     currentSubStep?: string;
+    completedAt?: Date; // Nouveau champ pour marquer la fin complète de l'étape
   } = {}
 
   switch (subStepType) {
@@ -333,9 +334,11 @@ export async function completeSubStep(
       updateData.keyCompletedAt = now
       updateData.collectedKey = data?.key || ''
       // L'étape est maintenant complètement terminée
+      updateData.completedAt = now // ✅ NOUVEAU: Marquer l'étape comme complètement terminée
       break
     case 'final':
       updateData.keyCompletedAt = now
+      updateData.completedAt = now // ✅ NOUVEAU: Marquer l'étape finale comme terminée
       // Pour l'étape finale (dernière étape), marquer la session comme terminée
       if (isLastStep(stepSession.stepRank)) {
         await completeSession(sessionId);

@@ -52,7 +52,7 @@ export const steps: Step[] = [
     moving: "Go à la Cour Damoye !\n\n🐎\nGalopez pendant que vous êtes encore en forme",
     enigma: {
       question: "Pas loin de la fontaine se cache une statue, qui est-ce?",
-      acceptedAnswers: ["La vierge Marie", "vierge Marie", "Marie"],
+      acceptedAnswers: ["La vierge Marie", "vierge Marie", "Marie", "vierge"],
       hints: [
         "Levez la tête !",
         "Connue pour avoir conçu de manière immaculée"

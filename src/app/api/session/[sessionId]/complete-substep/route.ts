@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { completeSubStep } from '@/lib/game';
+import { completeSubStep, addTimePenaltyToDatabase } from '@/lib/game';
 
 export async function POST(
   request: NextRequest,
@@ -23,6 +23,11 @@ export async function POST(
         { error: 'Type de sous-étape invalide' },
         { status: 400 }
       );
+    }
+
+    // Si c'est un "donner sa langue au chat", ajouter une pénalité de 5 minutes
+    if (data?.giveUp === true) {
+      await addTimePenaltyToDatabase(sessionId, stepName, 5);
     }
 
     await completeSubStep(sessionId, stepName, subStepType, data);

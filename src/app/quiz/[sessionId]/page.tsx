@@ -96,7 +96,6 @@ const QuizPage = () => {
   // Hook pour le timer
   const { 
     formattedTime: elapsedTime, 
-    addTimePenalty, 
     showPenaltyAnimationOnly,
     reloadPenalties,
     showPenaltyAnimation, 
@@ -294,9 +293,7 @@ const QuizPage = () => {
 
     setSubmitting(true);
     try {
-      // Appliquer une pénalité de 5 minutes (maintenant sauvegardée automatiquement en BDD)
-      await addTimePenalty(5);
-      
+      // La pénalité est maintenant gérée côté serveur
       const response = await fetch(`/api/session/${sessionId}/complete-substep`, {
         method: 'POST',
         headers: {
@@ -305,18 +302,22 @@ const QuizPage = () => {
         body: JSON.stringify({
           stepName: stepData.stepName,
           subStepType: stepData.currentSubStep,
-          data: {} // Plus besoin de passer giveUp: true
+          data: { giveUp: true } // Indique au serveur d'ajouter une pénalité
         }),
       });
 
       if (response.ok) {
-        // Attendre que l'animation de pénalité soit terminée (1,5 secondes)
-        // puis afficher la transition "Dommage !" avec la bonne réponse
+        // Déclencher l'animation de pénalité côté client (5 minutes)
+        showPenaltyAnimationOnly(5);
+        // Puis recharger les pénalités depuis la BDD après l'ajout côté serveur
+        await reloadPenalties();
+        
+        // Attendre que l'animation de pénalité soit terminée puis afficher la transition
         setTimeout(() => {
           // Obtenir la bonne réponse depuis la configuration des étapes
           const correctAnswer = getStepCorrectAnswer(stepData.stepName, stepData.currentSubStep as 'direction');
           showSubStepTransitionMessage(false, 'direction', false, correctAnswer || undefined);
-        }, 1500);
+        }, 1500); // 1.5 secondes pour laisser l'animation de pénalité s'afficher
       } else {
         const data = await response.json();
         toast.error(data.error, { className: quizToastClass });
@@ -415,9 +416,13 @@ const QuizPage = () => {
           playSound(SoundName.WRONG3); // wrong3 pour direction ratée
         }
         
-        // Vérifier si c'est l'étape finale pour ajouter une pénalité
+        // Vérifier si c'est l'étape finale
         if (stepData.subStepData.type === 'final') {
-          await addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse finale
+          // Pour l'étape finale, la pénalité est déjà gérée côté serveur dans addEnigmaAttempt
+          // Déclencher l'animation de pénalité côté client (1 minute)
+          showPenaltyAnimationOnly(1);
+          // Puis recharger les pénalités depuis la BDD après l'ajout côté serveur
+          await reloadPenalties();
           wrongAnswerToastRef.current?.show();
           
           // Jouer le son approprié si spécifié
@@ -445,9 +450,11 @@ const QuizPage = () => {
             await loadCurrentStep();
           }
         } else if (stepData.subStepData.type === 'enigma') {
-          // Pour les énigmes, la pénalité est déjà gérée côté serveur
-          // On ajoute la pénalité côté client pour l'affichage immédiat
-          await addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse énigme
+          // Pour les énigmes, la pénalité est déjà gérée côté serveur dans addEnigmaAttempt
+          // Déclencher l'animation de pénalité côté client (1 minute)
+          showPenaltyAnimationOnly(1);
+          // Puis recharger les pénalités depuis la BDD après l'ajout côté serveur
+          await reloadPenalties();
           wrongAnswerToastRef.current?.show();
           
           // Jouer le son approprié si spécifié
@@ -475,13 +482,16 @@ const QuizPage = () => {
             await loadCurrentStep();
           }
         } else if (stepData.subStepData.type === 'key') {
-          // Pour les clés, ajouter la pénalité côté client pour l'animation
-          await addTimePenalty(5); // Ajouter 5 minutes pour une mauvaise réponse de clé
+          // Pour les clés, la pénalité est déjà gérée côté serveur dans addKeyPenalty
+          // Déclencher l'animation de pénalité côté client (5 minutes)
+          showPenaltyAnimationOnly(5);
+          // Puis recharger les pénalités depuis la BDD après l'ajout côté serveur
+          await reloadPenalties();
           
-          // Recharger directement l'étape après un délai
+          // Recharger directement l'étape après un délai pour laisser l'animation se terminer
           setTimeout(async () => {
             await loadCurrentStep();
-          }, 1000); // Court délai pour permettre l'affichage de la pénalité
+          }, 1500); // Délai pour permettre l'affichage de l'animation de pénalité
         } else {
           // Vérifier si c'est un bonus raté qui doit passer à la suite
           if (data.moveToNext) {

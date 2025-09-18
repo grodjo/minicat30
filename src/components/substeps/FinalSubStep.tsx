@@ -14,6 +14,13 @@ interface FinalSubStepProps {
   attemptsCount?: number;
   maxAttempts?: number;
   sessionId: string;
+  transitionOverlay?: {
+    show: boolean;
+    message: string;
+    success: boolean;
+    fadeOut: boolean;
+    correctAnswer?: string;
+  };
 }
 
 export const FinalSubStep = ({
@@ -25,7 +32,8 @@ export const FinalSubStep = ({
   isStepEntering,
   attemptsCount = 0,
   maxAttempts = 10,
-  sessionId
+  sessionId,
+  transitionOverlay
 }: FinalSubStepProps) => {
   const [answer, setAnswer] = useState('');
 
@@ -70,12 +78,12 @@ export const FinalSubStep = ({
         <Button
           type="submit"
           disabled={!answer.trim() || isSubmitting || isCorrectAnswer || attemptsCount >= maxAttempts}
-          className="h-16 px-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl rounded-2xl shadow-xl flex-shrink-0 disabled:opacity-50"
+          className="h-14 px-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl rounded-xl shadow-lg flex-shrink-0 disabled:opacity-50"
         >
           {isSubmitting ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
           ) : (
-            <span className="text-2xl">➤</span>
+            <span className="text-xl">➤</span>
           )}
         </Button>
       </div>
@@ -91,6 +99,7 @@ export const FinalSubStep = ({
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
+      transitionOverlay={transitionOverlay}
     >
       {bodyContent}
     </SubStep>

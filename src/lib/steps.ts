@@ -178,7 +178,7 @@ export const steps: Step[] = [
     stepRank: 6,
     name: "06",
     direction: {
-      instruction: "Dirigez vous vers une petite boutique qui aurait pu être celle de Gepetto sur la petite soeur de l'île de la cité.",
+      instruction: "Dirigez vous vers une petite boutique qui aurait pu être celle de Gepetto sur la petite soeur de l'île de la Cité.",
       hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
       acceptedAnswers: ["Clair de rêve"]
     },
@@ -201,8 +201,8 @@ export const steps: Step[] = [
     stepRank: 7,
     name: "07",
     direction: {
-      instruction: "AB°CD’CE.C. E°EF’C.C\n\nA = X^2\nB = X^3 \nC = Y\nD = Y-2X - 1\nE = X\nF = X^0*Y^0\n\n4Y - 3X = 14\n2X + Y = 9\n",
-      hints: ["Y=2", "Google Maps accepte les coordonnées 😉"],
+      instruction: "AB°CD’CE.C. E°EF’C.C\n\nA = E^2\nB = E^3\nD = C - 2E - 1\nF = E^0*C^0\n4C - 3E = 14\n2E + C = 9\n",
+      hints: ["E=2", "Google Maps accepte les coordonnées 😉"],
       acceptedAnswers: ["Place Maurice Audin", "Maurice Audin"]
     },
     moving: "Tracez vers la place Maurice Audin !\n\nC'est le moment d'appuyer sur le champignon 🍄",
@@ -247,8 +247,8 @@ export const steps: Step[] = [
     stepRank: 9,
     name: "09",
     direction: {
-      instruction: "Dernier arrêt au point culminant de la \"montagne\" la plus proche",
-      hints: ["Aux grands hommes la patrie reconnaissante"],
+      instruction: "Dernier arrêt au point culminant de la montagne la plus proche",
+      hints: ["\"Aux grands hommes la patrie reconnaissante\""],
       acceptedAnswers: ["Le Panthéon"]
     },
     moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\nProfitez du dénivelé pour faire la différence 🥾",
@@ -259,7 +259,7 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "Les femmes sont rares parmi les \"grands hommes\"... Quelle femme fut inhummée au Panthéon en 2018 ?",
-      acceptedAnswers: ["Simone Veil", "Simone"]
+      acceptedAnswers: ["Simone Veil", "Veil"]
     },
     key: {
       description: "Il faut ajouter le chiffre clé à l'animal sur le fronton pour obtenir un os du corps humain",

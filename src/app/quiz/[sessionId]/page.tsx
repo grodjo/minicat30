@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
 import { playEventSound, EventSound, playSound } from '@/lib/sounds';
+import { getStepCorrectAnswer } from '@/lib/steps';
+import { formatScoreboardTime } from '@/lib/time-formatting';
 
 // Composants
 import { QuizHeader } from '@/components/quiz/QuizHeader';
@@ -62,6 +64,13 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [completedSessionData, setCompletedSessionData] = useState<{
+    totalTime: string;
+    effectiveTime: string;
+    penaltyTime: string;
+    bonusCorrect: number;
+    bonusTotal: number;
+  } | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isStepEntering, setIsStepEntering] = useState(false);
   
@@ -96,6 +105,7 @@ const QuizPage = () => {
       const data = await response.json();
 
       if (data.completed) {
+        await loadCompletedSessionData();
         setCompleted(true);
       } else {
         // Séparer les données de session et d'étape
@@ -201,6 +211,37 @@ const QuizPage = () => {
     }, 3000); // 3 secondes d'affichage
   };
 
+  // Charger les données de session complétée pour l'écran de félicitations
+  const loadCompletedSessionData = async () => {
+    try {
+      const response = await fetch(`/api/session/${sessionId}/summary`);
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Formater les données pour le composant CompletedState
+        const formattedData = {
+          totalTime: formatScoreboardTime(data.totalTimeMs),
+          effectiveTime: formatScoreboardTime(data.effectiveTimeMs),
+          penaltyTime: `${Math.round(data.penaltyTimeMs / (60 * 1000))}min`, // Conversion simple en minutes
+          bonusCorrect: data.bonusStats.successCount,
+          bonusTotal: data.bonusStats.totalCount
+        };
+        
+        setCompletedSessionData(formattedData);
+      }
+    } catch (error) {
+      console.error('Error loading completed session data:', error);
+      // En cas d'erreur, utiliser des données par défaut
+      setCompletedSessionData({
+        totalTime: '--',
+        effectiveTime: '--',
+        penaltyTime: '--',
+        bonusCorrect: 0,
+        bonusTotal: 0
+      });
+    }
+  };
+
   // Gestion de la completion des sous-étapes sans réponse (direction, key)
   const handleSubStepComplete = async () => {
     if (!stepData) return;
@@ -258,8 +299,13 @@ const QuizPage = () => {
       });
 
       if (response.ok) {
-        // Afficher la transition "Dommage !" puis charger la prochaine sous-étape
-        showSubStepTransitionMessage(false, 'direction');
+        // Attendre que l'animation de pénalité soit terminée (2,5 secondes)
+        // puis afficher la transition "Dommage !" avec la bonne réponse
+        setTimeout(() => {
+          // Obtenir la bonne réponse depuis la configuration des étapes
+          const correctAnswer = getStepCorrectAnswer(stepData.stepName, stepData.currentSubStep as 'direction');
+          showSubStepTransitionMessage(false, 'direction', false, correctAnswer || undefined);
+        }, 2500);
       } else {
         const data = await response.json();
         toast.error(data.error, { className: quizToastClass });
@@ -331,6 +377,7 @@ const QuizPage = () => {
         // Charger la nouvelle question en arrière-plan pendant les confettis
         setTimeout(async () => {
           if (data.completed) {
+            await loadCompletedSessionData();
             setCompleted(true);
           } else {
             // Pour direction, enigma et bonus : utiliser la transition
@@ -397,6 +444,7 @@ const QuizPage = () => {
           if (data.moveToNext) {
             setTimeout(async () => {
               if (data.completed) {
+                await loadCompletedSessionData();
                 setCompleted(true);
               } else {
                 // Utiliser la transition pour les énigmes échouées
@@ -408,14 +456,13 @@ const QuizPage = () => {
             await loadCurrentStep();
           }
         } else if (stepData.subStepData.type === 'key') {
-          // Pour les clés, une pénalité de 5 minutes est déjà appliquée côté serveur
-          // On ajoute la pénalité côté client pour l'affichage immédiat
+          // Pour les clés, ajouter la pénalité côté client pour l'animation
           addTimePenalty(5); // Ajouter 5 minutes pour une mauvaise réponse de clé
           
-          // Afficher la transition avec la réponse correcte
+          // Recharger directement l'étape après un délai
           setTimeout(async () => {
-            showSubStepTransitionMessage(false, 'key', false, data.correctAnswer);
-          }, 500); // Court délai pour permettre l'affichage de la pénalité
+            await loadCurrentStep();
+          }, 1000); // Court délai pour permettre l'affichage de la pénalité
         } else {
           // Vérifier si c'est un bonus raté qui doit passer à la suite
           if (data.moveToNext) {
@@ -425,6 +472,7 @@ const QuizPage = () => {
             // Attendre que le toast disparaisse (3 secondes) puis charger la prochaine étape
             setTimeout(async () => {
               if (data.completed) {
+                await loadCompletedSessionData();
                 setCompleted(true);
               } else {
                 // Utiliser la transition pour les bonus échoués
@@ -473,7 +521,7 @@ const QuizPage = () => {
   }
 
   if (completed) {
-    return <CompletedState onGoToScoreboard={goToScoreboard} />;
+    return <CompletedState onGoToScoreboard={goToScoreboard} sessionData={completedSessionData || undefined} />;
   }
 
   if (!stepData) {
@@ -498,7 +546,7 @@ const QuizPage = () => {
     const shouldShowTransition = stepData.subStepData.type === 'direction' || 
                                 stepData.subStepData.type === 'enigma' || 
                                 stepData.subStepData.type === 'bonus' ||
-                                stepData.subStepData.type === 'key';
+                                stepData.subStepData.type === 'final';
     const propsWithTransition = shouldShowTransition ? {
       ...commonProps,
       transitionOverlay: subStepTransition
@@ -557,7 +605,7 @@ const QuizPage = () => {
       case 'key':
         return (
           <KeySubStep
-            {...propsWithTransition}
+            {...commonProps}
             content={stepData.subStepData.content!}
             onSubmit={handleAnswerSubmit}
           />
@@ -566,7 +614,7 @@ const QuizPage = () => {
       case 'final':
         return (
           <FinalSubStep
-            {...commonProps}
+            {...propsWithTransition}
             question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}

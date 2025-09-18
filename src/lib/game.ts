@@ -149,16 +149,16 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
   })
 
   const scoreboard = sessions.map((s): ScoreboardRow => {
-    // Calculer le temps de base (durée réelle de la session)
-    const baseTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
+    // Calculer le temps effectif (durée réelle de la session)
+    const effectiveTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
     
-    // Ajouter toutes les pénalités cumulées de toutes les étapes
+    // Calculer toutes les pénalités pures cumulées de toutes les étapes
     const totalPenalties = s.stepSessions.reduce((sum: number, ss): number => {
       return sum + ss.penaltyTimeMs
     }, 0)
     
-    // Temps total = temps de base + pénalités
-    const totalTime = baseTime + totalPenalties
+    // Temps total = temps effectif + pénalités (sans double comptage)
+    const totalTime = effectiveTime + totalPenalties
     
     const totalBonusCorrect = s.stepSessions.reduce((sum: number, ss): number => {
       return sum + (ss.isBonusCorrect ? 1 : 0)

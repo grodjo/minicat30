@@ -57,7 +57,7 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
     <Button
       variant="outline"
       size="sm"
-      className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 shadow-md font-medium"
+      className="h-10 px-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 shadow-md font-medium"
     >
       <span className="mr-2 text-lg">🗝️</span>
       Nos clés
@@ -69,9 +69,9 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-lg mx-auto max-h-[80vh] bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 border-2 border-yellow-200 shadow-2xl">
+      <DialogContent className="max-w-lg mx-auto max-h-[80vh] bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-center text-xl font-bold text-yellow-800">
+          <DialogTitle className="text-center text-xl font-bold text-green-800">
             🗝️ Clés Collectées
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -82,8 +82,8 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
         <div className="py-2">
           {loading ? (
             <div className="text-center py-6">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600 mx-auto mb-4"></div>
-              <p className="text-yellow-700">Chargement des clés...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+              <p className="text-green-700">Chargement des clés...</p>
             </div>
           ) : error ? (
             <div className="text-center py-6">
@@ -92,7 +92,7 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
                 onClick={fetchKeys}
                 variant="outline"
                 size="sm"
-                className="text-yellow-700 border-yellow-400 hover:bg-yellow-100"
+                className="text-green-700 border-green-400 hover:bg-green-100"
               >
                 Réessayer
               </Button>
@@ -104,12 +104,12 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
                   {keysData.keys.map((key, index) => (
                     <div
                       key={index}
-                      className="bg-gradient-to-r from-yellow-100/80 to-amber-100/80 border border-yellow-300/60 rounded-lg p-3 flex items-center backdrop-blur-sm"
+                      className="bg-gradient-to-r from-green-100/80 to-emerald-100/80 border border-green-300/60 rounded-lg p-3 flex items-center backdrop-blur-sm"
                     >
                       <span className="text-lg mr-3 flex-shrink-0">🗝️</span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs text-yellow-700 font-medium block">Étape {index + 1}</span>
-                        <p className="font-semibold text-yellow-900 text-sm leading-tight truncate" title={key}>
+                        <span className="text-xs text-green-700 font-medium block">Étape {index + 1}</span>
+                        <p className="font-semibold text-green-900 text-sm leading-tight truncate" title={key}>
                           {key}
                         </p>
                       </div>
@@ -119,7 +119,7 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
               ) : (
                 <div className="text-center py-6">
                   <span className="text-4xl mb-3 block">🔍</span>
-                  <p className="text-yellow-700 font-medium">Aucune clé trouvée</p>
+                  <p className="text-green-700 font-medium">Aucune clé trouvée</p>
                 </div>
               )}
             </>

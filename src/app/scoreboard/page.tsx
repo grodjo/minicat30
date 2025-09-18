@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatScoreboardTime } from '@/lib/time-formatting';
 
+// Helper function to format penalty time with hours
+function formatPenaltyTime(penaltyMs: number): string {
+  const totalMinutes = Math.round(penaltyMs / (60 * 1000));
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return minutes > 0 ? `${hours}h${minutes}min` : `${hours}h`;
+  }
+  return `${totalMinutes}min`;
+}
+
 interface ScoreboardEntry {
   rank: number;
   pseudo: string;
@@ -105,12 +116,15 @@ export default function ScoreboardPage() {
               {scoreboard.map((entry) => (
                 <div
                   key={`${entry.pseudo}-${entry.completedAt}`}
-                  className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer border border-violet-300/20"
+                  className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl px-4 py-4 hover:bg-white/15 transition-all duration-300 cursor-pointer border border-violet-300/20"
                   onClick={() => setSelectedPlayer(selectedPlayer?.pseudo === entry.pseudo ? null : entry)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base shadow-lg flex-shrink-0 ${
+                  {/* Player info with position circle as "emoji" */}
+                  <div className='flex items-center justify-between gap-4'>
+                  <div className='flex-grow'>
+                  <div className="flex items-center mb-3">
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg flex-shrink-0 ${
                         entry.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
                         entry.rank === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800' :
                         entry.rank === 3 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900' :
@@ -118,30 +132,36 @@ export default function ScoreboardPage() {
                       }`}>
                         {entry.rank}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-lg text-white mb-1">
-                          👤 {entry.pseudo}
-                        </h3>
-                      </div>
+                      <h3 className="font-semibold text-xl text-white truncate">
+                        {entry.pseudo}
+                      </h3>
                     </div>
-                    <div className="flex items-center space-x-6">
-                      <div className="text-right">
-                        <div className="text-lg font-semibold text-orange-300 mb-1">
-                          ⏱️ {formatScoreboardTime(entry.totalTimeMs)}
-                        </div>
-                        <div className="flex space-x-4 text-lg font-semibold text-violet-200/80">
-                          <span>🎯 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}</span>
-                        </div>
-                      </div>
-                      <div className={`text-violet-300 transition-transform duration-300 flex-shrink-0 ${
-                        selectedPlayer?.pseudo === entry.pseudo ? 'rotate-180' : ''
-                      }`}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="6,9 12,15 18,9"></polyline>
-                        </svg>
-                      </div>
+                    <div className="text-green-300 font-semibold text-lg text-left flex-shrink-0">
+                      🧠 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
                     </div>
                   </div>
+
+                  {/* Time details like in congratulations screen */}
+                  <div className="flex justify-between gap-4 text-base mb-4">
+                    <span className="text-yellow-300 text-left">
+                      ⏱️ {formatScoreboardTime(entry.totalTimeMs - entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}
+                    </span>
+                    <span className="text-red-300 text-left">
+                      ⚠️ {formatPenaltyTime(entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}
+                    </span>
+                    <span className="text-orange-300 font-bold text-left">
+                      🏁 {formatScoreboardTime(entry.totalTimeMs)}
+                    </span>
+                  </div>
+                  </div>
+                  <div className={`text-violet-300 transition-transform duration-300 flex-shrink-0 ${
+                      selectedPlayer?.pseudo === entry.pseudo ? 'rotate-180' : ''
+                    }`}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                      </svg>
+                    </div>
+                    </div>
 
                   {selectedPlayer?.pseudo === entry.pseudo && (
                     <div className="mt-8 pt-6 border-t border-violet-300/20">
@@ -151,7 +171,7 @@ export default function ScoreboardPage() {
                       <div className="grid gap-4">
                         {entry.steps.map((step, index) => {
                           const stepNumber = step.stepName === "Étape finale" ? "finale" : String(index + 1).padStart(2, '0');
-                          const stepDisplay = step.stepName === "Étape finale" ? "🏁 Étape finale" : `Étape ${stepNumber}`;
+                          const stepDisplay = step.stepName === "Étape finale" ? "Étape finale" : `Étape ${stepNumber}`;
                           
                           return (
                             <div
@@ -162,24 +182,23 @@ export default function ScoreboardPage() {
                                 <span className="font-medium text-violet-100 text-xl">
                                   {stepDisplay}
                                 </span>
-                                <span className="text-yellow-300 font-semibold text-lg">
-                                  ⏱️ {formatScoreboardTime(step.timeSpentMs)}
-                                </span>
+                                {step.stepName !== "Étape finale" && (
+                                  <span className={`flex items-center gap-2 font-semibold text-lg ${step.bonusCorrect ? 'text-green-400' : 'text-orange-400'}`}>
+                                    {step.bonusCorrect ? '🧠 ✅' : '🧠 ❌'}
+                                  </span>
+                                )}
                               </div>
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                  {step.stepName !== "Étape finale" && (
-                                    <span className={`flex items-center gap-2 font-semibold text-lg ${step.bonusCorrect ? 'text-green-400' : 'text-orange-400'}`}>
-                                      {step.bonusCorrect ? '🎯 ✅' : '🎯 ❌'}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex items-center">
-                                  {step.penaltyTimeMs > 0 && (
-                                    <span className="flex items-center gap-2 text-red-500 font-semibold text-lg">
-                                      ⚠️ +{formatScoreboardTime(step.penaltyTimeMs)}
-                                    </span>
-                                  )}
+                              <div className="space-y-2">
+                                <div className="flex justify-between gap-4 text-base">
+                                  <span className="text-yellow-300 text-left">
+                                    ⏱️ {formatScoreboardTime(step.timeSpentMs - step.penaltyTimeMs)}
+                                  </span>
+                                  <span className="text-red-300 text-left">
+                                    ⚠️ {formatPenaltyTime(step.penaltyTimeMs)}
+                                  </span>
+                                  <span className="text-orange-300 font-bold text-left">
+                                    🏁 {formatScoreboardTime(step.timeSpentMs)}
+                                  </span>
                                 </div>
                               </div>
                             </div>

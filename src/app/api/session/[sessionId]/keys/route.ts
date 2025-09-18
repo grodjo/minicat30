@@ -20,7 +20,7 @@ export async function GET(
 
     return NextResponse.json({
       keys,
-      totalKeys: keys.length
+      total: keys.length
     });
 
   } catch (error) {

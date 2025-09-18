@@ -53,7 +53,7 @@ export const Hints: React.FC<HintsProps> = ({
         }
       } else {
         // Pour un nouvel indice : jouer le son et déclencher l'animation immédiatement
-        playSound('ah');
+        playSound('duck');
         onTimePenalty(3);
         onHintUsed(hintIndex + 1);
         
@@ -73,7 +73,7 @@ export const Hints: React.FC<HintsProps> = ({
             setHintModalOpen(true);
             // Jouer le son de révélation une fois l'indice chargé et la modale ouverte
             playSound('ps2Reveal');
-          }, 2000); // 2 secondes pour laisser l'animation de pénalité se terminer
+          }, 1000); // 1 seconde pour laisser l'animation de pénalité se terminer
         } else {
           toast.error(data.error, {
             className: quizToastClass

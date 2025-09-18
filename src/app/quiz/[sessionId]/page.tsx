@@ -397,14 +397,11 @@ const QuizPage = () => {
         // Jouer le son approprié selon le type de question en cas d'erreur
         if (stepData.subStepData.type === 'bonus') {
           playEventSound(EventSound.bonusFailed); // dbzGhost pour bonus raté
-        } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
+        } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final' || stepData.subStepData.type === 'key') {
           // Utiliser wrong1 pour les énigmes
           playSound('wrong1');
         } else if (stepData.subStepData.type === 'direction') {
           playEventSound(EventSound.directionWrongAnswer); // wrong3 pour direction ratée
-        } else if (stepData.subStepData.type === 'key') {
-          // Utiliser wrong2 pour les clés incorrectes
-          playSound('scratchStop');
         }
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité

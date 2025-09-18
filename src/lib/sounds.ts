@@ -9,8 +9,8 @@ export enum EventSound {
 	directionComplete = 'pokemonCaught',   // Fin étape de direction  
 	
 	/** Feedback sounds */
-	enigmaSuccess = 'airHornWin',          // Énigme réussie
-	bonusSuccess = 'dbzKiBlast',           // Bonus réussi
+	enigmaSuccess = 'dbzKiBlast',          // Énigme réussie
+	bonusSuccess = 'airHornWin',           // Bonus réussi
 	enigmaWrongAnswer = 'wrong1',          // Énigme ratée 
 	directionWrongAnswer = 'wrong3',       // Direction ratée (utilise "wrong3")
 	bonusFailed = 'dbzGhost',              // Bonus raté

@@ -54,7 +54,7 @@ export const DirectionSubStep = ({
 
   const handleGiveUp = () => {
     // Jouer le son scratchStop avant d'abandonner
-    playSound('scratchStop');
+    playSound('dbzGhost');
     onGiveUp();
   };
 

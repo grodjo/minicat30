@@ -58,8 +58,10 @@ export const SubStep = ({
               </p>
             )}
             
-            <div className={`w-32 h-1 mx-auto rounded-full transition-all duration-300 ${
-              transitionOverlay.success ? 'bg-gradient-to-r from-green-400 to-emerald-400' : 'bg-gradient-to-r from-red-400 to-rose-400'
+            <div className={`w-16 h-0.5 mx-auto rounded-full shadow-lg transition-all duration-300 ${
+              transitionOverlay.success 
+                ? 'bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-green-400/50' 
+                : 'bg-gradient-to-r from-transparent via-red-400 to-transparent shadow-red-400/50'
             } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}></div>
           </div>
         </div>

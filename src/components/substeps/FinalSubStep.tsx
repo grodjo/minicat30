@@ -51,7 +51,7 @@ export const FinalSubStep = ({
       </div>
       
       {/* Compteur de tentatives */}
-      <div className={`inline-block px-4 py-2 rounded-lg font-semibold text-sm ${
+      <div className={`inline-block px-4 py-2 rounded-lg font-semibold text-sm mt-4 ${
         attemptsCount >= maxAttempts 
           ? 'bg-red-500/20 text-red-300 border border-red-400/30' 
           : attemptsCount >= maxAttempts * 0.8 
@@ -78,7 +78,7 @@ export const FinalSubStep = ({
         <Button
           type="submit"
           disabled={!answer.trim() || isSubmitting || isCorrectAnswer || attemptsCount >= maxAttempts}
-          className="h-14 px-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl rounded-xl shadow-lg flex-shrink-0 disabled:opacity-50"
+          className="h-14 w-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl rounded-xl shadow-lg flex-shrink-0 disabled:opacity-50"
         >
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

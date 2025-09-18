@@ -49,7 +49,7 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["La Cour Damoye", "Cour Damoye", "Damoye"]
     },
-    moving: "Go à la Cour Damoye !\n\nGalopez pendant que vous êtes encore en forme 🐎",
+    moving: "Go à la Cour Damoye !\n\n🐎\nGalopez pendant que vous êtes encore en forme",
     enigma: {
       question: "Pas loin de la fontaine se cache une statue, qui est-ce?",
       acceptedAnswers: ["La vierge Marie", "vierge Marie", "Marie"],
@@ -78,7 +78,7 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Hôtel de Sully", "Hôtel Sully"]
     },
-    moving: "Direction l'Hôtel de Sully !\n\nL'entrée se fait par la rue Saint Antoine 😇",
+    moving: "Direction l'Hôtel de Sully !\n\n😇\nL'entrée se fait par la rue Saint Antoine",
     enigma: {
       question: "Combien de tétons à l'air pouvez-vous apercevoir dans la cour ?",
       acceptedAnswers: ["13", "14", "treize", "quatorze"],
@@ -103,7 +103,7 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Village Saint-Paul", "Saint-Paul", "Cour Rabelais", "Cour Rabelais du village Saint-Paul"]
     },
-    moving: "Direction le village Saint-Paul !\n\nVous ferez les galeries et les boutiques un autre jour 😬",
+    moving: "Direction le village Saint-Paul !\n\n😬\nVous ferez les galeries et les boutiques un autre jour",
     enigma: {
       question: "Chez BC, quel est le prix du plat que Célia serait le plus à même de commander sur cette carte ?",
       acceptedAnswers: ["18", "18.00", "18,00", "18€", "18 euros", "18,00€", "18.00€", "18 €", "18.00 €", "18,00 €"],
@@ -132,7 +132,7 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Le lycée Charlemagne", "Charlemagne", "collège et lycée Charlemagne", "prépa Charlemagne"]
     },
-    moving: "Direction l'entrée du lycée Charlemagne !\n\nPour info, les autres équipes se débrouillent super bien 🥵",
+    moving: "Direction l'entrée du lycée Charlemagne !\n\n🥵\nPour info, les autres équipes se débrouillent super bien",
     enigma: {
       question: "Pas toute jeune cette fontaine ! En quelle année fut-elle construite ?",
       acceptedAnswers: ["1840", "Mille huit cent quarante"],
@@ -159,7 +159,7 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["L'Hôtel de Sens", "Hotel des sens", "Jardin de l'hôtel de sens", "Jardin de l'hôtel des sens"],
     },
-    moving: "Ça décale au jardin de l'Hôtel de Sens !\n\nAllez, vous avez presque fait la moitié 🔥",
+    moving: "Ça décale au jardin de l'Hôtel de Sens !\n\n🔥\nAllez, vous avez presque fait la moitié",
     enigma: {
       question: "En faisant abstraction des arbres dans les coins, combien de triangles sont dessinés par les allées du jardin ?",
       acceptedAnswers: ["16", "seize"],
@@ -182,7 +182,7 @@ export const steps: Step[] = [
       hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
       acceptedAnswers: ["Clair de rêve"]
     },
-    moving: "Allez zou, à la boutique Clair de Rêve !\n\nDur de résister à un petit crochet par Berthillon 🍨",
+    moving: "Allez zou, à la boutique Clair de Rêve !\n\n🍨\nDur de résister à un petit crochet par Berthillon",
     enigma: {
       question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
       acceptedAnswers: ["jaune", "orange"],
@@ -205,7 +205,7 @@ export const steps: Step[] = [
       hints: ["E=2", "Google Maps accepte les coordonnées 😉"],
       acceptedAnswers: ["Place Maurice Audin", "Maurice Audin"]
     },
-    moving: "Tracez vers la place Maurice Audin !\n\nC'est le moment d'appuyer sur le champignon 🍄",
+    moving: "Tracez vers la place Maurice Audin !\n\n🍄\nC'est le moment d'appuyer sur le champignon",
     enigma: {
       question: "Quel est le prénom de la femme de Maurice ?",
       acceptedAnswers: ["Josette"],
@@ -228,7 +228,7 @@ export const steps: Step[] = [
       hints: ["Paris ne s'appelait pas encore Paris", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
       acceptedAnswers: ["Les arènes de Lutèce", "Arène de Lutèce"]
     },
-    moving: "On file aux arènes de Lutèce !\n\nVotre avance s'amenuise, mais tenez bon 💪",
+    moving: "On file aux arènes de Lutèce !\n\n💪\nVotre avance s'amenuise, mais tenez bon",
     enigma: {
       question: "Qui a sculpté l'unique statue visible dans les arènes ?",
       acceptedAnswers: ["Gabriel de Mortillet"],
@@ -251,7 +251,7 @@ export const steps: Step[] = [
       hints: ["\"Aux grands hommes la patrie reconnaissante\""],
       acceptedAnswers: ["Le Panthéon"]
     },
-    moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\nProfitez du dénivelé pour faire la différence 🥾",
+    moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nProfitez du dénivelé pour faire la différence",
     enigma: {
       question: "Quel animal pouvez vous apercevoir sur le fronton ?",
       acceptedAnswers: ["Un coq"],
@@ -270,7 +270,7 @@ export const steps: Step[] = [
     stepRank: 10,
     name: "FINAL",
     enigma: {
-      question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !\n\nIndice gratuit : comme votre performance aujourd'hui",
+      question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !\n\n🤩\nIndice gratuit : \"comme votre performance aujourd'hui\"",
       acceptedAnswers: ["grandiose"],
       hints: []
     },

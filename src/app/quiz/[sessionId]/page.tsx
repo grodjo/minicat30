@@ -638,7 +638,7 @@ const QuizPage = () => {
       />
 
       {/* Timer positionné juste sous le header */}
-      <div className="absolute top-20 left-0 right-0 z-10 text-center pt-2">
+      <div className="absolute top-16 left-0 right-0 z-10 text-center pt-2">
         <Timer 
           elapsedTime={elapsedTime}
           showPenaltyAnimation={showPenaltyAnimation}
@@ -652,14 +652,14 @@ const QuizPage = () => {
       {showStepTransition && (
         <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
           <div className="text-center space-y-8">
-            <div className="text-6xl animate-bounce">🚀</div>
+            <div className="text-6xl animate-bounce">{transitionStepName.includes('finale') ? '🏁' : '🚀'}</div>
             <h1 className="text-4xl md:text-5xl font-bold text-white tracking-wide animate-pulse">
               C&apos;est parti pour
             </h1>
             <h2 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 tracking-wider">
               {transitionStepName}
             </h2>
-            <div className="w-32 h-1 bg-gradient-to-r from-violet-400 to-purple-400 mx-auto rounded-full animate-pulse"></div>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50"></div>
           </div>
         </div>
       )}

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SubStep } from './SubStep';
+import { playEventSound, EventSound } from '@/lib/sounds';
 
 interface KeySubStepProps {
   stepName: string;
@@ -23,6 +24,22 @@ export const KeySubStep = ({
   isStepEntering
 }: KeySubStepProps) => {
   const [keyInput, setKeyInput] = useState('');
+  const [showFlyingKey, setShowFlyingKey] = useState(false);
+
+  // Déclencher l'animation de clé volante quand la réponse est correcte
+  useEffect(() => {
+    if (isCorrectAnswer && !showFlyingKey) {
+      setShowFlyingKey(true);
+      
+      // Jouer le son de téléportation au moment de l'accélération (40% de 2.5s = 1s)
+      setTimeout(() => {
+        playEventSound(EventSound.startGame);
+      }, 800);
+      
+      // Masquer l'animation après 2.5 secondes (durée de l'animation)
+      setTimeout(() => setShowFlyingKey(false), 2500);
+    }
+  }, [isCorrectAnswer, showFlyingKey]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,16 +95,27 @@ export const KeySubStep = ({
   );
 
   return (
-    <SubStep
-      stepName={stepName}
-      typeIcon="🗝️"
-      typeLabel="Le chiffre clé"
-      title={content}
-      isCorrectAnswer={isCorrectAnswer}
-      isStepEntering={isStepEntering}
-      bottomContent={bottomContent}
-    >
-      {bodyContent}
-    </SubStep>
+    <div className="relative">
+      {/* Animation de clé volante */}
+      {showFlyingKey && (
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+          <div className="text-6xl animate-key-fly">
+            🗝️
+          </div>
+        </div>
+      )}
+      
+      <SubStep
+        stepName={stepName}
+        typeIcon="🗝️"
+        typeLabel="Le chiffre clé"
+        title={content}
+        isCorrectAnswer={isCorrectAnswer}
+        isStepEntering={isStepEntering}
+        bottomContent={bottomContent}
+      >
+        {bodyContent}
+      </SubStep>
+    </div>
   );
 };

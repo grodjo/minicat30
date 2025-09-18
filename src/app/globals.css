@@ -420,3 +420,27 @@ body {
 .error-toast-slide[data-sonner-toast][data-state="closed"] {
   animation: error-toast-slide-out 0.15s cubic-bezier(0.7, 0, 0.84, 0) forwards !important;
 }
+
+/* Animation de clé qui s'envole */
+@keyframes key-fly {
+  0% {
+    transform: translateY(200px);
+    opacity: 1;
+  }
+  20% {
+    transform: translateY(-50px);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-80px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-1800px);
+    opacity: 0;
+  }
+}
+
+.animate-key-fly {
+  animation: key-fly 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}

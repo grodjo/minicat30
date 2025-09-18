@@ -310,13 +310,13 @@ const QuizPage = () => {
       });
 
       if (response.ok) {
-        // Attendre que l'animation de pénalité soit terminée (2,5 secondes)
+        // Attendre que l'animation de pénalité soit terminée (1,5 secondes)
         // puis afficher la transition "Dommage !" avec la bonne réponse
         setTimeout(() => {
           // Obtenir la bonne réponse depuis la configuration des étapes
           const correctAnswer = getStepCorrectAnswer(stepData.stepName, stepData.currentSubStep as 'direction');
           showSubStepTransitionMessage(false, 'direction', false, correctAnswer || undefined);
-        }, 2500);
+        }, 1500);
       } else {
         const data = await response.json();
         toast.error(data.error, { className: quizToastClass });

@@ -182,7 +182,7 @@ export const steps: Step[] = [
       hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
       acceptedAnswers: ["Clair de rêve"]
     },
-    moving: "Allez zou, à la boutique Clair de Rêve !\n\n🍨\nDur de résister à un petit crochet par Berthillon",
+    moving: "En route vers Clair de Rêve !\n\n🍨\nDur dur de résister à un petit crochet par Berthillon",
     enigma: {
       question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
       acceptedAnswers: ["jaune", "orange"],
@@ -193,7 +193,7 @@ export const steps: Step[] = [
       acceptedAnswers: ["1940", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950"]
     },
     key: {
-      description: "Le Louis qui a donné son nom à cette île avait comme numéro le chiffre clé",
+      description: "Le roi qui a donné son nom à cette île avait le chiffre clé comme numéro de règne",
       acceptedAnswers: ["9"]
     }
   },

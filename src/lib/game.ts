@@ -203,6 +203,16 @@ export async function getSessionWithUser(sessionId: string) {
   return session
 }
 
+// Calculer le total des pénalités pour une session
+export async function getSessionTotalPenalties(sessionId: string): Promise<number> {
+  const result = await prisma.stepSession.aggregate({
+    where: { gameSessionId: sessionId },
+    _sum: { penaltyTimeMs: true }
+  })
+  
+  return result._sum.penaltyTimeMs || 0
+}
+
 // Nouvelles fonctions pour gérer les sous-étapes
 
 export async function getCurrentStepWithSubStep(sessionId: string) {
@@ -274,7 +284,7 @@ export async function completeSubStep(
   sessionId: string, 
   stepName: string, 
   subStepType: 'direction' | 'moving' | 'enigma' | 'bonus' | 'key' | 'final', 
-  data?: { isCorrect?: boolean; key?: string }
+  data?: { isCorrect?: boolean; key?: string; giveUp?: boolean }
 ) {
   const stepSession = await prisma.stepSession.findUnique({
     where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
@@ -362,18 +372,26 @@ export async function addEnigmaAttempt(sessionId: string, stepName: string) {
     throw new Error('Session d\'étape introuvable')
   }
 
+  // Ajouter la pénalité de temps (1 minute)
+  await addTimePenaltyToDatabase(sessionId, stepName, 1);
+
   return prisma.stepSession.update({
     where: { id: stepSession.id },
     data: {
-      enigmaAttemptsCount: stepSession.enigmaAttemptsCount + 1,
-      penaltyTimeMs: stepSession.penaltyTimeMs + WRONG_ANSWER_PENALTY_TIME_MS
+      enigmaAttemptsCount: stepSession.enigmaAttemptsCount + 1
     }
   })
 }
 
 // Fonction pour ajouter une pénalité de clé (5 minutes)
 export async function addKeyPenalty(sessionId: string, stepName: string) {
-  const KEY_PENALTY_TIME_MS = 5 * 60 * 1000; // 5 minutes
+  // Ajouter la pénalité de temps (5 minutes)
+  await addTimePenaltyToDatabase(sessionId, stepName, 5);
+}
+
+// Fonction générique pour ajouter une pénalité de temps
+export async function addTimePenaltyToDatabase(sessionId: string, stepName: string, penaltyMinutes: number) {
+  const penaltyMs = penaltyMinutes * 60 * 1000;
   
   const stepSession = await prisma.stepSession.findUnique({
     where: { gameSessionId_stepName: { gameSessionId: sessionId, stepName } }
@@ -386,7 +404,7 @@ export async function addKeyPenalty(sessionId: string, stepName: string) {
   return prisma.stepSession.update({
     where: { id: stepSession.id },
     data: {
-      penaltyTimeMs: stepSession.penaltyTimeMs + KEY_PENALTY_TIME_MS
+      penaltyTimeMs: stepSession.penaltyTimeMs + penaltyMs
     }
   })
 }
@@ -401,15 +419,15 @@ export async function addHintPenalty(sessionId: string, stepName: string) {
     throw new Error('Session d\'étape introuvable')
   }
 
+  // Ajouter la pénalité de temps (3 minutes)
+  await addTimePenaltyToDatabase(sessionId, stepName, 3);
+
   // Détermine quel champ mettre à jour selon la sous-étape actuelle
   const currentSubStep = stepSession.currentSubStep;
   const updateData: {
-    penaltyTimeMs: number;
     directionHintIndex?: number;
     enigmaHintIndex?: number;
-  } = {
-    penaltyTimeMs: stepSession.penaltyTimeMs + HINT_PENALTY_TIME_MS
-  };
+  } = {};
 
   if (currentSubStep === 'direction') {
     updateData.directionHintIndex = stepSession.directionHintIndex + 1;

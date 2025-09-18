@@ -9,7 +9,8 @@ interface HintsProps {
   totalHints: number;
   currentHintIndex: number;
   onHintUsed: (newHintIndex: number) => void; // Callback pour mettre à jour l'état parent
-  onTimePenalty: (minutes: number) => void; // Callback pour ajouter une pénalité de temps
+  onPenaltyAnimationTrigger?: (minutes: number) => void; // Callback pour déclencher l'animation de pénalité
+  onPenaltiesReload?: () => Promise<void>; // Callback pour recharger les pénalités depuis la BDD
   className?: string;
 }
 
@@ -23,7 +24,8 @@ export const Hints: React.FC<HintsProps> = ({
   totalHints,
   currentHintIndex,
   onHintUsed,
-  onTimePenalty,
+  onPenaltyAnimationTrigger,
+  onPenaltiesReload,
   className = ""
 }) => {
   const [currentHint, setCurrentHint] = useState<HintData | null>(null);
@@ -54,7 +56,7 @@ export const Hints: React.FC<HintsProps> = ({
       } else {
         // Pour un nouvel indice : jouer le son et déclencher l'animation immédiatement
         playSound('duck');
-        onTimePenalty(3);
+        onPenaltyAnimationTrigger?.(3); // Déclencher l'animation de pénalité de 3 minutes
         onHintUsed(hintIndex + 1);
         
         // Récupérer l'indice en arrière-plan pendant que l'animation se joue
@@ -67,13 +69,16 @@ export const Hints: React.FC<HintsProps> = ({
 
         const data = await response.json();
         if (response.ok) {
+          // Recharger les pénalités depuis la BDD après l'appel API
+          await onPenaltiesReload?.();
+          
           // Attendre que l'animation de pénalité se termine avant d'ouvrir la modale
           setTimeout(() => {
             setCurrentHint(data);
             setHintModalOpen(true);
             // Jouer le son de révélation une fois l'indice chargé et la modale ouverte
             playSound('ps2Reveal');
-          }, 1000); // 1 seconde pour laisser l'animation de pénalité se terminer
+          }, 500); //  500ms pour laisser l'animation de pénalité se terminer
         } else {
           toast.error(data.error, {
             className: quizToastClass

@@ -165,7 +165,7 @@ const Home = () => {
                       value={pseudo}
                       onChange={(e) => setPseudo(e.target.value)}
                       required
-                      minLength={3}
+                      minLength={1}
                       maxLength={50}
                       disabled={isLoading || isExiting}
                       className="w-full bg-transparent border-0 border-b-2 border-violet-300/40 text-white text-xl font-bold text-center py-4 px-2 focus:outline-none focus:border-violet-400 transition-all duration-300 placeholder:text-violet-300/50 placeholder:text-lg tracking-wide font-mono"
@@ -186,7 +186,7 @@ const Home = () => {
                   {/* Bouton carré à droite */}
                   <Button
                     type="submit"
-                    disabled={!pseudo.trim() || pseudo.trim().length < 3 || isLoading || isExiting}
+                    disabled={!pseudo.trim() || pseudo.trim().length < 1 || isLoading || isExiting}
                     className="w-16 h-16 rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl disabled:from-slate-600 disabled:to-slate-600 disabled:text-slate-300 flex items-center justify-center p-0 hover:scale-105 active:scale-95"
                   >
                     {isLoading ? '⏳' : 'Go!'}

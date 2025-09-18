@@ -12,7 +12,8 @@ interface EnigmaSubStepProps {
   totalHints: number;
   currentHintIndex: number;
   onHintUsed: (newHintIndex: number) => void;
-  onTimePenalty: (minutes: number) => void;
+  onPenaltyAnimationTrigger?: (minutes: number) => void;
+  onPenaltiesReload?: () => Promise<void>;
   sessionId: string;
   isSubmitting: boolean;
   isCorrectAnswer: boolean;
@@ -38,7 +39,8 @@ export const EnigmaSubStep = ({
   totalHints,
   currentHintIndex,
   onHintUsed,
-  onTimePenalty,
+  onPenaltyAnimationTrigger,
+  onPenaltiesReload,
   sessionId,
   attemptsCount = 0,
   maxAttempts = 10,
@@ -60,7 +62,8 @@ export const EnigmaSubStep = ({
         totalHints={totalHints}
         currentHintIndex={currentHintIndex}
         onHintUsed={onHintUsed}
-        onTimePenalty={onTimePenalty}
+        onPenaltyAnimationTrigger={onPenaltyAnimationTrigger}
+        onPenaltiesReload={onPenaltiesReload}
       />
       
       {/* Compteur de tentatives */}

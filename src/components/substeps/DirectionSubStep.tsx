@@ -17,7 +17,8 @@ interface DirectionSubStepProps {
   totalHints: number;
   currentHintIndex: number;
   onHintUsed: (newHintIndex: number) => void;
-  onTimePenalty: (minutes: number) => void;
+  onPenaltyAnimationTrigger?: (minutes: number) => void;
+  onPenaltiesReload?: () => Promise<void>;
   onGiveUp: () => void;
   sessionId: string;
   transitionOverlay?: {
@@ -39,7 +40,8 @@ export const DirectionSubStep = ({
   totalHints,
   currentHintIndex,
   onHintUsed,
-  onTimePenalty,
+  onPenaltyAnimationTrigger,
+  onPenaltiesReload,
   onGiveUp,
   sessionId,
   transitionOverlay
@@ -66,7 +68,8 @@ export const DirectionSubStep = ({
         totalHints={totalHints}
         currentHintIndex={currentHintIndex}
         onHintUsed={onHintUsed}
-        onTimePenalty={onTimePenalty}
+        onPenaltyAnimationTrigger={onPenaltyAnimationTrigger}
+        onPenaltiesReload={onPenaltiesReload}
       />
       
       {/* Bouton "donner sa langue au chat" - toujours présent mais disabled tant que tous les indices ne sont pas utilisés */}

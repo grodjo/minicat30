@@ -94,7 +94,18 @@ const QuizPage = () => {
   const wrongAnswerToastRef = useRef<WrongAnswerToastRef>(null);
 
   // Hook pour le timer
-  const { formattedTime: elapsedTime, addTimePenalty, showPenaltyAnimation, lastPenaltyMinutes } = useTimer(sessionInfo?.startedAt || null);
+  const { 
+    formattedTime: elapsedTime, 
+    addTimePenalty, 
+    showPenaltyAnimationOnly,
+    reloadPenalties,
+    showPenaltyAnimation, 
+    lastPenaltyMinutes 
+  } = useTimer(
+    sessionInfo?.startedAt || null, 
+    sessionId, 
+    stepData?.stepName // Passer le stepName actuel
+  );
 
   // Classe Tailwind pour les toasts de la page quiz - positionnés au-dessus du footer
   const quizToastClass = "transform -translate-y-22";
@@ -283,8 +294,8 @@ const QuizPage = () => {
 
     setSubmitting(true);
     try {
-      // Appliquer une pénalité de 5 minutes
-      handleTimePenalty(5);
+      // Appliquer une pénalité de 5 minutes (maintenant sauvegardée automatiquement en BDD)
+      await addTimePenalty(5);
       
       const response = await fetch(`/api/session/${sessionId}/complete-substep`, {
         method: 'POST',
@@ -294,7 +305,7 @@ const QuizPage = () => {
         body: JSON.stringify({
           stepName: stepData.stepName,
           subStepType: stepData.currentSubStep,
-          data: { giveUp: true }
+          data: {} // Plus besoin de passer giveUp: true
         }),
       });
 
@@ -406,7 +417,7 @@ const QuizPage = () => {
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité
         if (stepData.subStepData.type === 'final') {
-          addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse finale
+          await addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse finale
           wrongAnswerToastRef.current?.show();
           
           // Jouer le son approprié si spécifié
@@ -436,7 +447,7 @@ const QuizPage = () => {
         } else if (stepData.subStepData.type === 'enigma') {
           // Pour les énigmes, la pénalité est déjà gérée côté serveur
           // On ajoute la pénalité côté client pour l'affichage immédiat
-          addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse énigme
+          await addTimePenalty(1); // Ajouter 1 minute pour une mauvaise réponse énigme
           wrongAnswerToastRef.current?.show();
           
           // Jouer le son approprié si spécifié
@@ -465,7 +476,7 @@ const QuizPage = () => {
           }
         } else if (stepData.subStepData.type === 'key') {
           // Pour les clés, ajouter la pénalité côté client pour l'animation
-          addTimePenalty(5); // Ajouter 5 minutes pour une mauvaise réponse de clé
+          await addTimePenalty(5); // Ajouter 5 minutes pour une mauvaise réponse de clé
           
           // Recharger directement l'étape après un délai
           setTimeout(async () => {
@@ -513,10 +524,6 @@ const QuizPage = () => {
         currentHintIndex: newHintIndex
       }
     } : null);
-  };
-
-  const handleTimePenalty = (minutes: number) => {
-    addTimePenalty(minutes);
   };
 
   const goToScoreboard = () => {
@@ -570,7 +577,8 @@ const QuizPage = () => {
             totalHints={stepData.totalHints}
             currentHintIndex={stepData.stepSession.currentHintIndex}
             onHintUsed={handleHintUsed}
-            onTimePenalty={handleTimePenalty}
+            onPenaltyAnimationTrigger={showPenaltyAnimationOnly}
+            onPenaltiesReload={reloadPenalties}
             onGiveUp={handleGiveUp}
             sessionId={sessionId}
           />
@@ -594,7 +602,8 @@ const QuizPage = () => {
             totalHints={stepData.totalHints}
             currentHintIndex={stepData.stepSession.currentHintIndex}
             onHintUsed={handleHintUsed}
-            onTimePenalty={handleTimePenalty}
+            onPenaltyAnimationTrigger={showPenaltyAnimationOnly}
+            onPenaltiesReload={reloadPenalties}
             sessionId={sessionId}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}
             maxAttempts={10}

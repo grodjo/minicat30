@@ -421,8 +421,19 @@ const QuizPage = () => {
             }
           }
           
-          // Recharger les données pour mettre à jour le compteur de tentatives
-          if (!data.moveToNext && !data.completed) {
+          // Vérifier si on doit passer à l'étape suivante (tentatives épuisées)
+          if (data.moveToNext) {
+            setTimeout(async () => {
+              if (data.completed) {
+                await loadCompletedSessionData();
+                setCompleted(true);
+              } else {
+                // Utiliser la transition pour l'étape finale échouée
+                showSubStepTransitionMessage(false, 'final', false, data.correctAnswer);
+              }
+            }, 1500);
+          } else {
+            // Recharger les données pour mettre à jour le compteur de tentatives
             await loadCurrentStep();
           }
         } else if (stepData.subStepData.type === 'enigma') {

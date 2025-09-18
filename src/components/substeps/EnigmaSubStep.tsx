@@ -92,8 +92,8 @@ export const EnigmaSubStep = ({
         />
         <Button
           type="submit"
-          disabled={!answer.trim() || isSubmitting || isCorrectAnswer}
-          className="h-14 w-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg"
+          disabled={!answer.trim() || isSubmitting || isCorrectAnswer || attemptsCount >= maxAttempts}
+          className="h-14 w-14 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold text-lg rounded-xl shadow-lg disabled:opacity-50"
         >
           {isSubmitting ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

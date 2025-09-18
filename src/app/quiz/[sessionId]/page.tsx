@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
-import { playEventSound, EventSound, playSound } from '@/lib/sounds';
+import { playSound, SoundName } from '@/lib/sounds';
 import { getStepCorrectAnswer } from '@/lib/steps';
 import { formatScoreboardTime } from '@/lib/time-formatting';
 
@@ -140,7 +140,7 @@ const QuizPage = () => {
             : `l\'Étape ${stepData.stepRank.toString().padStart(2, '0')}`;
           setTransitionStepName(transitionName);
           setShowStepTransition(true);
-          playEventSound(EventSound.stepTransition); // marioKartGridIntro
+          playSound(SoundName.MARIO_KART_GRID_INTRO);
           
           // Déclencher l'animation d'entrée de la sous-étape après 6 secondes (quand la transition se termine)
           setTimeout(() => {
@@ -148,11 +148,11 @@ const QuizPage = () => {
             setIsStepEntering(true);
             setTimeout(() => setIsStepEntering(false), 600); // Animation de 600ms
             // Jouer le son de sous-étape pour la première sous-étape
-            playEventSound(EventSound.newSubStep);
+            playSound(SoundName.PS2_EXPAND);
           }, 6000);
         } else if (isNewSubStep) {
           // Nouvelle sous-étape dans la même étape : jouer le son ps2Expand
-          playEventSound(EventSound.newSubStep);
+          playSound(SoundName.PS2_EXPAND);
         }
         
         // Mettre à jour l'étape précédente
@@ -198,11 +198,11 @@ const QuizPage = () => {
     if (!skipSound) {
       if (success) {
         if (subStepType === 'enigma') {
-          playEventSound(EventSound.enigmaSuccess);
+          playSound(SoundName.DBZ_KI_BLAST);
         } else if (subStepType === 'bonus') {
-          playEventSound(EventSound.bonusSuccess);
+          playSound(SoundName.AIR_HORN_WIN);
         } else {
-          playEventSound(EventSound.directionComplete);
+          playSound(SoundName.POKEMON_CAUGHT);
         }
       }
       // Sons de mauvaise réponse retirés pour les transitions de substep
@@ -354,11 +354,11 @@ const QuizPage = () => {
       if (data.isCorrect) {
         // Jouer le son approprié selon le type de question (sauf pour les clés)
         if (stepData.subStepData.type === 'bonus') {
-          playEventSound(EventSound.bonusSuccess); // dbzKiBlast pour bonus réussi
+          playSound(SoundName.AIR_HORN_WIN); // airHornWin pour bonus réussi
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
-          playEventSound(EventSound.enigmaSuccess); // airHornWin pour énigme réussie
+          playSound(SoundName.DBZ_KI_BLAST); // dbzKiBlast pour énigme réussie
         } else if (stepData.subStepData.type === 'direction') {
-          playEventSound(EventSound.directionComplete); // pokemonCaught pour direction réussie
+          playSound(SoundName.POKEMON_CAUGHT); // pokemonCaught pour direction réussie
         }
         // Pas de son pour les clés (type === 'key')
         
@@ -407,12 +407,12 @@ const QuizPage = () => {
       } else {
         // Jouer le son approprié selon le type de question en cas d'erreur
         if (stepData.subStepData.type === 'bonus') {
-          playEventSound(EventSound.bonusFailed); // dbzGhost pour bonus raté
+          playSound(SoundName.DBZ_GHOST); // dbzGhost pour bonus raté
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final' || stepData.subStepData.type === 'key') {
           // Utiliser wrong1 pour les énigmes
-          playSound('wrong1');
+          playSound(SoundName.WRONG1);
         } else if (stepData.subStepData.type === 'direction') {
-          playEventSound(EventSound.directionWrongAnswer); // wrong3 pour direction ratée
+          playSound(SoundName.WRONG3); // wrong3 pour direction ratée
         }
         
         // Vérifier si c'est l'étape finale pour ajouter une pénalité
@@ -423,9 +423,9 @@ const QuizPage = () => {
           // Jouer le son approprié si spécifié
           if (data.playSound) {
             if (data.playSound === 'scratchStop') {
-              playEventSound(EventSound.stop);
+              playSound(SoundName.SCRATCH_STOP);
             } else if (data.playSound === 'alarmEnd') {
-              playEventSound(EventSound.alarm);
+              playSound(SoundName.ALARM_END);
             }
           }
           
@@ -453,9 +453,9 @@ const QuizPage = () => {
           // Jouer le son approprié si spécifié
           if (data.playSound) {
             if (data.playSound === 'scratchStop') {
-              playEventSound(EventSound.stop);
+              playSound(SoundName.SCRATCH_STOP);
             } else if (data.playSound === 'alarmEnd') {
-              playEventSound(EventSound.alarm);
+              playSound(SoundName.ALARM_END);
             }
           }
           

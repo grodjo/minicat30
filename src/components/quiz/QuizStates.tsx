@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
-import { playEventSound, EventSound } from '@/lib/sounds';
+import { playSound, SoundName } from '@/lib/sounds';
 
 interface LoadingStateProps {
   message?: string;
@@ -33,7 +33,7 @@ interface CompletedStateProps {
 export const CompletedState = ({ onGoToScoreboard, sessionData }: CompletedStateProps) => {
   // Jouer le son de victoire épique dès l'affichage de l'écran de félicitations
   useEffect(() => {
-    playEventSound(EventSound.victory); // epicVictory
+    playSound(SoundName.EPIC_VICTORY);
   }, []);
 
   return (

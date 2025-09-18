@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SubStep } from './SubStep';
 import { Hints } from './Hints';
-import { playSound } from '@/lib/sounds';
+import { playSound, SoundName } from '@/lib/sounds';
 
 interface DirectionSubStepProps {
   stepName: string;
@@ -56,7 +56,7 @@ export const DirectionSubStep = ({
 
   const handleGiveUp = () => {
     // Jouer le son scratchStop avant d'abandonner
-    playSound('dbzGhost');
+    playSound(SoundName.DBZ_GHOST);
     onGiveUp();
   };
 

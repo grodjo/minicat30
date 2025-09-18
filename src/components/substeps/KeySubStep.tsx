@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SubStep } from './SubStep';
-import { playEventSound, EventSound } from '@/lib/sounds';
+import { playSound, SoundName } from '@/lib/sounds';
 
 interface KeySubStepProps {
   stepName: string;
@@ -33,8 +33,8 @@ export const KeySubStep = ({
       
       // Jouer le son de téléportation au moment de l'accélération (40% de 2.5s = 1s)
       setTimeout(() => {
-        playEventSound(EventSound.startGame);
-      }, 800);
+        playSound(SoundName.DBZ_TELEPORTATION);
+      }, 1000);
       
       // Masquer l'animation après 2.5 secondes (durée de l'animation)
       setTimeout(() => setShowFlyingKey(false), 2500);

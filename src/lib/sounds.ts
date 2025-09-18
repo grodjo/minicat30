@@ -1,32 +1,28 @@
-export enum EventSound {
-	/** Interface sounds */
-	buttonClick = 'ps2Login',              // Bouton "Go!" principal
-	startGame = 'dbzTeleportation',        // Bouton "START/REPRENDRE" 
-	
-	/** Navigation sounds */
-	stepTransition = 'marioKartGridIntro', // Écran de transition nouvelle étape
-	newSubStep = 'ps2Expand',              // Nouvelle sous-étape
-	directionComplete = 'pokemonCaught',   // Fin étape de direction  
-	
-	/** Feedback sounds */
-	enigmaSuccess = 'dbzKiBlast',          // Énigme réussie
-	bonusSuccess = 'airHornWin',           // Bonus réussi
-	enigmaWrongAnswer = 'wrong1',          // Énigme ratée 
-	directionWrongAnswer = 'wrong3',       // Direction ratée (utilise "wrong3")
-	bonusFailed = 'dbzGhost',              // Bonus raté
-	hintPenalty = 'wrong2',                // Indice utilisé avec pénalité (temporaire - sera 'ah' dans l'usage)
-	hintRevealed = 'ps2Reveal',            // Indice révélé dans la modale
-	
-	/** Legacy sounds (unused in current implementation) */
-	newStep = 'ps2Collapse',               // Ancienne nouvelle étape
-	connection = 'ps2Connection',
-	itemBox = 'marioKartItemBox',
-	auraBurst = 'dbzAuraBurst',
-	alarm = 'alarmEnd',
-	victory = 'epicVictory',
-	notification = 'ps2Notif',
-	stop = 'scratchStop',
-};
+export enum SoundName {
+  // Sounds available in /public/sounds/
+  AH = 'ah',
+  AIR_HORN_WIN = 'airHornWin',
+  ALARM_END = 'alarmEnd',
+  DBZ_AURA_BURST = 'dbzAuraBurst',
+  DBZ_GHOST = 'dbzGhost',
+  DBZ_KI_BLAST = 'dbzKiBlast',
+  DBZ_TELEPORTATION = 'dbzTeleportation',
+  DUCK = 'duck',
+  EPIC_VICTORY = 'epicVictory',
+  MARIO_KART_GRID_INTRO = 'marioKartGridIntro',
+  MARIO_KART_ITEM_BOX = 'marioKartItemBox',
+  POKEMON_CAUGHT = 'pokemonCaught',
+  PS2_COLLAPSE = 'ps2Collapse',
+  PS2_CONNECTION = 'ps2Connection',
+  PS2_EXPAND = 'ps2Expand',
+  PS2_LOGIN = 'ps2Login',
+  PS2_NOTIF = 'ps2Notif',
+  PS2_REVEAL = 'ps2Reveal',
+  SCRATCH_STOP = 'scratchStop',
+  WRONG1 = 'wrong1',
+  WRONG2 = 'wrong2',
+  WRONG3 = 'wrong3',
+}
 
 interface ISoundCache {
 	[soundName: string]: HTMLAudioElement;
@@ -61,10 +57,11 @@ const getAudioElement = (soundName: string): HTMLAudioElement | null => {
 	}
 };
 
-export const playSound = (soundName: string): void => {
+// Fonction principale pour jouer un son
+export const playSound = (soundName: SoundName): void => {
 	const audioElement = getAudioElement(soundName);
 	if (audioElement) {
-		// Reset et jouer immédiatement - version ultra simplifiée
+		// Reset et jouer immédiatement
 		audioElement.currentTime = 0;
 		audioElement.play().catch((error: unknown) => {
 			console.warn(`Failed to play sound ${soundName}:`, error);
@@ -72,16 +69,11 @@ export const playSound = (soundName: string): void => {
 	}
 };
 
-export const pauseSound = (soundName: string): void => {
+export const pauseSound = (soundName: SoundName): void => {
 	if (!soundCache[soundName]) return;
 	
 	// Mettre en pause l'élément audio
 	soundCache[soundName].pause();
-};
-
-// Fonction principale pour jouer un son d'événement
-export const playEventSound = (eventName: EventSound): void => {
-	playSound(eventName);
 };
 
 // Fonction pour nettoyer le cache

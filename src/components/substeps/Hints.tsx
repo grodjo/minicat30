@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { playSound } from '@/lib/sounds';
+import { playSound, SoundName } from '@/lib/sounds';
 
 interface HintsProps {
   sessionId: string;
@@ -47,7 +47,7 @@ export const Hints: React.FC<HintsProps> = ({
           setCurrentHint(data);
           setHintModalOpen(true);
           // Jouer le son de révélation d'indice pour les indices déjà débloqués
-          playSound('ps2Reveal');
+          playSound(SoundName.PS2_REVEAL);
         } else {
           toast.error(data.error, {
             className: quizToastClass
@@ -55,7 +55,7 @@ export const Hints: React.FC<HintsProps> = ({
         }
       } else {
         // Pour un nouvel indice : jouer le son et déclencher l'animation immédiatement
-        playSound('duck');
+        playSound(SoundName.DUCK);
         onPenaltyAnimationTrigger?.(3); // Déclencher l'animation de pénalité de 3 minutes
         onHintUsed(hintIndex + 1);
         
@@ -77,7 +77,7 @@ export const Hints: React.FC<HintsProps> = ({
             setCurrentHint(data);
             setHintModalOpen(true);
             // Jouer le son de révélation une fois l'indice chargé et la modale ouverte
-            playSound('ps2Reveal');
+            playSound(SoundName.PS2_REVEAL);
           }, 500); //  500ms pour laisser l'animation de pénalité se terminer
         } else {
           toast.error(data.error, {

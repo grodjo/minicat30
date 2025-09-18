@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { SoundName } from '@/lib/sounds';
 
 export const SoundPreloader = () => {
   useEffect(() => {
@@ -14,7 +15,15 @@ export const SoundPreloader = () => {
         console.log('🔊 Initialisation du système audio...');
         
         // 1. Précharger les sons critiques (métadonnées seulement)
-        const criticalSounds = ['ps2Login', 'wrong1', 'airHornWin'];
+        const criticalSounds = [
+          SoundName.PS2_LOGIN,
+          SoundName.WRONG1,
+          SoundName.AIR_HORN_WIN,
+          SoundName.DBZ_TELEPORTATION,
+          SoundName.POKEMON_CAUGHT,
+          SoundName.DBZ_KI_BLAST,
+          SoundName.PS2_EXPAND,
+        ];
         
         criticalSounds.forEach((soundName) => {
           const audio = new Audio(`/sounds/${soundName}.mov`);

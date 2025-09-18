@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { SubStep } from './SubStep';
-import { playEventSound, EventSound } from '@/lib/sounds';
+import { playSound, SoundName } from '@/lib/sounds';
 
 interface MovingSubStepProps {
   stepName: string;
@@ -23,7 +23,7 @@ export const MovingSubStep = ({
 }: MovingSubStepProps) => {
   const handleMovingComplete = () => {
     // Jouer le son ps2Connection à la fin de l'étape de déplacement
-    playEventSound(EventSound.connection);
+    playSound(SoundName.PS2_CONNECTION);
     onComplete();
   };
 

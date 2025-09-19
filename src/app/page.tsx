@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -132,6 +133,20 @@ const Home = () => {
       <div className="relative z-10 text-center space-y-12 max-w-2xl w-full">
         {/* Titre principal avec sous-titre */}
         <div className={`space-y-4 ${isExiting ? 'animate-exit-title-up' : ''}`}>
+          {/* Logo du chat au-dessus du titre */}
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 animate-bounce-slow">
+              <Image 
+                src="/cats/grinning-cat-with-smiling-eyes.svg" 
+                alt="Grinning Cat Logo" 
+                width={128}
+                height={128}
+                className="w-full h-full drop-shadow-2xl"
+                priority
+              />
+            </div>
+          </div>
+          
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight animate-title-shine drop-shadow-2xl font-sans filter brightness-110">
             MINICAT 30
           </h1>

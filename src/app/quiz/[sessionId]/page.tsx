@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
@@ -678,7 +679,19 @@ const QuizPage = () => {
       {showStepTransition && (
         <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 flex items-center justify-center">
           <div className="text-center space-y-8">
-            <div className="text-6xl animate-bounce">{transitionStepName.includes('finale') ? '🏁' : '🚀'}</div>
+            <div className="text-6xl animate-bounce flex justify-center">
+              {transitionStepName.includes('finale') ? (
+                '🏁'
+              ) : (
+                <Image
+                  src="/cats/cat-with-wry-smile.svg"
+                  alt="Cat with wry smile"
+                  width={128}
+                  height={128}
+                  className="w-32 h-32"
+                />
+              )}
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white tracking-wide animate-pulse">
               C&apos;est parti pour
             </h1>

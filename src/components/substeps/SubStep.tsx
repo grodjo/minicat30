@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import Image from 'next/image';
 
 interface SubStepProps {
   stepName: string;
@@ -39,9 +40,25 @@ export const SubStep = ({
           transitionOverlay.fadeOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}>
           <div className="text-center space-y-6 max-w-md mx-auto px-4">
-            {/* Emoji qui rebondit */}
-            <div className="text-8xl animate-bounce">
-              {transitionOverlay.success ? '🥳' : '😖'}
+            {/* Cat qui rebondit */}
+            <div className="text-8xl animate-bounce flex justify-center">
+              {transitionOverlay.success ? (
+                <Image
+                  src="/cats/grinning-cat.svg"
+                  alt="Grinning cat"
+                  width={128}
+                  height={128}
+                  className="w-32 h-32"
+                />
+              ) : (
+                <Image
+                  src="/cats/crying-cat.svg"
+                  alt="Crying cat"
+                  width={128}
+                  height={128}
+                  className="w-32 h-32"
+                />
+              )}
             </div>
             
             {/* Message principal */}

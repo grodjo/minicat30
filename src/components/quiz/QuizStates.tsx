@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { playSound, SoundName } from '@/lib/sounds';
+import Image from 'next/image';
 
 interface LoadingStateProps {
   message?: string;
@@ -38,7 +39,15 @@ export const CompletedState = ({ onGoToScoreboard, sessionData }: CompletedState
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-      <div className="text-8xl mb-8 animate-bounce">🎉</div>
+      <div className="text-8xl mb-8 animate-bounce flex justify-center">
+        <Image
+          src="/cats/kissing-cat.svg"
+          alt="Kissing cat"
+          width={128}
+          height={128}
+          className="w-32 h-32"
+        />
+      </div>
       <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-wide">
         Félicitations
       </h1>

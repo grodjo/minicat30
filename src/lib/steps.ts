@@ -254,16 +254,16 @@ export const steps: Step[] = [
     },
     moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nProfitez du dénivelé pour faire la différence",
     enigma: {
-      question: "Sur quel monument autour de la place peut-on apercevoir la sculpture d'un piti mouton trop mignon ? 🐑",
-      acceptedAnswers: ["Eglise Saint Etienne du Mont", "Saint Etienne du Mont"],
-      hints: ["Il est aux pieds d'une femme", "La femme en question a l'air plutôt catho"]
+      question: "Un animal est présent sur le fronton, lequel ?",
+      acceptedAnswers: ["Coq"],
+      hints: ["Un symbole national", "Il est au centre du fronton"]
     },
     bonus: {
       question: "Les femmes sont rares parmi les \"grands hommes\"... Quelle femme fut inhummée au Panthéon en 2018 ?",
       acceptedAnswers: ["Simone Veil", "Veil"]
     },
     key: {
-      description: "Il y a aussi un animal sur le fronton du Panthéon ! Si on lui ajoute le chiffre clé, on obtient un os du corps humain.",
+      description: "Ajoutez le chiffre clé à la réponse de l'énigme pour obtenir un os du corps humain.",
       acceptedAnswers: ["6"]
     }
   },

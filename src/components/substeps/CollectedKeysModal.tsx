@@ -13,11 +13,10 @@ import {
 import { steps } from '@/lib/steps';
 
 interface CollectedKeysModalProps {
-  sessionId: string;
   trigger?: React.ReactNode;
 }
 
-export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalProps) => {
+export const CollectedKeysModal = ({ trigger }: CollectedKeysModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Récupérer les clés directement depuis les étapes (première valeur acceptedAnswers)

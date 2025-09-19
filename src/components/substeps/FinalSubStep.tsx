@@ -13,7 +13,6 @@ interface FinalSubStepProps {
   isStepEntering: boolean;
   attemptsCount?: number;
   maxAttempts?: number;
-  sessionId: string;
   transitionOverlay?: {
     show: boolean;
     message: string;
@@ -32,7 +31,6 @@ export const FinalSubStep = ({
   isStepEntering,
   attemptsCount = 0,
   maxAttempts = 10,
-  sessionId,
   transitionOverlay
 }: FinalSubStepProps) => {
   const [answer, setAnswer] = useState('');
@@ -47,7 +45,7 @@ export const FinalSubStep = ({
     <div className="text-center mb-6 space-y-4">
       {/* Bouton pour voir les clés collectées */}
       <div className="flex justify-center mb-4">
-        <CollectedKeysModal sessionId={sessionId} />
+        <CollectedKeysModal />
       </div>
       
       {/* Compteur de tentatives */}

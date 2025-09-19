@@ -106,7 +106,7 @@ export const steps: Step[] = [
     },
     moving: "En avant vers le village Saint-Paul !\n\n😬\nVous ferez les galeries et les boutiques un autre jour",
     enigma: {
-      question: "Un bistrot se cache dans la cour du père de Gargantua.\nSur quel plat à la carte Célia se serait-elle précipitée ?",
+      question: "Un bistrot se cache dans la cour du père de Gargantua.\nAvec une telle carte, sur quel plat Célia se serait-elle forcément précipitée ?",
       acceptedAnswers: ["Burger", "Hamburger"],
       hints: [
         "Le plus sale ! 😱",
@@ -115,7 +115,7 @@ export const steps: Step[] = [
 
     },
     bonus: {
-      question: "De quelle ville cette délicate spécialité culinaire tire-t-elle son nom ?",
+      question: "De quelle ville cette délicate spécialité culinaire tire-t-elle son nom ?",
       acceptedAnswers: ["Hambourg", "Hamburg"]
     },
     key: {
@@ -127,9 +127,9 @@ export const steps: Step[] = [
     stepRank: 4,
     name: "04",
     direction: {
-      instruction: "À 5 minutes à pied, rendez-vous en classes préparatoires, sous la supervision du roi des francs !",
+      instruction: "À 5 minutes à pied, retour en classes préparatoires, sous la supervision du roi des francs !",
       hints: [
-        "C'est également l'établissement du fils de Pépin le Bref",
+        "Roi des francs mais aussi fils de Pépin le Bref",
       ],
       acceptedAnswers: ["Charlemagne", "Le lycée Charlemagne", "collège et lycée Charlemagne", "prépa Charlemagne", "collège charlemagne"]
     },
@@ -229,7 +229,7 @@ export const steps: Step[] = [
       hints: ["Paris ne s'appelait pas durant l'Antiquité", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
       acceptedAnswers: ["Les arènes de Lutèce", "Arène de Lutèce"]
     },
-    moving: "On file aux arènes de Lutèce !\n\n💪\nVotre avance s'amenuise, mais tenez bon",
+    moving: "Filez aux arènes de Lutèce !\n\n💪\nVotre avance s'amenuise, mais tenez bon",
     enigma: {
       question: "Qui a sculpté l'unique statue visible dans les arènes ?",
       acceptedAnswers: ["Gabriel de Mortillet"],
@@ -237,7 +237,7 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "En ces temps barbares, quel emoji aurait ordonné à lui seul la mise à mort d'un gladiateur ?",
-      acceptedAnswers: ["👎", "pouce baissé", "pouce vers le bas", "pouce en bas"]
+      acceptedAnswers: ["👎"]
     },
     key: {
       description: "Le chiffre clé correspond au siècle durant lequel les arènes furent détruites par les barbares",
@@ -252,11 +252,11 @@ export const steps: Step[] = [
       hints: ["\"Aux grands hommes la patrie reconnaissante\""],
       acceptedAnswers: ["Le Panthéon"]
     },
-    moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nProfitez du dénivelé pour faire la différence",
+    moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nAccélérez dans le dénivelé pour faire la différence",
     enigma: {
       question: "Un animal est présent sur le fronton, lequel ?",
       acceptedAnswers: ["Coq"],
-      hints: ["Un symbole national", "Il est au centre du fronton"]
+      hints: ["Un véritable symbole national", "Il est au milieu du fronton"]
     },
     bonus: {
       question: "Les femmes sont rares parmi les \"grands hommes\"... Quelle femme fut inhummée au Panthéon en 2018 ?",

@@ -41,7 +41,7 @@ export const BonusSubStep = ({
   const bodyContent = (
     <div className="text-center mb-6">
       <p className="text-amber-400 text-lg font-semibold">
-        ⚠️ Une seule tentative !
+        Une seule tentative !
       </p>
     </div>
   );

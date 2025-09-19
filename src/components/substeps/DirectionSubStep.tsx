@@ -80,7 +80,7 @@ export const DirectionSubStep = ({
             disabled={isSubmitting || currentHintIndex < totalHints}
             className="px-6 py-3 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-300 hover:to-red-400 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            😼 Donner sa langue au chat
+            😼 Langue au chat
           </Button>
         </div>
       )}

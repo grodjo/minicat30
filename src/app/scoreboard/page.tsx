@@ -92,7 +92,10 @@ export default function ScoreboardPage() {
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4 drop-shadow-2xl">
               🏆 CLASSEMENT
             </h1>
-            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50"></div>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50 mb-4"></div>
+            <p className="text-lg text-violet-200/80 font-medium">
+              Classement par temps total final
+            </p>
           </div>
 
           {scoreboard.length === 0 ? (
@@ -119,12 +122,11 @@ export default function ScoreboardPage() {
                   className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl px-4 py-4 hover:bg-white/15 transition-all duration-300 cursor-pointer border border-violet-300/20"
                   onClick={() => setSelectedPlayer(selectedPlayer?.pseudo === entry.pseudo ? null : entry)}
                 >
-                  {/* Player info with position circle as "emoji" */}
-                  <div className='flex items-center justify-between gap-4'>
-                  <div className='flex-grow'>
-                  <div className="flex items-center mb-3">
-                    <div className="flex items-center space-x-3 min-w-0 flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg flex-shrink-0 ${
+                  {/* Player info with large position circle and simplified display */}
+                  <div className='flex items-center justify-between gap-6'>
+                    <div className='flex items-center gap-6 flex-grow'>
+                      {/* Large position circle */}
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl shadow-lg flex-shrink-0 ${
                         entry.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
                         entry.rank === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800' :
                         entry.rank === 3 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900' :
@@ -132,36 +134,32 @@ export default function ScoreboardPage() {
                       }`}>
                         {entry.rank}
                       </div>
-                      <h3 className="font-semibold text-xl text-white truncate">
-                        {entry.pseudo}
-                      </h3>
+                      
+                      {/* Player name and main stats */}
+                      <div className="flex-grow">
+                        <h3 className="font-bold text-2xl text-white mb-2">
+                          {entry.pseudo}
+                        </h3>
+                        <div className="flex items-center gap-8 text-lg">
+                          <span className="text-orange-300 font-bold">
+                            🏁 {formatScoreboardTime(entry.totalTimeMs)}
+                          </span>
+                          <span className="text-green-300 font-semibold">
+                            🧠 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-green-300 font-semibold text-lg text-left flex-shrink-0">
-                      🧠 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
-                    </div>
-                  </div>
-
-                  {/* Time details like in congratulations screen */}
-                  <div className="flex justify-between gap-4 text-base mb-4">
-                    <span className="text-yellow-300 text-left">
-                      ⏱️ {formatScoreboardTime(entry.totalTimeMs - entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}
-                    </span>
-                    <span className="text-red-300 text-left">
-                      ⚠️ {formatPenaltyTime(entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}
-                    </span>
-                    <span className="text-orange-300 font-bold text-left">
-                      🏁 {formatScoreboardTime(entry.totalTimeMs)}
-                    </span>
-                  </div>
-                  </div>
-                  <div className={`text-violet-300 transition-transform duration-300 flex-shrink-0 ${
+                    
+                    {/* Expand arrow */}
+                    <div className={`text-violet-300 transition-transform duration-300 flex-shrink-0 ${
                       selectedPlayer?.pseudo === entry.pseudo ? 'rotate-180' : ''
                     }`}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="6,9 12,15 18,9"></polyline>
                       </svg>
                     </div>
-                    </div>
+                  </div>
 
                   {selectedPlayer?.pseudo === entry.pseudo && (
                     <div className="mt-8 pt-6 border-t border-violet-300/20">

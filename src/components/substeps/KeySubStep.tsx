@@ -58,8 +58,8 @@ export const KeySubStep = ({
 
   const bodyContent = (
     <div className="text-center mb-6">
-      <p className="text-red-400 text-base font-bold">
-        ⚠️ Chaque mauvaise réponse coûte 5 minutes !
+      <p className="text-red-400 text-lg font-bold">
+        ⚠️ 5 minutes de pénalité par erreur
       </p>
     </div>
   );

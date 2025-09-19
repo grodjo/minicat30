@@ -59,11 +59,11 @@ export const steps: Step[] = [
       ]
     },
     bonus: {
-      question: "Moi aussi je peux être vierge et même extra-vierge !\n\nQui suis-je ?",
+      question: "Moi aussi je peux être vierge, et même... extra vierge !\n\nQui suis-je ?",
       acceptedAnswers: ["L'huile d'olive", "huile d'olive", "huile"]
     },
     key: {
-      description: "Le chiffre clé correspond à l'heure d'ouverture de la cour le jeudi",
+      description: "La cour ouvre le jeudi à l'heure du chiffre clé",
       acceptedAnswers: ["9"]
     }
   },
@@ -71,10 +71,10 @@ export const steps: Step[] = [
     stepRank: 2,
     name: "02",
     direction: {
-      instruction: "À l'ombre de la place des Vosges, mon jardin et ma cour valent le détour.",
+      instruction: "Dans l'ombre de la place des Vosges, mon jardin et ma cour valent pourtant le détour. Venez les admirer !",
       hints: [
         "Je partage mon nom avec un pont",
-        "Associé à Morland, mon nom est celui d'une station de métro",
+        "Associé à Morland, mon nom devient celui d'une station de métro",
       ],
       acceptedAnswers: ["Hôtel de Sully", "Hôtel Sully"]
     },
@@ -89,7 +89,7 @@ export const steps: Step[] = [
       acceptedAnswers: ["Oedipe"]
     },
     key: {
-      description: "Le chiffre clé est celui qui manque sur le cadran solaire",
+      description: "Le chiffre clé est manquant sur le cadran solaire",
       acceptedAnswers: ["7"]
     }
   },
@@ -97,24 +97,25 @@ export const steps: Step[] = [
     stepRank: 3,
     name: "03",
     direction: {
-      instruction: "Au sein d'un petit village avoisinant, trouvez la cour portant le nom de l'auteur de Gargantua !",
+      instruction: "Rendez-vous ensuite au petit village d'à côté !",
       hints: [
-        "L'église et le métro d'à côté porte le même nom",
+        "L'église d'à côté porte le même nom",
+        "Le métro d'à côté porte le même nom"
       ],
-      acceptedAnswers: ["Village Saint-Paul", "Saint-Paul", "Cour Rabelais", "Cour Rabelais du village Saint-Paul"]
+      acceptedAnswers: ["Village Saint-Paul", "Saint-Paul"]
     },
-    moving: "Direction le village Saint-Paul !\n\n😬\nVous ferez les galeries et les boutiques un autre jour",
+    moving: "En avant vers le village Saint-Paul !\n\n😬\nVous ferez les galeries et les boutiques un autre jour",
     enigma: {
-      question: "Chez BC, quel est le prix du plat que Célia serait le plus à même de commander sur cette carte ?",
-      acceptedAnswers: ["18", "18.00", "18,00", "18€", "18 euros", "18,00€", "18.00€", "18 €", "18.00 €", "18,00 €"],
+      question: "Un bistrot se cache dans la cour du père de Gargantua.\nSur quel plat à la carte Célia se serait-elle précipitée ?",
+      acceptedAnswers: ["Burger", "Hamburger"],
       hints: [
-        "C'est du sale ! 😱",
-        "En vrai ça a le mérite d'être complet : des féculents, de la viande, des crudités, un laitage, tout y est 👌",
+        "Le plus sale ! 😱",
+        "Ça a le mérite d'être complet : des féculents, de la viande, des crudités, un laitage, tout y est 👌"
       ],
 
     },
-    bonus: { // ⚠️ Warning
-      question: "De quelle ville provient cette délicate spécialité culinaire ?",
+    bonus: {
+      question: "De quelle ville cette délicate spécialité culinaire tire-t-elle son nom ?",
       acceptedAnswers: ["Hambourg", "Hamburg"]
     },
     key: {
@@ -130,7 +131,7 @@ export const steps: Step[] = [
       hints: [
         "C'est également l'établissement du fils de Pépin le Bref",
       ],
-      acceptedAnswers: ["Le lycée Charlemagne", "Charlemagne", "collège et lycée Charlemagne", "prépa Charlemagne"]
+      acceptedAnswers: ["Charlemagne", "Le lycée Charlemagne", "collège et lycée Charlemagne", "prépa Charlemagne", "collège charlemagne"]
     },
     moving: "Direction l'entrée du lycée Charlemagne !\n\n🥵\nPour info, les autres équipes se débrouillent super bien",
     enigma: {
@@ -170,7 +171,7 @@ export const steps: Step[] = [
       acceptedAnswers: ["André"]
     },
     key: {
-      description: "Interdit de nourrir les oiseaux dans les parcs !\nVous connaissez sûrement l'article de la réglementation qui porte le numéro du chiffre clé !",
+      description: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous n'ignorez évidemment pas l'article de la réglementation qui porte le numéro du chiffre clé !",
       acceptedAnswers: ["3"]
     }
   },
@@ -178,7 +179,7 @@ export const steps: Step[] = [
     stepRank: 6,
     name: "06",
     direction: {
-      instruction: "Dirigez vous vers une petite boutique qui aurait pu être celle de Gepetto sur la petite soeur de l'île de la Cité.",
+      instruction: "Dirigez vous vers une petite boutique qui aurait pu être celle de Gepetto sur la petite soeur de la Cité",
       hints: ["Les glaces les plus connues de Paris ne se trouvent pas loin non plus", "C'est une boutique de marionettes"],
       acceptedAnswers: ["Clair de rêve"]
     },
@@ -193,7 +194,7 @@ export const steps: Step[] = [
       acceptedAnswers: ["1940", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950"]
     },
     key: {
-      description: "Le roi qui a donné son nom à cette île avait le chiffre clé comme numéro de règne",
+      description: "Le roi qui a donné son nom à l'île dont vous foulez le sol avait le chiffre clé comme numéro de règne",
       acceptedAnswers: ["9"]
     }
   },
@@ -207,7 +208,7 @@ export const steps: Step[] = [
     },
     moving: "Tracez vers la place Maurice Audin !\n\n🍄\nC'est le moment d'appuyer sur le champignon",
     enigma: {
-      question: "Quel est le prénom de la femme de Maurice ?",
+      question: "Comment se prénomme de la femme de ce cher Maurice ?",
       acceptedAnswers: ["Josette"],
       hints: ["Il doit bien y avoir un panneau sur cette place !"]
     },
@@ -216,7 +217,7 @@ export const steps: Step[] = [
       acceptedAnswers: ["Evian"]
     },
     key: {
-      description: "Le chiffre clé correspond à l'écart d'âge entre Maurice et sa femme à la mort de ce dernier",
+      description: "Le chiffre clé correspond à l'écart d'âge entre Josette et Maurice à la mort de ce dernier",
       acceptedAnswers: ["1"]
     }
   },
@@ -224,8 +225,8 @@ export const steps: Step[] = [
     stepRank: 8,
     name: "08",
     direction: {
-      instruction: "Rendez-vous maintenant chez les gladiateurs !",
-      hints: ["Paris ne s'appelait pas encore Paris", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
+      instruction: "Pénétrez ensuite dans l'ancienne antre des gladiateurs !",
+      hints: ["Paris ne s'appelait pas durant l'Antiquité", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
       acceptedAnswers: ["Les arènes de Lutèce", "Arène de Lutèce"]
     },
     moving: "On file aux arènes de Lutèce !\n\n💪\nVotre avance s'amenuise, mais tenez bon",
@@ -235,7 +236,7 @@ export const steps: Step[] = [
       hints: ["Il faut le prénom et le nom"]
     },
     bonus: {
-      question: "Dans l'imaginaire collectif, quel est le signal de mise a mort du gladiateur perdant ?",
+      question: "En ces temps barbares, quel emoji aurait ordonné à lui seul la mise à mort d'un gladiateur ?",
       acceptedAnswers: ["👎", "pouce baissé", "pouce vers le bas", "pouce en bas"]
     },
     key: {
@@ -247,22 +248,22 @@ export const steps: Step[] = [
     stepRank: 9,
     name: "09",
     direction: {
-      instruction: "Dernier arrêt au point culminant de la montagne la plus proche",
+      instruction: "Dernier arrêt au sommet de la montagne la plus proche",
       hints: ["\"Aux grands hommes la patrie reconnaissante\""],
       acceptedAnswers: ["Le Panthéon"]
     },
     moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nProfitez du dénivelé pour faire la différence",
     enigma: {
-      question: "Quel animal pouvez vous apercevoir sur le fronton ?",
-      acceptedAnswers: ["Un coq"],
-      hints: ["Cocorico"]
+      question: "Sur quel monument autour de la place peut-on apercevoir la sculpture d'un piti mouton trop mignon ? 🐑",
+      acceptedAnswers: ["Eglise Saint Etienne du Mont", "Saint Etienne du Mont"],
+      hints: ["Il est aux pieds d'une femme", "La femme en question a l'air plutôt catho"]
     },
     bonus: {
       question: "Les femmes sont rares parmi les \"grands hommes\"... Quelle femme fut inhummée au Panthéon en 2018 ?",
       acceptedAnswers: ["Simone Veil", "Veil"]
     },
     key: {
-      description: "Il faut ajouter le chiffre clé à l'animal sur le fronton pour obtenir un os du corps humain",
+      description: "Il y a aussi un animal sur le fronton du Panthéon ! Si on lui ajoute le chiffre clé, on obtient un os du corps humain.",
       acceptedAnswers: ["6"]
     }
   },

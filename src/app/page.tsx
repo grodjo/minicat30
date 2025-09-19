@@ -14,12 +14,25 @@ const Home = () => {
   const [showStartModal, setShowStartModal] = useState(false);
   const [hasActiveSession, setHasActiveSession] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [hasPlayers, setHasPlayers] = useState(false);
   const router = useRouter();
 
   // Éviter les erreurs d'hydratation en attendant le montage côté client
   useEffect(() => {
     setIsMounted(true);
+    // Vérifier s'il y a des joueurs sur le scoreboard
+    checkPlayers();
   }, []);
+
+  const checkPlayers = async () => {
+    try {
+      const response = await fetch('/api/has-players');
+      const { hasPlayers: playersExist } = await response.json();
+      setHasPlayers(playersExist);
+    } catch (error) {
+      console.error('Error checking players:', error);
+    }
+  };
 
   const handleShowModal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,18 +114,20 @@ const Home = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Bouton classement en haut à droite */}
-      <div className="absolute top-8 right-4 z-20 pt-4">
-        <button
-          onClick={goToScoreboard}
-          className="text-violet-200 hover:text-white text-sm font-medium flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl border border-violet-300/20 hover:bg-white/10 transition-all duration-200"
-        >
-          🏆 Classement
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9,18 15,12 9,6"></polyline>
-          </svg>
-        </button>
-      </div>
+      {/* Bouton classement en haut à droite - affiché seulement s'il y a des joueurs */}
+      {hasPlayers && (
+        <div className="absolute top-8 right-4 z-20 pt-4">
+          <button
+            onClick={goToScoreboard}
+            className="text-violet-200 hover:text-white text-sm font-medium flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl border border-violet-300/20 hover:bg-white/10 transition-all duration-200"
+          >
+            🏆 Classement
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+          </button>
+        </div>
+      )}
 
       <div className="relative z-10 text-center space-y-12 max-w-2xl w-full">
         {/* Titre principal avec sous-titre */}

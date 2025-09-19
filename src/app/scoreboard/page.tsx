@@ -123,35 +123,33 @@ export default function ScoreboardPage() {
                   onClick={() => setSelectedPlayer(selectedPlayer?.pseudo === entry.pseudo ? null : entry)}
                 >
                   {/* Player info with large position circle and simplified display */}
-                  <div className='flex items-center justify-between gap-6'>
-                    <div className='flex items-center gap-6 flex-grow'>
-                      {/* Large position circle */}
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl shadow-lg flex-shrink-0 ${
-                        entry.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
-                        entry.rank === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800' :
-                        entry.rank === 3 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900' :
-                        'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
-                      }`}>
-                        {entry.rank}
-                      </div>
-                      
-                      {/* Player name and main stats */}
-                      <div className="flex-grow">
-                        <h3 className="font-bold text-2xl text-white mb-2">
-                          {entry.pseudo}
-                        </h3>
-                        <div className="flex items-center gap-8 text-lg">
-                          <span className="text-orange-300 font-bold">
-                            🏁 {formatScoreboardTime(entry.totalTimeMs)}
-                          </span>
-                          <span className="text-green-300 font-semibold">
-                            🧠 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
-                          </span>
-                        </div>
+                  <div className='flex items-center gap-6'>
+                    {/* Large position circle */}
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl shadow-lg flex-shrink-0 ${
+                      entry.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
+                      entry.rank === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800' :
+                      entry.rank === 3 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900' :
+                      'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                    }`}>
+                      {entry.rank}
+                    </div>
+                    
+                    {/* Player name and main stats - with controlled width */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-2xl text-white mb-2 truncate">
+                        {entry.pseudo}
+                      </h3>
+                      <div className="flex items-center gap-8 text-lg">
+                        <span className="text-orange-300 font-bold">
+                          🏁 {formatScoreboardTime(entry.totalTimeMs)}
+                        </span>
+                        <span className="text-green-300 font-semibold">
+                          🧠 {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
+                        </span>
                       </div>
                     </div>
                     
-                    {/* Expand arrow */}
+                    {/* Expand arrow - always visible */}
                     <div className={`text-violet-300 transition-transform duration-300 flex-shrink-0 ${
                       selectedPlayer?.pseudo === entry.pseudo ? 'rotate-180' : ''
                     }`}>
@@ -163,9 +161,39 @@ export default function ScoreboardPage() {
 
                   {selectedPlayer?.pseudo === entry.pseudo && (
                     <div className="mt-8 pt-6 border-t border-violet-300/20">
-                      <h4 className="text-lg font-semibold text-violet-200 mb-4 flex items-center gap-2">
-                        Détail par étape
+                      <h4 className="text-lg font-semibold text-violet-200 mb-6 flex items-center gap-2">
+                        Statistiques globales
                       </h4>
+                      
+                      {/* Statistiques globales comme dans l'écran de félicitations */}
+                      <div className="bg-white/10 backdrop-blur-md rounded-xl shadow-lg p-6 mb-6 border border-violet-300/20">
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-yellow-300 text-lg">⏱️ Temps effectif :</span>
+                            <span className="text-yellow-300 font-semibold text-lg">{formatScoreboardTime(entry.totalTimeMs - entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}</span>
+                          </div>
+                          {entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0) > 0 && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-red-300 text-lg">⚠️ Pénalités :</span>
+                              <span className="text-red-300 font-semibold text-lg">{formatPenaltyTime(entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center border-t border-violet-300/30 pt-4">
+                            <span className="text-orange-300 text-xl font-bold">🏁 Temps final :</span>
+                            <span className="text-orange-300 font-bold text-2xl">{formatScoreboardTime(entry.totalTimeMs)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-violet-300 text-xl">🧠 Questions bonus :</span>
+                            <span className="text-green-300 font-bold text-2xl">
+                              {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <h5 className="text-md font-semibold text-violet-200 mb-4">
+                        Détail par étape
+                      </h5>
                       <div className="grid gap-4">
                         {entry.steps.map((step, index) => {
                           const stepNumber = step.stepName === "Étape finale" ? "finale" : String(index + 1).padStart(2, '0');
@@ -191,9 +219,11 @@ export default function ScoreboardPage() {
                                   <span className="text-yellow-300 text-left">
                                     ⏱️ {formatScoreboardTime(step.timeSpentMs - step.penaltyTimeMs)}
                                   </span>
-                                  <span className="text-red-300 text-left">
-                                    ⚠️ {formatPenaltyTime(step.penaltyTimeMs)}
-                                  </span>
+                                  {step.penaltyTimeMs > 0 && (
+                                    <span className="text-red-300 text-left">
+                                      ⚠️ {formatPenaltyTime(step.penaltyTimeMs)}
+                                    </span>
+                                  )}
                                   <span className="text-orange-300 font-bold text-left">
                                     🏁 {formatScoreboardTime(step.timeSpentMs)}
                                   </span>

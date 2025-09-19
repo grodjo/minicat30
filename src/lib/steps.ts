@@ -438,6 +438,7 @@ export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string
 
   switch (subStepType) {
     case 'enigma':
+    case 'final':
       if (!finalStep.enigma || !finalStep.enigma.acceptedAnswers) return false;
       return validateAnswer(answer, finalStep.enigma.acceptedAnswers);
     default:

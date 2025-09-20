@@ -285,7 +285,7 @@ export const steps: Step[] = [
     stepRank: 10,
     name: "FINAL",
     enigma: {
-      question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !\n\n🤩\nIndice gratuit : \"comme votre performance aujourd'hui\"",
+      question: "Tournez vous vers la bibliothèque Sainte Geneviève!\n\n Avec l'aide de toutes vos clés et de l'exemple, déterminez le mot de la fin !\n\n🤩\nIndice gratuit : \"comme votre performance aujourd'hui\"",
       acceptedAnswers: ["grandiose"],
       strictMode: true,
       hints: []

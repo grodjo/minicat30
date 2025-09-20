@@ -46,6 +46,25 @@ describe('normalizeAnswer', () => {
 		expect(normalizeAnswer('Aux enfants')).toBe('enfants');
 	});
 
+	// Tests pour les nouveaux spécificateurs ajoutés
+	test('should remove new French specifiers', () => {
+		// Tests pour l' avec différents apostrophes
+		expect(normalizeAnswer("L'arbre")).toBe('arbre');
+		expect(normalizeAnswer("L`arbre")).toBe('arbre');
+		expect(normalizeAnswer("L’arbre")).toBe('arbre');
+		
+		// Tests pour d' avec différents apostrophes
+		expect(normalizeAnswer("D'accord")).toBe('accord');
+		expect(normalizeAnswer("d’accord")).toBe('accord');
+		expect(normalizeAnswer("D`accord")).toBe('accord');
+		
+		// Tests pour en et the
+		expect(normalizeAnswer('En voiture')).toBe('voiture');
+		expect(normalizeAnswer('en train')).toBe('train');
+		expect(normalizeAnswer('The house')).toBe('house');
+		expect(normalizeAnswer('the cat')).toBe('cat');
+	});
+
 	// Tests pour la conversion des mots-nombres
 	test('should convert number words to digits', () => {
 		expect(normalizeAnswer('deux chiens')).toBe('2 chiens');
@@ -67,6 +86,15 @@ describe('normalizeAnswer', () => {
 		expect(normalizeAnswer('Une théière avec trois tasses')).toBe('theiere avec 3 tasses');
 		expect(normalizeAnswer('Des forêts avec dix arbres')).toBe('forets avec 10 arbres');
 		expect(normalizeAnswer('Un bœuf & deux vaches')).toBe('boeuf et 2 vaches');
+	});
+
+	// Tests combinés avec les nouveaux spécificateurs
+	test('should handle complex combinations with new specifiers', () => {
+		expect(normalizeAnswer("L'école avec trois élèves")).toBe('ecole avec 3 eleves');
+		expect(normalizeAnswer("D'énormes quatre voitures")).toBe('enormes 4 voitures');
+		expect(normalizeAnswer("En forêt avec deux arbres")).toBe('foret avec 2 arbres');
+		expect(normalizeAnswer("The café & eau")).toBe('cafe et eau');
+		expect(normalizeAnswer("L`histoire d`amour")).toBe('histoire d`amour'); // d` n'est pas au début donc pas supprimé
 	});
 
 	// Tests pour les tirets et points

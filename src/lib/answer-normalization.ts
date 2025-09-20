@@ -75,12 +75,16 @@ export const normalizeAnswer = (answer: string): string => {
 
 const specifiers = [
 	"l'",
+	"l`",
+	"l’",
 	'le ',
 	'la ',
 	'les ',
 	'un ',
 	'une ',
 	"d'",
+	"d`",
+	"d’",
 	'du ',
 	'de la ',
 	'des ',

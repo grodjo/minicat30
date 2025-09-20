@@ -617,7 +617,7 @@ const QuizPage = () => {
             onPenaltiesReload={reloadPenalties}
             sessionId={sessionId}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}
-            maxAttempts={5}
+            maxAttempts={10}
           />
         );
 
@@ -646,7 +646,7 @@ const QuizPage = () => {
             question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}
-            maxAttempts={5}
+            maxAttempts={10}
           />
         );
 

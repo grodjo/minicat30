@@ -4,7 +4,7 @@ import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep,
 // Constants pour les pénalités
 export const HINT_PENALTY_TIME_MS = 3 * 60 * 1000; // 3 minutes
 export const WRONG_ANSWER_PENALTY_TIME_MS = 1 * 60 * 1000; // 1 minute
-export const MAX_ENIGMA_ATTEMPTS = 5;
+export const MAX_ENIGMA_ATTEMPTS = 10;
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {

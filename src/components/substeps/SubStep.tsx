@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 import Image from 'next/image';
+import { successDisplays, failDisplays } from '@/lib/random-displays';
 
 interface SubStepProps {
   stepName: string;
@@ -32,6 +33,17 @@ export const SubStep = ({
   bottomContent,
   transitionOverlay
 }: SubStepProps) => {
+  // Mémoiser les GIFs aléatoires pour éviter qu'ils changent à chaque re-render
+  const successGif = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * successDisplays.length);
+    return successDisplays[randomIndex].gif;
+  }, []);
+
+  const failGif = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * failDisplays.length);
+    return failDisplays[randomIndex].gif;
+  }, []);
+
   return (
     <>
       {/* Overlay de transition pour les sous-étapes */}
@@ -40,33 +52,42 @@ export const SubStep = ({
           transitionOverlay.fadeOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}>
           <div className="text-center space-y-6 max-w-md mx-auto px-4">
-            {/* Cat qui rebondit */}
-            <div className="text-8xl animate-bounce flex justify-center">
+            {/* GIF qui rebondit */}
+            <div className="flex justify-center">
+              <video
+                src={transitionOverlay.success ? successGif : failGif}
+                autoPlay
+                loop
+                muted
+                className="w-64 h-64 rounded-lg object-cover"
+              />
+            </div>
+            
+            {/* Message principal */}
+            <div className="flex items-center justify-center gap-3">
+              <h2 className={`text-4xl font-bold transition-all duration-300 ${
+                transitionOverlay.success ? 'text-green-300' : 'text-red-300'
+              } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}>
+                {transitionOverlay.success ? 'Bien joué !' : 'Dommage...'}
+              </h2>
               {transitionOverlay.success ? (
                 <Image
                   src="/cats/grinning-cat.svg"
                   alt="Grinning cat"
-                  width={128}
-                  height={128}
-                  className="w-32 h-32"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12"
                 />
               ) : (
                 <Image
                   src="/cats/crying-cat.svg"
                   alt="Crying cat"
-                  width={128}
-                  height={128}
-                  className="w-32 h-32"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12"
                 />
               )}
             </div>
-            
-            {/* Message principal */}
-            <h2 className={`text-4xl font-bold transition-all duration-300 ${
-              transitionOverlay.success ? 'text-green-300' : 'text-red-300'
-            } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}>
-              {transitionOverlay.success ? 'Bien joué !' : 'Dommage...'}
-            </h2>
             
             {/* Réponse correcte en cas d'échec */}
             {!transitionOverlay.success && transitionOverlay.correctAnswer && (

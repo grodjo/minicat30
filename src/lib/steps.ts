@@ -112,7 +112,7 @@ export const steps: Step[] = [
       question: "Un bistrot se cache dans la cour du père de Gargantua.\nAvec une telle carte, sur quel plat Célia se serait-elle forcément précipitée ?",
       acceptedAnswers: ["Burger", "Hamburger"],
       hints: [
-        "Le plus sale ! 😱",
+        "C'est un plat ma foi très complet comprenant des féculents, de la viande, des crudités et un laitage",
         "Elle n'aurait pas lu la carte bien longtemps..."
       ],
 
@@ -260,7 +260,7 @@ export const steps: Step[] = [
     stepRank: 9,
     name: "09",
     direction: {
-      instruction: "Dernier arrêt au sommet de la montagne la plus proche",
+      instruction: "Dernier arrêt au point culminant de la montagne la plus proche",
       hints: ["\"Aux grands hommes la patrie reconnaissante\""],
       acceptedAnswers: ["Le Panthéon", "La place du Panthéon"]
     },

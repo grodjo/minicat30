@@ -112,8 +112,8 @@ export const steps: Step[] = [
       question: "Un bistrot se cache dans la cour du père de Gargantua.\nAvec une telle carte, sur quel plat Célia se serait-elle forcément précipitée ?",
       acceptedAnswers: ["Burger", "Hamburger"],
       hints: [
+        "Elle n'aurait pas lu la carte bien longtemps",
         "C'est un plat ma foi très complet comprenant des féculents, de la viande, des crudités et un laitage",
-        "Elle n'aurait pas lu la carte bien longtemps..."
       ],
 
     },

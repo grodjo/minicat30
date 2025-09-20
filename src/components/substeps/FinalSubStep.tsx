@@ -30,7 +30,7 @@ export const FinalSubStep = ({
   isCorrectAnswer,
   isStepEntering,
   attemptsCount = 0,
-  maxAttempts = 10,
+  maxAttempts = 5,
   transitionOverlay
 }: FinalSubStepProps) => {
   const [answer, setAnswer] = useState('');

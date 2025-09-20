@@ -139,7 +139,7 @@ export default function ScoreboardPage() {
                       <h3 className="font-bold text-2xl text-white mb-2 truncate">
                         {entry.pseudo}
                       </h3>
-                      <div className="flex items-center gap-8 text-lg">
+                      <div className="flex items-center gap-2 justify-between text-lg">
                         <span className="text-orange-300 font-bold">
                           🏁 {formatScoreboardTime(entry.totalTimeMs)}
                         </span>

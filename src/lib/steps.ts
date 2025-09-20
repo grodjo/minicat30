@@ -60,7 +60,7 @@ export const steps: Step[] = [
       ]
     },
     bonus: {
-      question: "Je viens du sud et moi aussi je peux être vierge, extra vierge même !\n\nQui suis-je ?",
+      question: "Je viens du sud et moi aussi je peux être vierge, extra vierge même...\n\nQui suis-je ?",
       acceptedAnswers: ["L'huile d'olive", "huile d'olive", "huile"]
     },
     key: {
@@ -79,7 +79,7 @@ export const steps: Step[] = [
       ],
       acceptedAnswers: ["Hôtel de Sully", "Hôtel Sully"]
     },
-    moving: "Direction l'Hôtel de Sully !\n\n😇\nL'entrée se fait par la rue Saint Antoine",
+    moving: "Direction l'Hôtel de Sully !\n\n😇\nL'entrée se fait par la rue Saint-Antoine",
     enigma: {
       question: "Combien de tétons à l'air pouvez-vous apercevoir dans la cour ?",
       acceptedAnswers: ["13", "14", "treize", "quatorze"],
@@ -178,7 +178,7 @@ export const steps: Step[] = [
       strictMode: true
     },
     key: {
-      description: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous n'ignorez évidemment pas l'article de la réglementation qui porte le numéro du chiffre clé !",
+      description: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous n'ignorez évidemment pas l'article de la réglementation qui porte le numéro du chiffre clé",
       acceptedAnswers: ["3"]
     }
   },
@@ -237,13 +237,13 @@ export const steps: Step[] = [
     name: "08",
     direction: {
       instruction: "Pénétrez ensuite dans l'ancienne antre des gladiateurs !",
-      hints: ["Paris ne s'appelait pas durant l'Antiquité", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
+      hints: ["Paris ne s'appelait pas Paris durant l'Antiquité", "Il faut le dire, celles de Nîmes sont quand même plus connues"],
       acceptedAnswers: ["Les arènes de Lutèce", "Arène de Lutèce"]
     },
     moving: "Filez aux arènes de Lutèce !\n\n💪\nVotre avance s'amenuise, mais tenez bon",
     enigma: {
       question: "Qui a sculpté l'unique statue visible dans les arènes ?",
-      acceptedAnswers: ["Gabriel de Mortillet"],
+      acceptedAnswers: ["Mortillet"],
       hints: ["Il faut le prénom et le nom"]
     },
     bonus: {

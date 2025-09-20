@@ -243,7 +243,7 @@ const Home = () => {
                       <br/>
                       <p>Ce bouton vous donnera accès à la première étape du jeu et déclenchera le chronomètre ⏱️</p>
                       <br/>
-                      <p>Soyez rapides, soyez malins, soyez beaux 🤩</p>
+                      <p>Soyez rapides, soyez observateurs, soyez malins, soyez beaux 🤩</p>
                       <br/>
                       <p>Bonne chance 🍀</p>
                     </div>)

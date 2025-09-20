@@ -43,7 +43,7 @@ export const EnigmaSubStep = ({
   onPenaltiesReload,
   sessionId,
   attemptsCount = 0,
-  maxAttempts = 10,
+  maxAttempts = 5,
   transitionOverlay
 }: EnigmaSubStepProps) => {
   const [answer, setAnswer] = useState('');

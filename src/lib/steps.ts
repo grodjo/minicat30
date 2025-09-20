@@ -10,17 +10,18 @@ export interface Step {
   moving?: string;
   enigma?: {
     question: string;
-    answers?: string[];
-    hints?: string[];
-    acceptedAnswers?: string[];
+    hints: string[];
+    acceptedAnswers: string[];
+    strictMode?: boolean;
   };
   key?:{
-    description?: string;
-    acceptedAnswers?: string[];
+    description: string;
+    acceptedAnswers: string[];
   };
   bonus?: {
     question: string;
     acceptedAnswers: string[];
+    strictMode?: boolean
   };
 }
 
@@ -59,7 +60,7 @@ export const steps: Step[] = [
       ]
     },
     bonus: {
-      question: "Moi aussi je peux être vierge, et même... extra vierge !\n\nQui suis-je ?",
+      question: "Je viens du sud et moi aussi je peux être vierge, extra vierge même !\n\nQui suis-je ?",
       acceptedAnswers: ["L'huile d'olive", "huile d'olive", "huile"]
     },
     key: {
@@ -82,11 +83,13 @@ export const steps: Step[] = [
     enigma: {
       question: "Combien de tétons à l'air pouvez-vous apercevoir dans la cour ?",
       acceptedAnswers: ["13", "14", "treize", "quatorze"],
+      strictMode: true,
       hints: []
     },
     bonus: {
       question: "Oh les belles sphinges !\nDans la mythologie grecque, à qui ont-elles posé l'énigme de l'animal à 4 pattes le matin, 2 le midi et 3 le soir ?",
-      acceptedAnswers: ["Oedipe"]
+      acceptedAnswers: ["Oedipe"],
+      strictMode: true
     },
     key: {
       description: "Le chiffre clé est manquant sur le cadran solaire",
@@ -97,7 +100,7 @@ export const steps: Step[] = [
     stepRank: 3,
     name: "03",
     direction: {
-      instruction: "Rendez-vous ensuite au petit village d'à côté !",
+      instruction: "Rendez-vous ensuite dans le petit village d'à côté !",
       hints: [
         "L'église d'à côté porte le même nom",
         "Le métro d'à côté porte le même nom"
@@ -110,13 +113,14 @@ export const steps: Step[] = [
       acceptedAnswers: ["Burger", "Hamburger"],
       hints: [
         "Le plus sale ! 😱",
-        "Ça a le mérite d'être complet : des féculents, de la viande, des crudités, un laitage, tout y est 👌"
+        "Elle n'aurait pas lu la carte bien longtemps..."
       ],
 
     },
     bonus: {
       question: "De quelle ville cette délicate spécialité culinaire tire-t-elle son nom ?",
-      acceptedAnswers: ["Hambourg", "Hamburg"]
+      acceptedAnswers: ["Hambourg", "Hamburg"],
+      strictMode: true
     },
     key: {
       description: "Le chiffre clé est le numéro de la cour Saint-Paul",
@@ -137,6 +141,7 @@ export const steps: Step[] = [
     enigma: {
       question: "Pas toute jeune cette fontaine ! En quelle année fut-elle construite ?",
       acceptedAnswers: ["1840", "Mille huit cent quarante"],
+      strictMode: true,
       hints: [
         "M : 1000, D : 500, C : 100, L : 50, X : 10, V : 5, I : 1",
       ]
@@ -164,11 +169,13 @@ export const steps: Step[] = [
     enigma: {
       question: "En faisant abstraction des arbres dans les coins, combien de triangles sont dessinés par les allées du jardin ?",
       acceptedAnswers: ["16", "seize"],
+      strictMode: true,
       hints: ["J'aurais pu faire un schema mais j'ai eu la flemme, débrouillez-vous !"]
     },
     bonus: {
       question: "À propos de jardins, vous connaissez sûrement le célèbre jardinier de Versailles. Mais quel était son prénom ?",
-      acceptedAnswers: ["André"]
+      acceptedAnswers: ["André"],
+      strictMode: true
     },
     key: {
       description: "Interdit de nourrir les oiseaux dans les parcs enfin !\nVous n'ignorez évidemment pas l'article de la réglementation qui porte le numéro du chiffre clé !",
@@ -187,11 +194,13 @@ export const steps: Step[] = [
     enigma: {
       question: "À priori le peintre ne devrait pas avoir besoin d'une couleur, laquelle ?",
       acceptedAnswers: ["jaune", "orange"],
+      strictMode: true,
       hints: ["Il peint un couple", "Ils ne sont pas vraiment solaires"]
     },
     bonus: {
       question: "À dix ans près, en quelle année est sorti le dessin animé Pinocchio de Disney ?",
-      acceptedAnswers: ["1940", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950"]
+      acceptedAnswers: ["1940", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950"],
+      strictMode: true
     },
     key: {
       description: "Le roi qui a donné son nom à l'île dont vous foulez le sol avait le chiffre clé comme numéro de règne",
@@ -202,19 +211,21 @@ export const steps: Step[] = [
     stepRank: 7,
     name: "07",
     direction: {
-      instruction: "AB°CD’CE.C. E°EF’C.C\n\nA = E^2\nB = E^3\nD = C - 2E - 1\nF = E^0*C^0\n4C - 3E = 14\n2E + C = 9\n",
+      instruction: "AB°CD’CE.C E°EF’C.C\n\nA = E^2\nB = E^3\nD = C - 2E - 1\nF = E^0*C^0\n4C - 3E = 14\n2E + C = 9\n",
       hints: ["E=2", "Google Maps accepte les coordonnées 😉"],
-      acceptedAnswers: ["Place Maurice Audin", "Maurice Audin"]
+      acceptedAnswers: ["Audin"]
     },
     moving: "Tracez vers la place Maurice Audin !\n\n🍄\nC'est le moment d'appuyer sur le champignon",
     enigma: {
       question: "Comment se prénomme de la femme de ce cher Maurice ?",
       acceptedAnswers: ["Josette"],
+      strictMode: true,
       hints: ["Il doit bien y avoir un panneau sur cette place !"]
     },
     bonus: {
       question: "Dans quelle ville ont été signés les accords qui ont mis fin à la guerre d'Algérie ?",
-      acceptedAnswers: ["Evian"]
+      acceptedAnswers: ["Evian"],
+      strictMode: true
     },
     key: {
       description: "Le chiffre clé correspond à l'écart d'âge entre Josette et Maurice à la mort de ce dernier",
@@ -237,7 +248,8 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "En ces temps barbares, quel emoji aurait ordonné à lui seul la mise à mort d'un gladiateur ?",
-      acceptedAnswers: ["👎"]
+      acceptedAnswers: ["👎"],
+      strictMode: true
     },
     key: {
       description: "Le chiffre clé correspond au siècle durant lequel les arènes furent détruites par les barbares",
@@ -250,17 +262,19 @@ export const steps: Step[] = [
     direction: {
       instruction: "Dernier arrêt au sommet de la montagne la plus proche",
       hints: ["\"Aux grands hommes la patrie reconnaissante\""],
-      acceptedAnswers: ["Le Panthéon"]
+      acceptedAnswers: ["Le Panthéon", "La place du Panthéon"]
     },
     moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nAccélérez dans le dénivelé pour faire la différence",
     enigma: {
       question: "Un animal est présent sur le fronton, lequel ?",
       acceptedAnswers: ["Coq"],
+      strictMode: true,
       hints: ["Un véritable symbole national", "Il est au milieu du fronton"]
     },
     bonus: {
       question: "Les femmes sont rares parmi les \"grands hommes\"... Quelle femme fut inhummée au Panthéon en 2018 ?",
-      acceptedAnswers: ["Simone Veil", "Veil"]
+      acceptedAnswers: ["Simone Veil", "Veil"],
+      strictMode: true
     },
     key: {
       description: "Ajoutez le chiffre clé à la réponse de l'énigme pour obtenir un os du corps humain.",
@@ -273,6 +287,7 @@ export const steps: Step[] = [
     enigma: {
       question: "Avec l'aide de toutes vos clés, déterminez le mot de la fin !\n\n🤩\nIndice gratuit : \"comme votre performance aujourd'hui\"",
       acceptedAnswers: ["grandiose"],
+      strictMode: true,
       hints: []
     },
   }
@@ -410,23 +425,23 @@ export const validateStepAnswer = (stepName: string, subStepType: SubStepType, a
   switch (subStepType) {
     case 'direction':
       if (!step.direction) return false;
-      return validateAnswer(answer, step.direction.acceptedAnswers);
+      return validateAnswer(answer, step.direction.acceptedAnswers, false);
     case 'moving':
       // Les sous-étapes 'moving' ne nécessitent pas de validation de réponse
       return true;
     case 'enigma':
       if (!step.enigma || !step.enigma.acceptedAnswers) return false;
-      return validateAnswer(answer, step.enigma.acceptedAnswers);
+      return validateAnswer(answer, step.enigma.acceptedAnswers, step.enigma.strictMode || false);
     case 'bonus':
       if (!step.bonus) return false;
-      return validateAnswer(answer, step.bonus.acceptedAnswers);
+      return validateAnswer(answer, step.bonus.acceptedAnswers, step.bonus.strictMode || false);
     case 'key':
       // Maintenant les clés nécessitent une validation de réponse
       if (!step.key || !step.key.acceptedAnswers) return false;
-      return validateAnswer(answer, step.key.acceptedAnswers);
+      return validateAnswer(answer, step.key.acceptedAnswers, false); // Les clés n'ont pas d'option strictMode
     case 'final':
       if (!step.enigma || !step.enigma.acceptedAnswers) return false;
-      return validateAnswer(answer, step.enigma.acceptedAnswers);
+      return validateAnswer(answer, step.enigma.acceptedAnswers, step.enigma.strictMode || false);
     default:
       return false;
   }
@@ -440,7 +455,7 @@ export const validateFinalStepAnswer = (subStepType: SubStepType, answer: string
     case 'enigma':
     case 'final':
       if (!finalStep.enigma || !finalStep.enigma.acceptedAnswers) return false;
-      return validateAnswer(answer, finalStep.enigma.acceptedAnswers);
+      return validateAnswer(answer, finalStep.enigma.acceptedAnswers, finalStep.enigma.strictMode || false);
     default:
       return false;
   }

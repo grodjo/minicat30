@@ -120,3 +120,62 @@ describe('checkIfAttemptIsValid()', (): void => {
 		expect(validateAnswer('test', [])).toBeFalsy();
 	});
 });
+
+describe('Strict mode validation', (): void => {
+	it('should reject partial matches in strict mode', (): void => {
+		const answer = 'Louis XII';
+		const attempt = 'louis XII le pieux';
+		// Mode inclusif : accepté
+		expect(checkIfAttemptIsValid(attempt, answer, false)).toBeTruthy();
+		// Mode strict : refusé
+		expect(checkIfAttemptIsValid(attempt, answer, true)).toBeFalsy();
+	});
+
+	it('should accept exact matches in strict mode', (): void => {
+		const answer = 'pintade';
+		const attempt = 'pintade';
+		expect(checkIfAttemptIsValid(attempt, answer, true)).toBeTruthy();
+	});
+
+	it('should accept normalized matches in strict mode', (): void => {
+		const answer = 'Une pintade';
+		const attempt = 'pintade';
+		// Après normalisation, les deux deviennent "pintade"
+		expect(checkIfAttemptIsValid(attempt, answer, true)).toBeTruthy();
+	});
+
+	it('should reject different responses in strict mode', (): void => {
+		const answer = 'chat';
+		const attempt = 'chien';
+		// Mode inclusif : refusé (pas d'inclusion)
+		expect(checkIfAttemptIsValid(attempt, answer, false)).toBeFalsy();
+		// Mode strict : refusé (différent)
+		expect(checkIfAttemptIsValid(attempt, answer, true)).toBeFalsy();
+	});
+
+	it('should reject extra words in strict mode', (): void => {
+		const answer = 'chat';
+		const attempt = 'chat noir';
+		// Mode inclusif : accepté ("chat" inclus dans "chat noir")
+		expect(checkIfAttemptIsValid(attempt, answer, false)).toBeTruthy();
+		// Mode strict : refusé ("chat" ≠ "chat noir")
+		expect(checkIfAttemptIsValid(attempt, answer, true)).toBeFalsy();
+	});
+
+	it('should handle accents and special characters in strict mode', (): void => {
+		const answer = 'café';
+		const attempt = 'CAFÉ';
+		// Après normalisation : "cafe" === "cafe"
+		expect(checkIfAttemptIsValid(attempt, answer, true)).toBeTruthy();
+	});
+
+	it('should validate multiple answers with strict mode', (): void => {
+		const acceptedAnswers = ['13', 'treize'];
+		// Mode inclusif
+		expect(validateAnswer('treize ans', acceptedAnswers, false)).toBeTruthy();
+		// Mode strict
+		expect(validateAnswer('treize ans', acceptedAnswers, true)).toBeFalsy();
+		expect(validateAnswer('treize', acceptedAnswers, true)).toBeTruthy();
+		expect(validateAnswer('13', acceptedAnswers, true)).toBeTruthy();
+	});
+});

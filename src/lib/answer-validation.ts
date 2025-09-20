@@ -29,29 +29,42 @@ const getAttemptsBlankCombinations = (answer: string): Array<string> => {
 
 export const checkIfAttemptIsValid = (
 	answer: string,
-	acceptedAnswer: string
+	acceptedAnswer: string,
+	strictMode: boolean = false
 ): boolean => {
 	const normalizedAttempt = normalizeAnswer(answer);
-	const attemptBlanksCombinations = getAttemptsBlankCombinations(
-		normalizedAttempt
-	);
+	const normalizedAcceptedAnswer = normalizeAnswer(acceptedAnswer);
 	
-	return attemptBlanksCombinations.includes(normalizeAnswer(acceptedAnswer));
+	if (strictMode) {
+		// Mode strict : égalité exacte après normalisation
+		return normalizedAttempt === normalizedAcceptedAnswer;
+	} else {
+		// Mode inclusif : la réponse acceptée doit être incluse dans la tentative
+		const attemptBlanksCombinations = getAttemptsBlankCombinations(
+			normalizedAttempt
+		);
+		return attemptBlanksCombinations.includes(normalizedAcceptedAnswer);
+	}
 };
 
 /**
  * Valide une tentative de réponse contre une liste de réponses acceptées
  * @param answer La réponse saisie par l'utilisateur
  * @param acceptedAnswers Liste des réponses acceptées
+ * @param strictMode Mode de validation strict (true) ou inclusif (false, par défaut)
  * @returns true si la réponse est valide, false sinon
  */
-export const validateAnswer = (answer: string, acceptedAnswers: string[]): boolean => {
+export const validateAnswer = (
+	answer: string, 
+	acceptedAnswers: string[], 
+	strictMode: boolean = false
+): boolean => {
 	if (!answer || !acceptedAnswers || acceptedAnswers.length === 0) {
 		return false;
 	}
 
 	// Tester la réponse contre chaque réponse acceptée
 	return acceptedAnswers.some(acceptedAnswer => 
-		checkIfAttemptIsValid(answer, acceptedAnswer)
+		checkIfAttemptIsValid(answer, acceptedAnswer, strictMode)
 	);
 };

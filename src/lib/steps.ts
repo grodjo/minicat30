@@ -248,7 +248,7 @@ export const steps: Step[] = [
     },
     bonus: {
       question: "En ces temps barbares, quel emoji aurait ordonné à lui seul la mise à mort d'un gladiateur ?",
-      acceptedAnswers: ["👎"],
+      acceptedAnswers: ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"],
       strictMode: true
     },
     key: {

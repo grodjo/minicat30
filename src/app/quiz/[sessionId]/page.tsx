@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
 import { playSound, SoundName } from '@/lib/sounds';
-import { getStepCorrectAnswer } from '@/lib/steps';
 import { formatScoreboardTime } from '@/lib/time-formatting';
 
 // Composants
@@ -308,6 +307,8 @@ const QuizPage = () => {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        
         // Déclencher l'animation de pénalité côté client (5 minutes)
         showPenaltyAnimationOnly(5);
         // Puis recharger les pénalités depuis la BDD après l'ajout côté serveur
@@ -315,9 +316,8 @@ const QuizPage = () => {
         
         // Attendre que l'animation de pénalité soit terminée puis afficher la transition
         setTimeout(() => {
-          // Obtenir la bonne réponse depuis la configuration des étapes
-          const correctAnswer = getStepCorrectAnswer(stepData.stepName, stepData.currentSubStep as 'direction');
-          showSubStepTransitionMessage(false, 'direction', false, correctAnswer || undefined);
+          // Utiliser la réponse correcte retournée par l'API
+          showSubStepTransitionMessage(false, 'direction', false, data.correctAnswer || undefined);
         }, 1500); // 1.5 secondes pour laisser l'animation de pénalité s'afficher
       } else {
         const data = await response.json();

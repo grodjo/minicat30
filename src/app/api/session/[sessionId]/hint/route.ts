@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addHintPenalty, getCurrentStepWithSubStep } from '@/lib/game';
-import { getStepByOrder, isLastStep, getFinalStep } from '@/lib/steps';
+import { getStepByOrder, isLastStep, getFinalStep } from '@/lib/steps-logic';
 
 export async function POST(
   request: NextRequest,

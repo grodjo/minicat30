@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { completeSubStep, completeSession, getCurrentStepWithSubStep, addEnigmaAttempt, addKeyPenalty, MAX_ENIGMA_ATTEMPTS } from '@/lib/game';
-import { validateStepAnswer, validateFinalStepAnswer, isLastStep, getStepCorrectAnswer } from '@/lib/steps';
+import { validateStepAnswer, validateFinalStepAnswer, isLastStep, getStepCorrectAnswer } from '@/lib/steps-logic';
 
 export async function POST(
   request: NextRequest,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentStepWithSubStep } from '@/lib/game';
-import { getStepByName, isLastStep, getFinalStep } from '@/lib/steps';
+import { getStepByName, isLastStep, getFinalStep } from '@/lib/steps-logic';
 
 export async function GET(
   request: NextRequest,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { completeSubStep, addTimePenaltyToDatabase } from '@/lib/game';
+import { getStepCorrectAnswer } from '@/lib/steps-logic';
 
 export async function POST(
   request: NextRequest,
@@ -32,9 +33,13 @@ export async function POST(
 
     await completeSubStep(sessionId, stepName, subStepType, data);
 
+    // Obtenir la réponse correcte pour la retourner au client si nécessaire
+    const correctAnswer = getStepCorrectAnswer(stepName, subStepType);
+
     return NextResponse.json({
       success: true,
-      message: `Sous-étape ${subStepType} complétée`
+      message: `Sous-étape ${subStepType} complétée`,
+      correctAnswer
     });
 
   } catch (error) {

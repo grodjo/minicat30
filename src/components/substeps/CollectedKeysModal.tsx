@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { steps } from '@/lib/steps';
+import { steps } from '../../game-steps';
 
 interface CollectedKeysModalProps {
   trigger?: React.ReactNode;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentStepWithSubStep, getSessionWithUser } from '@/lib/game';
-import { getSubStepData } from '@/lib/steps';
+import { getSubStepData } from '@/lib/steps-logic';
 
 export async function GET(
   request: NextRequest,

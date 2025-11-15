@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE, validateStepAnswer, validateFinalStepAnswer } from './steps'
+import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE, validateStepAnswer, validateFinalStepAnswer } from './steps-logic'
 
 // Constants pour les pénalités
 export const HINT_PENALTY_TIME_MS = 3 * 60 * 1000; // 3 minutes

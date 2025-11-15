@@ -1,7 +1,9 @@
+import { fatbearFriendsSteps } from "./fatbear-friends";
 import { minicatBirthdaySteps } from "./minicat-birthday";
 
 const availableGameSteps = {
   'minicat-birthday': minicatBirthdaySteps,
+  'fatbear-friends': fatbearFriendsSteps,
 };
 
 export function getSteps() {

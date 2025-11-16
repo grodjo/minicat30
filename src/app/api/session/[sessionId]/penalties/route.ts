@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionTotalPenalties } from '@/lib/game';
+import { getSessionTotalPenalties, getSessionTotalBonusTime } from '@/lib/game';
 
 export async function GET(
   request: NextRequest,
@@ -17,9 +17,11 @@ export async function GET(
     }
 
     const totalPenaltyTimeMs = await getSessionTotalPenalties(sessionId);
+    const totalBonusTimeMs = await getSessionTotalBonusTime(sessionId);
 
     return NextResponse.json({
-      totalPenaltyTimeMs
+      totalPenaltyTimeMs,
+      totalBonusTimeMs
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des pénalités:', error);

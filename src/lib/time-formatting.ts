@@ -7,12 +7,18 @@ const INITIAL_DELAY_SECONDS = 7;
  */
 export function formatTimerTime(seconds: number): string {
   const correctedSeconds = seconds - INITIAL_DELAY_SECONDS; // Take initial delay into account
-  if (correctedSeconds < 0) return '00:00:00';
-  const hours = Math.floor(correctedSeconds / 3600);
-  const minutes = Math.floor((correctedSeconds % 3600) / 60);
-  const remainingSeconds = correctedSeconds % 60;
+  
+  // Gérer les temps négatifs (rare, mais possible avec un gros bonus)
+  const isNegative = correctedSeconds < 0;
+  const absoluteSeconds = Math.abs(correctedSeconds);
+  
+  const hours = Math.floor(absoluteSeconds / 3600);
+  const minutes = Math.floor((absoluteSeconds % 3600) / 60);
+  const remainingSeconds = absoluteSeconds % 60;
 
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  
+  return isNegative ? `-${formattedTime}` : formattedTime;
 }
 
 /**
@@ -48,20 +54,27 @@ export function formatPenaltyTime(totalTimeMs: number): string {
  */
 export function formatScoreboardTime(totalTimeMs: number): string {
   const correctedSeconds = Math.floor(totalTimeMs / 1000) - INITIAL_DELAY_SECONDS; // Take initial delay into account
-  if (correctedSeconds < 0) return '0s';
-  const hours = Math.floor(correctedSeconds / 3600);
-  const minutes = Math.floor((correctedSeconds % 3600) / 60);
-  const seconds = correctedSeconds % 60;
   
+  // Gérer les temps négatifs (rare, mais possible avec un gros bonus)
+  const isNegative = correctedSeconds < 0;
+  const absoluteSeconds = Math.abs(correctedSeconds);
+  
+  const hours = Math.floor(absoluteSeconds / 3600);
+  const minutes = Math.floor((absoluteSeconds % 3600) / 60);
+  const seconds = absoluteSeconds % 60;
+  
+  let formattedTime: string;
   if (hours > 0) {
     // Format: "2h 24min" (omit minutes if 0)
-    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
+    formattedTime = minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
   } else {
     // Format: "2min 24s" (omit seconds if 0, omit minutes if 0)
     if (minutes > 0) {
-      return seconds > 0 ? `${minutes}min ${seconds}s` : `${minutes}min`;
+      formattedTime = seconds > 0 ? `${minutes}min ${seconds}s` : `${minutes}min`;
     } else {
-      return `${seconds}s`;
+      formattedTime = `${seconds}s`;
     }
   }
+  
+  return isNegative ? `-${formattedTime}` : formattedTime;
 }

@@ -6,11 +6,14 @@ import { formatTimerTime } from '@/lib/time-formatting';
 export const useTimer = (startedAt: string | null, sessionId?: string, stepName?: string) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [penaltyTime, setPenaltyTime] = useState(0);
+  const [bonusTime, setBonusTime] = useState(0);
   const [showPenaltyAnimation, setShowPenaltyAnimation] = useState(false);
+  const [showBonusAnimation, setShowBonusAnimation] = useState(false);
   const [lastPenaltyMinutes, setLastPenaltyMinutes] = useState(1);
+  const [lastBonusMinutes, setLastBonusMinutes] = useState(3);
   const [initialPenaltiesLoaded, setInitialPenaltiesLoaded] = useState(false);
 
-  // Charger les pénalités existantes depuis la base de données
+  // Charger les pénalités et bonus existants depuis la base de données
   useEffect(() => {
     if (!sessionId || initialPenaltiesLoaded) return;
 
@@ -20,6 +23,7 @@ export const useTimer = (startedAt: string | null, sessionId?: string, stepName?
         if (response.ok) {
           const data = await response.json();
           setPenaltyTime(data.totalPenaltyTimeMs || 0);
+          setBonusTime(data.totalBonusTimeMs || 0);
         }
       } catch (error) {
         console.error('Erreur lors du chargement des pénalités:', error);
@@ -38,7 +42,11 @@ export const useTimer = (startedAt: string | null, sessionId?: string, stepName?
     
     const updateTimer = () => {
       const now = Date.now();
-      const elapsed = now - startTime + penaltyTime;
+      // Appliquer le bonus comme un décalage du temps de départ
+      // Si on a gagné 3min de bonus, c'est comme si on avait commencé 3min plus tard
+      const adjustedStartTime = startTime + bonusTime;
+      const elapsed = (now - adjustedStartTime) + penaltyTime;
+      // Autoriser les valeurs négatives (cas marginal où le bonus ramène en négatif)
       setElapsedTime(elapsed);
     };
 
@@ -49,9 +57,9 @@ export const useTimer = (startedAt: string | null, sessionId?: string, stepName?
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [startedAt, penaltyTime, initialPenaltiesLoaded]);
+  }, [startedAt, penaltyTime, bonusTime, initialPenaltiesLoaded]);
 
-  // Fonction pour recharger les pénalités depuis la BDD
+  // Fonction pour recharger les pénalités et bonus depuis la BDD
   const reloadPenalties = useCallback(async () => {
     if (!sessionId) return;
     
@@ -60,6 +68,7 @@ export const useTimer = (startedAt: string | null, sessionId?: string, stepName?
       if (response.ok) {
         const data = await response.json();
         setPenaltyTime(data.totalPenaltyTimeMs || 0);
+        setBonusTime(data.totalBonusTimeMs || 0);
       }
     } catch (error) {
       console.error('Erreur lors du rechargement des pénalités:', error);
@@ -74,6 +83,17 @@ export const useTimer = (startedAt: string | null, sessionId?: string, stepName?
     // Masquer l'animation après 2 secondes
     setTimeout(() => {
       setShowPenaltyAnimation(false);
+    }, 2000);
+  }, []);
+
+  // Fonction pour déclencher seulement l'animation de bonus (utilisée quand le bonus est déjà géré côté serveur)
+  const showBonusAnimationOnly = useCallback((minutes: number = 3) => {
+    setLastBonusMinutes(minutes);
+    setShowBonusAnimation(true);
+    
+    // Masquer l'animation après 2 secondes
+    setTimeout(() => {
+      setShowBonusAnimation(false);
     }, 2000);
   }, []);
 
@@ -125,8 +145,11 @@ export const useTimer = (startedAt: string | null, sessionId?: string, stepName?
     formattedTime: formatTimerTime(elapsedSeconds),
     addTimePenalty,
     showPenaltyAnimationOnly,
+    showBonusAnimationOnly,
     reloadPenalties,
     showPenaltyAnimation,
-    lastPenaltyMinutes
+    showBonusAnimation,
+    lastPenaltyMinutes,
+    lastBonusMinutes
   };
 };

@@ -1,10 +1,11 @@
 import { prisma } from './prisma'
 import { getStepByOrder, getStepByName, getTotalSteps, isLastStep, getFinalStep, getAvailableSubSteps, getNextSubStep, TOTAL_BONUS_AVAILABLE, validateStepAnswer, validateFinalStepAnswer } from './steps-logic'
 
-// Constants pour les pénalités
+// Constants pour les pénalités et bonus
 export const HINT_PENALTY_TIME_MS = 3 * 60 * 1000; // 3 minutes
-export const WRONG_ANSWER_PENALTY_TIME_MS = 1 * 60 * 1000; // 1 minute
-export const MAX_ENIGMA_ATTEMPTS = 10;
+export const WRONG_ANSWER_PENALTY_TIME_MS = 2 * 60 * 1000; // 2 minutes
+export const BONUS_TIME_MS = 3 * 60 * 1000; // 3 minutes de bonus
+export const MAX_ENIGMA_ATTEMPTS = 5;
 
 // Création utilisateur (échoue si le pseudo existe déjà – l'erreur Prisma P2002 est gérée côté API)
 export async function createUser(pseudo: string) {
@@ -125,6 +126,7 @@ interface ScoreboardStepRow {
   stepName: string
   timeSpent: number
   penaltyTime: number
+  bonusTime: number
   bonusCorrect: boolean
 }
 interface ScoreboardRow {
@@ -149,7 +151,7 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
   })
 
   const scoreboard = sessions.map((s): ScoreboardRow => {
-    // ✅ NOUVEAU: Calcul du temps effectif de la session (durée réelle sans pénalités)
+    // ✅ NOUVEAU: Calcul du temps effectif de la session (durée réelle sans pénalités ni bonus)
     const sessionEffectiveTime = s.completedAt ? s.completedAt.getTime() - s.startedAt.getTime() : 0
     
     // ✅ NOUVEAU: Calcul des pénalités totales de la session
@@ -157,8 +159,13 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
       return sum + ss.penaltyTimeMs
     }, 0)
     
-    // ✅ NOUVEAU: Temps final de la session = temps effectif + pénalités
-    const sessionTotalTime = sessionEffectiveTime + sessionTotalPenalties
+    // ✅ NOUVEAU: Calcul du bonus time total de la session
+    const sessionTotalBonusTime = s.stepSessions.reduce((sum: number, ss): number => {
+      return sum + ss.bonusTimeMs
+    }, 0)
+    
+    // ✅ NOUVEAU: Temps final de la session = temps effectif + pénalités - bonus
+    const sessionTotalTime = sessionEffectiveTime + sessionTotalPenalties - sessionTotalBonusTime
     
     const totalBonusCorrect = s.stepSessions.reduce((sum: number, ss): number => {
       return sum + (ss.isBonusCorrect ? 1 : 0)
@@ -172,17 +179,18 @@ export async function getScoreboard(): Promise<ScoreboardRow[]> {
       totalBonusAvailable,
       completedAt: s.completedAt!,
       steps: s.stepSessions.map((ss): ScoreboardStepRow => {
-        // ✅ NOUVEAU: Calcul du temps effectif de l'étape (durée réelle sans pénalités)
+        // ✅ NOUVEAU: Calcul du temps effectif de l'étape (durée réelle sans pénalités ni bonus)
         const stepEffectiveTime = ss.completedAt && ss.startedAt ?
           ss.completedAt.getTime() - ss.startedAt.getTime() : 0
         
-        // ✅ NOUVEAU: Temps final de l'étape = temps effectif + pénalités de cette étape
-        const stepTotalTime = stepEffectiveTime + ss.penaltyTimeMs
+        // ✅ NOUVEAU: Temps final de l'étape = temps effectif + pénalités - bonus de cette étape
+        const stepTotalTime = stepEffectiveTime + ss.penaltyTimeMs - ss.bonusTimeMs
         
         return {
           stepName: isLastStep(ss.stepRank) ? 'Étape finale' : ss.stepName,
           timeSpent: stepTotalTime, // ✅ NOUVEAU: Temps total de l'étape (effectif + pénalités)
           penaltyTime: ss.penaltyTimeMs, // ✅ Pénalités pures de cette étape
+          bonusTime: ss.bonusTimeMs, // ✅ Bonus de temps gagné sur cette étape
           bonusCorrect: ss.isBonusCorrect || false
         }
       })
@@ -211,6 +219,15 @@ export async function getSessionTotalPenalties(sessionId: string): Promise<numbe
   })
   
   return result._sum.penaltyTimeMs || 0
+}
+
+export async function getSessionTotalBonusTime(sessionId: string): Promise<number> {
+  const result = await prisma.stepSession.aggregate({
+    where: { gameSessionId: sessionId },
+    _sum: { bonusTimeMs: true }
+  })
+  
+  return result._sum.bonusTimeMs || 0
 }
 
 // Nouvelles fonctions pour gérer les sous-étapes
@@ -305,6 +322,7 @@ export async function completeSubStep(
     enigmaCompletedAt?: Date;
     bonusAttemptedAt?: Date;
     isBonusCorrect?: boolean;
+    bonusTimeMs?: number;
     keyCompletedAt?: Date;
     collectedKey?: string;
     currentSubStep?: string;
@@ -336,6 +354,10 @@ export async function completeSubStep(
     case 'bonus':
       updateData.bonusAttemptedAt = now
       updateData.isBonusCorrect = data?.isCorrect || false
+      // Si le bonus est correct, ajouter le temps de bonus
+      if (data?.isCorrect) {
+        updateData.bonusTimeMs = BONUS_TIME_MS
+      }
       // Trouve la prochaine sous-étape disponible
       const nextAfterBonus = getNextSubStep(step, 'bonus');
       if (nextAfterBonus) updateData.currentSubStep = nextAfterBonus;

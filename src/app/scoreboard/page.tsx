@@ -29,6 +29,8 @@ interface ScoreboardEntry {
     timeSpentMs: number;
     penaltyTime: string;
     penaltyTimeMs: number;
+    bonusTime: string;
+    bonusTimeMs: number;
     bonusCorrect: boolean;
   }[];
 }
@@ -93,9 +95,7 @@ export default function ScoreboardPage() {
               🏆 CLASSEMENT
             </h1>
             <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50 mb-4"></div>
-            <p className="text-lg text-violet-200/80 font-medium">
-              Classement par temps total final
-            </p>
+            
           </div>
 
           {scoreboard.length === 0 ? (
@@ -140,7 +140,7 @@ export default function ScoreboardPage() {
                         {entry.pseudo}
                       </h3>
                       <div className="flex items-center gap-2 justify-between text-lg">
-                        <span className="text-orange-300 font-bold">
+                        <span className="text-white font-bold">
                           🏁 {formatScoreboardTime(entry.totalTimeMs)}
                         </span>
                         <span className="text-green-300 font-semibold">
@@ -170,23 +170,23 @@ export default function ScoreboardPage() {
                         <div className="space-y-4">
                           <div className="flex justify-between items-center">
                             <span className="text-yellow-300 text-lg">⏱️ Temps effectif :</span>
-                            <span className="text-yellow-300 font-semibold text-lg">{formatScoreboardTime(entry.totalTimeMs - entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}</span>
+                            <span className="text-yellow-300 font-semibold text-lg">{formatScoreboardTime(entry.totalTimeMs - entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0) + entry.steps.reduce((sum, step) => sum + step.bonusTimeMs, 0))}</span>
                           </div>
                           {entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0) > 0 && (
                             <div className="flex justify-between items-center">
                               <span className="text-red-300 text-lg">⚠️ Pénalités :</span>
-                              <span className="text-red-300 font-semibold text-lg">{formatPenaltyTime(entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}</span>
+                              <span className="text-red-300 font-semibold text-lg">+{formatPenaltyTime(entry.steps.reduce((sum, step) => sum + step.penaltyTimeMs, 0))}</span>
+                            </div>
+                          )}
+                          {entry.steps.reduce((sum, step) => sum + step.bonusTimeMs, 0) > 0 && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-green-300 text-lg">🧠 Bonus :</span>
+                              <span className="text-green-300 font-semibold text-lg">-{formatPenaltyTime(entry.steps.reduce((sum, step) => sum + step.bonusTimeMs, 0))}</span>
                             </div>
                           )}
                           <div className="flex justify-between items-center border-t border-violet-300/30 pt-4">
-                            <span className="text-orange-300 text-xl font-bold">🏁 Temps final :</span>
-                            <span className="text-orange-300 font-bold text-2xl">{formatScoreboardTime(entry.totalTimeMs)}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-violet-300 text-xl">🧠 Questions bonus :</span>
-                            <span className="text-green-300 font-bold text-2xl">
-                              {entry.totalBonusCorrect}/{entry.totalBonusAvailable}
-                            </span>
+                            <span className="text-white text-xl font-bold">🏁 Temps final :</span>
+                            <span className="text-white font-bold text-2xl">{formatScoreboardTime(entry.totalTimeMs)}</span>
                           </div>
                         </div>
                       </div>
@@ -204,29 +204,31 @@ export default function ScoreboardPage() {
                               key={`${entry.pseudo}-step-${index}`}
                               className="bg-white/5 rounded-xl p-6 border border-violet-300/10"
                             >
-                              <div className="flex justify-between items-center mb-4">
+                              <div className="flex justify-between items-center mb-6">
                                 <span className="font-medium text-violet-100 text-xl">
                                   {stepDisplay}
                                 </span>
-                                {step.stepName !== "Étape finale" && (
-                                  <span className={`flex items-center gap-2 font-semibold text-lg ${step.bonusCorrect ? 'text-green-400' : 'text-orange-400'}`}>
-                                    {step.bonusCorrect ? '🧠 ✅' : '🧠 ❌'}
-                                  </span>
-                                )}
+                                <span className="text-white font-bold text-xl">
+                                  {formatScoreboardTime(step.timeSpentMs)}
+                                </span>
                               </div>
-                              <div className="space-y-2">
-                                <div className="flex justify-between gap-4 text-base">
-                                  <span className="text-yellow-300 text-left">
-                                    ⏱️ {formatScoreboardTime(step.timeSpentMs - step.penaltyTimeMs)}
-                                  </span>
-                                  {step.penaltyTimeMs > 0 && (
-                                    <span className="text-red-300 text-left">
-                                      ⚠️ {formatPenaltyTime(step.penaltyTimeMs)}
-                                    </span>
-                                  )}
-                                  <span className="text-orange-300 font-bold text-left">
-                                    🏁 {formatScoreboardTime(step.timeSpentMs)}
-                                  </span>
+                              
+                              {/* Grid 3 colonnes sur 2 lignes */}
+                              <div className="grid grid-cols-3 gap-3">
+                                {/* Ligne 1 : Émojis */}
+                                <div className="text-center text-2xl">⏱️</div>
+                                <div className="text-center text-2xl">⚠️</div>
+                                <div className="text-center text-2xl">🧠</div>
+                                
+                                {/* Ligne 2 : Temps */}
+                                <div className="text-center text-yellow-300 font-semibold text-base">
+                                  {formatScoreboardTime(step.timeSpentMs - step.penaltyTimeMs + step.bonusTimeMs)}
+                                </div>
+                                <div className="text-center text-red-300 font-semibold text-base">
+                                  {step.penaltyTimeMs > 0 ? `+${formatPenaltyTime(step.penaltyTimeMs)}` : '-'}
+                                </div>
+                                <div className="text-center text-green-300 font-semibold text-base">
+                                  {step.bonusTimeMs > 0 ? `-${formatPenaltyTime(step.bonusTimeMs)}` : '-'}
                                 </div>
                               </div>
                             </div>

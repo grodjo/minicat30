@@ -97,9 +97,12 @@ const QuizPage = () => {
   const { 
     formattedTime: elapsedTime, 
     showPenaltyAnimationOnly,
+    showBonusAnimationOnly,
     reloadPenalties,
-    showPenaltyAnimation, 
-    lastPenaltyMinutes 
+    showPenaltyAnimation,
+    showBonusAnimation,
+    lastPenaltyMinutes,
+    lastBonusMinutes
   } = useTimer(
     sessionInfo?.startedAt || null, 
     sessionId, 
@@ -357,6 +360,10 @@ const QuizPage = () => {
         // Jouer le son approprié selon le type de question (sauf pour les clés)
         if (stepData.subStepData.type === 'bonus') {
           playSound(SoundName.AIR_HORN_WIN); // airHornWin pour bonus réussi
+          // Déclencher l'animation de bonus (gain de temps)
+          showBonusAnimationOnly(3);
+          // Recharger les pénalités/bonus depuis la BDD après l'ajout côté serveur
+          await reloadPenalties();
         } else if (stepData.subStepData.type === 'enigma' || stepData.subStepData.type === 'final') {
           playSound(SoundName.DBZ_KI_BLAST); // dbzKiBlast pour énigme réussie
         } else if (stepData.subStepData.type === 'direction') {
@@ -669,7 +676,9 @@ const QuizPage = () => {
         <Timer 
           elapsedTime={elapsedTime}
           showPenaltyAnimation={showPenaltyAnimation}
+          showBonusAnimation={showBonusAnimation}
           penaltyMinutes={lastPenaltyMinutes}
+          bonusMinutes={lastBonusMinutes}
           size="large"
           className="justify-center"
         />

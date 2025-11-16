@@ -48,6 +48,7 @@ model StepSession {
   enigmaAttemptsCount Int @default(0) // Nombre de tentatives pour l'énigme
   bonusAttemptedAt DateTime?
   isBonusCorrect Boolean?
+  bonusTimeMs Int @default(0) // Temps de bonus gagné (en ms) - 3 minutes si correct
   keyCompletedAt DateTime?
   collectedKey String? // La clé trouvée dans cette étape
   

@@ -19,6 +19,8 @@ export async function GET() {
         timeSpentMs: step.timeSpent,
         penaltyTime: formatTime(step.penaltyTime),
         penaltyTimeMs: step.penaltyTime,
+        bonusTime: formatTime(step.bonusTime),
+        bonusTimeMs: step.bonusTime,
         bonusCorrect: step.bonusCorrect
       }))
     }));

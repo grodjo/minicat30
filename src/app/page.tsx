@@ -235,10 +235,10 @@ const Home = () => {
                 {hasActiveSession ? `Ravie de vous revoir ${pseudo} !` : `Bienvenue à vous ${pseudo} !`}
               </DialogTitle>
               <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full"></div>
-              <DialogDescription className="text-violet-200/80 text-center text-lg md:text-xl leading-relaxed px-6 font-semibold mb-4">
+              <div className="text-violet-200/80 text-center text-lg md:text-xl leading-relaxed px-6 font-semibold mb-4">
                 {hasActiveSession 
-                  ? (<div><p>Vous avez une partie en cours 🔥</p><p>Ce bouton vous permet de reprendre où vous en étiez mais le chronomètre a continué à défiler sans vous 😉</p><p>Bonne continuation !</p></div>)
-                  : (<div>
+                  ? (<><p>Vous avez une partie en cours 🔥</p><p>Ce bouton vous permet de reprendre où vous en étiez mais le chronomètre a continué à défiler sans vous 😉</p><p>Bonne continuation !</p></>)
+                  : (<>
                       <p>J&apos;espère que vous êtes en forme 🔥</p>
                       <br/>
                       <p>Ce bouton vous donnera accès à la première étape du jeu et déclenchera le chronomètre ⏱️</p>
@@ -246,9 +246,9 @@ const Home = () => {
                       <p>Soyez rapides, soyez observateurs, soyez malins, soyez beaux 🤩</p>
                       <br/>
                       <p>Bonne chance 🍀</p>
-                    </div>)
+                    </>)
                 }
-              </DialogDescription>
+              </div>
             </DialogHeader>
             
             {/* Bouton classique en bas de la modale */}

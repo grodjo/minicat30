@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { useTimer } from '@/hooks/use-timer';
 import confetti from 'canvas-confetti';
 import { playSound, SoundName } from '@/lib/sounds';
-import { formatScoreboardTime } from '@/lib/time-formatting';
 
 // Composants
 import { QuizHeader } from '@/components/quiz/QuizHeader';
@@ -65,11 +64,10 @@ const QuizPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [completedSessionData, setCompletedSessionData] = useState<{
-    totalTime: string;
-    effectiveTime: string;
-    penaltyTime: string;
-    bonusCorrect: number;
-    bonusTotal: number;
+    totalTimeMs: number;
+    effectiveTimeMs: number;
+    penaltyTimeMs: number;
+    bonusTimeMs: number;
   } | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
   const [isStepEntering, setIsStepEntering] = useState(false);
@@ -231,13 +229,12 @@ const QuizPage = () => {
       if (response.ok) {
         const data = await response.json();
         
-        // Formater les données pour le composant CompletedState
+        // Passer les valeurs Ms directement (comme dans le scoreboard)
         const formattedData = {
-          totalTime: formatScoreboardTime(data.totalTimeMs),
-          effectiveTime: formatScoreboardTime(data.effectiveTimeMs),
-          penaltyTime: `${Math.round(data.penaltyTimeMs / (60 * 1000))}min`, // Conversion simple en minutes
-          bonusCorrect: data.bonusStats.successCount,
-          bonusTotal: data.bonusStats.totalCount
+          totalTimeMs: data.totalTimeMs,
+          effectiveTimeMs: data.effectiveTimeMs,
+          penaltyTimeMs: data.penaltyTimeMs,
+          bonusTimeMs: data.bonusTimeMs || 0
         };
         
         setCompletedSessionData(formattedData);
@@ -246,11 +243,10 @@ const QuizPage = () => {
       console.error('Error loading completed session data:', error);
       // En cas d'erreur, utiliser des données par défaut
       setCompletedSessionData({
-        totalTime: '--',
-        effectiveTime: '--',
-        penaltyTime: '--',
-        bonusCorrect: 0,
-        bonusTotal: 0
+        totalTimeMs: 0,
+        effectiveTimeMs: 0,
+        penaltyTimeMs: 0,
+        bonusTimeMs: 0
       });
     }
   };

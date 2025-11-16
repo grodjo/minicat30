@@ -206,7 +206,7 @@ export const fatbearFriendsSteps: Step[] = [
     enigma: {
       question: "Qui a sculpté l'unique statue visible dans les arènes ?",
       acceptedAnswers: ["Mortillet"],
-      hints: ["Il faut le prénom et le nom"]
+      hints: ["Les plus flemmards regarderont directement les photos sur Google Maps 😂"]
     },
     bonus: {
       question: "En ces temps barbares, quel emoji aurait ordonné la mise à mort d'un gladiateur ?",
@@ -223,7 +223,7 @@ export const fatbearFriendsSteps: Step[] = [
     name: "09",
     direction: {
       instruction: "Dernier arrêt au point culminant de la montagne la plus proche",
-      hints: ["\"Aux grands hommes la patrie reconnaissante\""],
+      hints: ["Il s'agit bien de la montagne Sainte Geneviève", "\"Aux grands hommes la patrie reconnaissante\""],
       acceptedAnswers: ["Le Panthéon", "La place du Panthéon"]
     },
     moving: "Bon courage pour l'ascension jusqu'au Panthéon !\n\n🥾\nAccélérez dans le dénivelé pour faire la différence",
@@ -247,7 +247,7 @@ export const fatbearFriendsSteps: Step[] = [
     stepRank: 10,
     name: "FINAL",
     enigma: {
-      question: "Tournez vous vers la bibliothèque Sainte Geneviève!\n\n Avec l'aide de toutes vos clés et de l'exemple, déterminez le mot de la fin !\n\n🤩\nIndice gratuit : \"comme votre performance aujourd'hui\"",
+      question: "Tournez vous vers la bibliothèque Sainte Geneviève!\n\n À l'aide de vos clés et de l'exemple, trouvez le mot de la fin !\n\n🤩\nIndice gratuit : \"comme votre performance aujourd'hui\"",
       acceptedAnswers: ["grandiose"],
       strictMode: true,
       hints: []

@@ -33,7 +33,9 @@ export async function POST(
 
     if (isCorrect) {
       // Marquer la sous-étape comme complétée
-      await completeSubStep(sessionId, stepName, subStepType, { isCorrect: true });
+      // Pour les clés, passer la réponse dans les données
+      const dataToPass = subStepType === 'key' ? { isCorrect: true, key: answer } : { isCorrect: true };
+      await completeSubStep(sessionId, stepName, subStepType, dataToPass);
 
       // Vérifier si toutes les étapes sont terminées
       const nextStepData = await getCurrentStepWithSubStep(sessionId);

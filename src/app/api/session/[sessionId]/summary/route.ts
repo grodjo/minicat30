@@ -26,8 +26,11 @@ export async function GET(request: Request, context: { params: Promise<{ session
     // ✅ NOUVEAU: Calculer le temps de pénalité total depuis les stepSessions (en millisecondes)
     const totalPenaltyMs = gameSession.stepSessions.reduce((sum, ss) => sum + ss.penaltyTimeMs, 0);
 
-    // ✅ NOUVEAU: Calculer le temps total final (effectif + pénalités) comme dans le scoreboard
-    const totalTimeMs = effectiveTimeMs + totalPenaltyMs;
+    // ✅ NOUVEAU: Calculer le temps de bonus total depuis les stepSessions (en millisecondes)
+    const totalBonusMs = gameSession.stepSessions.reduce((sum, ss) => sum + ss.bonusTimeMs, 0);
+
+    // ✅ NOUVEAU: Calculer le temps total final (effectif + pénalités - bonus) comme dans le scoreboard
+    const totalTimeMs = effectiveTimeMs + totalPenaltyMs - totalBonusMs;
 
     // Calculer les statistiques des questions bonus
     const bonusSteps = gameSession.stepSessions.filter(ss => ss.bonusAttemptedAt !== null);
@@ -44,6 +47,7 @@ export async function GET(request: Request, context: { params: Promise<{ session
       totalTimeMs,
       effectiveTimeMs,
       penaltyTimeMs: totalPenaltyMs,
+      bonusTimeMs: totalBonusMs,
       enigmaAttempts: totalEnigmaAttempts,
       bonusStats: {
         successCount: bonusSuccessCount,

@@ -23,7 +23,7 @@ export const Timer = ({
     ? 'text-4xl font-black px-4 py-4 rounded-2xl border-2 w-68' // Largeur fixe pour le grand timer
     : 'text-sm font-semibold px-3 py-2 rounded-full border w-28'; // Largeur fixe pour le petit timer
     
-  const animationIndicatorSize = size === 'large' ? 'text-4xl -top-8' : 'text-3xl -left-16';
+  const animationIndicatorSize = size === 'large' ? 'text-4xl -bottom-8' : 'text-3xl -bottom-10';
 
   return (
     <div className={`relative flex items-center ${className}`}>

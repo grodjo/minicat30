@@ -13,6 +13,7 @@ interface SubStepProps {
   isStepEntering: boolean;
   children?: ReactNode;
   bottomContent: ReactNode;
+  hideStepName?: boolean; // Nouvelle prop pour masquer le titre de l'étape et son séparateur
   transitionOverlay?: {
     show: boolean;
     message: string;
@@ -31,6 +32,7 @@ export const SubStep = ({
   isStepEntering,
   children,
   bottomContent,
+  hideStepName = false,
   transitionOverlay
 }: SubStepProps) => {
   // Mémoiser les GIFs aléatoires pour éviter qu'ils changent à chaque re-render
@@ -52,17 +54,6 @@ export const SubStep = ({
           transitionOverlay.fadeOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
         }`}>
           <div className="text-center space-y-6 max-w-md mx-auto px-4">
-            {/* GIF qui rebondit */}
-            <div className="flex justify-center">
-              <video
-                src={transitionOverlay.success ? successGif : failGif}
-                autoPlay
-                loop
-                muted
-                className="w-64 h-64 rounded-lg object-cover"
-              />
-            </div>
-            
             {/* Message principal */}
             <div className="flex items-center justify-center gap-3">
               <h2 className={`text-4xl font-bold transition-all duration-300 ${
@@ -101,6 +92,17 @@ export const SubStep = ({
                 ? 'bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-green-400/50' 
                 : 'bg-gradient-to-r from-transparent via-red-400 to-transparent shadow-red-400/50'
             } ${transitionOverlay.fadeOut ? 'animate-none' : 'animate-pulse'}`}></div>
+            
+            {/* GIF qui rebondit */}
+            <div className="flex justify-center">
+              <video
+                src={transitionOverlay.success ? successGif : failGif}
+                autoPlay
+                loop
+                muted
+                className="w-64 h-64 rounded-lg object-cover"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -112,13 +114,15 @@ export const SubStep = ({
         isStepEntering ? 'animate-question-bounce-in' : 
         'opacity-100 transform translate-y-0'
       }`}>
-        {/* Titre de l'étape */}
-        <div className="text-center mb-8">
-          <h2 className="text-lg font-bold text-violet-200/90 tracking-wider mb-3">
-            {stepName}
-          </h2>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50"></div>
-        </div>
+        {/* Titre de l'étape - masqué si hideStepName est true */}
+        {!hideStepName && (
+          <div className="text-center mb-8">
+            <h2 className="text-lg font-bold text-violet-200/90 tracking-wider mb-3">
+              {stepName}
+            </h2>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent mx-auto rounded-full shadow-lg shadow-violet-400/50"></div>
+          </div>
+        )}
 
         {/* Indicateur de type */}
         <div className="text-center mb-6">

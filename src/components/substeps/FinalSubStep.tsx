@@ -44,7 +44,7 @@ export const FinalSubStep = ({
   };
 
   const bodyContent = (
-    <div className="text-center mb-6 space-y-4">
+    <div className="text-center space-y-4">
       {/* Bouton pour voir les clés collectées */}
       <div className="flex justify-center mb-4">
         <CollectedKeysModal sessionId={sessionId} />
@@ -99,6 +99,7 @@ export const FinalSubStep = ({
       isCorrectAnswer={isCorrectAnswer}
       isStepEntering={isStepEntering}
       bottomContent={bottomContent}
+      hideStepName={true}
       transitionOverlay={transitionOverlay}
     >
       {bodyContent}

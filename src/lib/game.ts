@@ -464,16 +464,20 @@ export async function addHintPenalty(sessionId: string, stepName: string) {
 }
 
 export async function getCollectedKeys(sessionId: string): Promise<string[]> {
+  // Récupérer toutes les étapes de la session sauf l'étape finale
   const stepSessions = await prisma.stepSession.findMany({
     where: { 
-      gameSessionId: sessionId,
-      collectedKey: { not: null }
+      gameSessionId: sessionId
     },
-    select: { collectedKey: true },
+    select: { 
+      collectedKey: true,
+      stepRank: true
+    },
     orderBy: { stepRank: 'asc' }
   })
 
+  // Filtrer l'étape finale et retourner les clés (chaîne vide si pas collectée)
   return stepSessions
-    .map(ss => ss.collectedKey)
-    .filter((key): key is string => key !== null)
+    .filter(ss => !isLastStep(ss.stepRank))
+    .map(ss => ss.collectedKey || '')
 }

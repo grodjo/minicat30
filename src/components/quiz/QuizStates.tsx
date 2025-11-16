@@ -4,6 +4,18 @@ import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { playSound, SoundName } from '@/lib/sounds';
 import Image from 'next/image';
+import { formatScoreboardTime } from '@/lib/time-formatting';
+
+// Helper function to format penalty time with hours
+function formatPenaltyTime(penaltyMs: number): string {
+  const totalMinutes = Math.round(penaltyMs / (60 * 1000));
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return minutes > 0 ? `${hours}h${minutes}min` : `${hours}h`;
+  }
+  return `${totalMinutes}min`;
+}
 
 interface LoadingStateProps {
   message?: string;
@@ -23,11 +35,10 @@ export const LoadingState = ({ message = "Chargement..." }: LoadingStateProps = 
 interface CompletedStateProps {
   onGoToScoreboard: () => void;
   sessionData?: {
-    totalTime: string;
-    effectiveTime: string;
-    penaltyTime: string;
-    bonusCorrect: number;
-    bonusTotal: number;
+    totalTimeMs: number;
+    effectiveTimeMs: number;
+    penaltyTimeMs: number;
+    bonusTimeMs: number;
   };
 }
 
@@ -61,21 +72,23 @@ export const CompletedState = ({ onGoToScoreboard, sessionData }: CompletedState
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <span className="text-yellow-300 text-lg">⏱️ Temps effectif :</span>
-              <span className="text-yellow-300 font-semibold text-lg">{sessionData.effectiveTime}</span>
+              <span className="text-yellow-300 font-semibold text-lg">{formatScoreboardTime(sessionData.effectiveTimeMs)}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-red-300 text-lg">⚠️ Pénalités :</span>
-              <span className="text-red-300 font-semibold text-lg">{sessionData.penaltyTime}</span>
-            </div>
+            {sessionData.penaltyTimeMs > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-red-300 text-lg">⚠️ Pénalités :</span>
+                <span className="text-red-300 font-semibold text-lg">+{formatPenaltyTime(sessionData.penaltyTimeMs)}</span>
+              </div>
+            )}
+            {sessionData.bonusTimeMs > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-green-300 text-lg">🧠 Bonus :</span>
+                <span className="text-green-300 font-semibold text-lg">-{formatPenaltyTime(sessionData.bonusTimeMs)}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center border-t border-violet-300/30 pt-4">
-              <span className="text-orange-300 text-xl font-bold">🏁 Temps final :</span>
-              <span className="text-orange-300 font-bold text-2xl">{sessionData.totalTime}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-violet-300 text-xl">🧠 Questions bonus :</span>
-              <span className="text-green-300 font-bold text-2xl">
-                {sessionData.bonusCorrect}/{sessionData.bonusTotal}
-              </span>
+              <span className="text-white text-xl font-bold">🏁 Temps final :</span>
+              <span className="text-white font-bold text-2xl">{formatScoreboardTime(sessionData.totalTimeMs)}</span>
             </div>
           </div>
         </div>

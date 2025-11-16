@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -48,9 +47,9 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
     <Button
       variant="outline"
       size="sm"
-      className="h-10 px-4 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white border-0 shadow-md font-medium"
+      className="h-10 px-4 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white border-0 shadow-md font-medium text-base font-semibold"
     >
-      <span className="mr-2 text-lg font-semibold">🗝️</span>
+      <span className="mr-2 text-lg">🗝️</span>
       Voir les clés
     </Button>
   );
@@ -65,9 +64,6 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
           <DialogTitle className="text-center text-2xl font-bold text-white drop-shadow-lg">
             🗝️ Clés Collectées
           </DialogTitle>
-          <DialogDescription className="sr-only">
-            Liste des clés collectées pendant le quiz
-          </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
@@ -81,13 +77,17 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
               {keys.map((key, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-center px-2 space-x-4"
+                  className="flex items-center justify-between px-4 py-2 bg-white/10 rounded-lg backdrop-blur-sm"
                 >
-                  <div className="text-white/80 text-sm font-semibold mr-4">
-                    Étape {index + 1}&nbsp;:
+                  <div className="text-white/80 text-sm font-semibold">
+                    Étape {index + 1}
                   </div>
-                  <div className="text-xl font-bold text-yellow-300 drop-shadow-md">
-                    {key}
+                  <div className="text-xl font-bold drop-shadow-md">
+                    {key ? (
+                      <span className="text-yellow-300">{key}</span>
+                    ) : (
+                      <span className="text-white/30">???</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -95,7 +95,7 @@ export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalPro
           ) : (
             <div className="text-center py-8">
               <span className="text-6xl mb-4 block">🔍</span>
-              <p className="text-white/80 font-medium text-lg">Aucune clé trouvée</p>
+              <p className="text-white/80 font-medium text-lg">Aucune étape trouvée</p>
             </div>
           )}
         </div>

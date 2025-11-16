@@ -652,6 +652,7 @@ const QuizPage = () => {
             {...propsWithTransition}
             question={stepData.subStepData.question!}
             onSubmit={handleAnswerSubmit}
+            sessionId={sessionId}
             attemptsCount={stepData.stepSession.enigmaAttemptsCount}
             maxAttempts={10}
           />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,27 +10,39 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { steps } from '../../game-steps';
 
 interface CollectedKeysModalProps {
+  sessionId: string;
   trigger?: React.ReactNode;
 }
 
-export const CollectedKeysModal = ({ trigger }: CollectedKeysModalProps) => {
+export const CollectedKeysModal = ({ sessionId, trigger }: CollectedKeysModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [keys, setKeys] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Récupérer les clés directement depuis les étapes (première valeur acceptedAnswers)
-  const getCollectedKeys = () => {
-    return steps
-      .filter(step => step.key && step.key.acceptedAnswers && step.key.acceptedAnswers.length > 0)
-      .map((step, index) => ({
-        stepIndex: index + 1,
-        stepName: step.name,
-        key: step.key!.acceptedAnswers![0] // Première valeur de acceptedAnswers
-      }));
+  // Charger les clés depuis l'API quand le modal s'ouvre
+  const loadKeys = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/session/${sessionId}/keys`);
+      if (response.ok) {
+        const data = await response.json();
+        setKeys(data.keys || []);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des clés:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const keysData = getCollectedKeys();
+  useEffect(() => {
+    if (isOpen && sessionId) {
+      loadKeys();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, sessionId]);
 
   const defaultTrigger = (
     <Button
@@ -59,18 +71,23 @@ export const CollectedKeysModal = ({ trigger }: CollectedKeysModalProps) => {
         </DialogHeader>
         
         <div className="py-4">
-          {keysData.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p className="text-white/80 font-medium">Chargement...</p>
+            </div>
+          ) : keys.length > 0 ? (
             <div className="space-y-2">
-              {keysData.map((keyInfo, index) => (
+              {keys.map((key, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-center px-2 space-x-4"
                 >
                   <div className="text-white/80 text-sm font-semibold mr-4">
-                    Étape {keyInfo.stepName === 'FINAL' ? 'finale' : keyInfo.stepName}&nbsp;:
+                    Étape {index + 1}&nbsp;:
                   </div>
                   <div className="text-xl font-bold text-yellow-300 drop-shadow-md">
-                    {keyInfo.key}
+                    {key}
                   </div>
                 </div>
               ))}

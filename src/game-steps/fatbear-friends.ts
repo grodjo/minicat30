@@ -71,17 +71,17 @@ export const fatbearFriendsSteps: Step[] = [
     },
     moving: "En avant vers le village Saint-Paul !\n\n😬\nVous ferez les galeries et les boutiques un autre jour",
     enigma: {
-      question: "Un bistrot se cache dans l'une des cours.\nEn observant sa carte, sur quel plat Célia se serait-elle forcément précipitée ?",
-      acceptedAnswers: ["Burger", "Hamburger"],
+      question: "Un bistrot se cache dans l'une des cours.\nQue commanderiez-vous pour assouvir une petite envie de japonais ?",
+      acceptedAnswers: ["Tempura", "Tempuras"] ,
       hints: [
-        "Elle n'aurait pas lu la carte bien longtemps",
-        "C'est un plat ma foi très complet comprenant des féculents, de la viande, des crudités et un laitage",
+        "C'est une petite envie, une entrée suffira",
+        "Une petite envie de fruit de mer aussi",
       ],
 
     },
     bonus: {
-      question: "De quelle ville cette délicate spécialité culinaire tire-t-elle son nom ?",
-      acceptedAnswers: ["Hambourg", "Hamburg"],
+      question: "Tout le monde a déjà décortiqué des crevettes, avec plus ou moins de finesse...\nMais avez-vous retenu le nombre de paire de pattes qu'elles possèdent ?",
+      acceptedAnswers: ["cinq", "5"],
       strictMode: true
     },
     key: {
@@ -93,7 +93,7 @@ export const fatbearFriendsSteps: Step[] = [
     stepRank: 4,
     name: "04",
     direction: {
-      instruction: "Retour ensuite sur les bancs de l'école du coin, sous la supervision du roi des francs !",
+      instruction: "Retour ensuite sur les bancs de l'école, sous la supervision du roi des francs !",
       hints: [
         "Roi des francs mais aussi fils de Pépin le Bref",
       ],
@@ -109,8 +109,8 @@ export const fatbearFriendsSteps: Step[] = [
       ]
     },
     bonus: {
-      question: "Des serpents sculptés dans la pierre, de l'eau, des canalisations ? Mais que dirait Harry dans cette situation ?",
-      acceptedAnswers: ["Ouvre toi", "Ouvre", "Open"]
+      question: "Des serpents sculptés, de l'eau, des canalisations, ça aurait pu être l'entrée de la Chambre des Secrets !\n\nQuel fantôme aide justement Harry à trouver cette entrée ?",
+      acceptedAnswers: ["Mimi Geignarde", "Geignarde", "Moaning Myrtle", "Myrtle"],
     },
     key: {
       description: "Le chiffre clé correspond au nombre de poteaux oranges dans cette rue.",
@@ -165,7 +165,7 @@ export const fatbearFriendsSteps: Step[] = [
       strictMode: true
     },
     key: {
-      description: "Celui a donné son nom à l'île dont vous foulez le sol avait le chiffre clé comme numéro de règne",
+      description: "Celui qui a donné son nom à l'île dont vous foulez le sol avait le chiffre clé comme numéro de règne",
       acceptedAnswers: ["9"]
     }
   },
